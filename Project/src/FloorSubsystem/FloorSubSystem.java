@@ -44,13 +44,15 @@ public class FloorSubSystem implements Runnable{
         return null;
     }
 
-    private void send(byte[] data){
 
+    // send method called by scheduler: return byte[] to scheduler.
+    public byte[] send(){
+        return null;
     }
 
-    private byte[] receive(){
-
-        return null;
+    // receive method called by scheduler: save message from scheduler to var.
+    public void receive(byte[] message){
+        // process message from scheduler
     }
 
 }

@@ -30,6 +30,7 @@ public class Floor {
 
     }
 
+    // An elevator reached the floor: turn off button light.
     public void reached(){
 
     }
