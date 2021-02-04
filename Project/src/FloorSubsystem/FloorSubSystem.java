@@ -7,7 +7,7 @@ public class FloorSubSystem implements Runnable{
     private byte[] requestedDir;
     private Floor[] floors;
 
-    private FileLoader instructionFile;
+    public FileLoader instructionFile;
 
     public FloorSubSystem(int maxFloor) throws Exception{
         // Error checking
