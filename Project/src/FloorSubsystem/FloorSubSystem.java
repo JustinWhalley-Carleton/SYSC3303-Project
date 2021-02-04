@@ -1,5 +1,6 @@
 package FloorSubsystem;
 
+import Scheduler.Scheduler;
 public class FloorSubSystem implements Runnable{
     // Constants
     private final int MIN_FLOOR;
@@ -9,7 +10,7 @@ public class FloorSubSystem implements Runnable{
 
     public FileLoader instructionFile;
 
-    public FloorSubSystem(int maxFloor) throws Exception{
+    public FloorSubSystem(Scheduler scheduler,int maxFloor) throws Exception{
         // Error checking
         if (maxFloor <= 1){
             throw new Exception("incompatible setting: maxFloor should be higher than 2.");
