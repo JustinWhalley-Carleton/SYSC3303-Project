@@ -32,12 +32,21 @@ public class Elevator implements Runnable{
 		return null;
 	}
 	
+<<<<<<< HEAD
 	public void send() {
 		scheduler.elevatorAddRequest(1, "Going up");
 	}
 	
 	public void recieve(byte[] info) {
 		scheduler.elevatorCheckRequest(floorSelection);
+=======
+	public byte[] send() {
+		scheduler.elevatorAddRequest(Integer(1), curFloor);
+	}
+	
+	public void recieve(byte[] info) {
+		scheduler.elevatorCheckRequest(Integer(1), curFloor);
+>>>>>>> 368c2170a6f0aba1552c4a96ac5fa7d5715d54a2
 	}
 	
 	private void openDoor() {
