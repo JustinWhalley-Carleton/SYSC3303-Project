@@ -88,9 +88,9 @@ public class Test {
 	 * generate the data for the file. Floor and carButton are random integers and the time increments by 30 seconds each time
 	 */
 	private void generateData() {
-		LocalTime referenceTime = LocalTime.now().plus(1, ChronoUnit.MINUTES);
+		LocalTime referenceTime = LocalTime.now().plus(10, ChronoUnit.SECONDS);
 		for(int i = 0; i < ROWS; i++) {
-			String temp = (referenceTime.plus(30*i,ChronoUnit.SECONDS)).toString();
+			String temp = (referenceTime.plus(10*i,ChronoUnit.SECONDS)).toString();
 			time[i] = temp;
 			floor[i] = rand.nextInt(10);
 			carButton[i] = rand.nextInt(10);
