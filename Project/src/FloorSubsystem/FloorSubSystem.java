@@ -1,6 +1,7 @@
 package FloorSubsystem;
-
 import Scheduler.Scheduler;
+import java.time.LocalTime;
+
 public class FloorSubSystem implements Runnable{
     // Constants
     private final int MIN_FLOOR;
@@ -8,6 +9,7 @@ public class FloorSubSystem implements Runnable{
     private byte[] requestedDir;
     private Floor[] floors;
 
+    private Scheduler scheduler;
     //    private SchedulerSubsystem scheduler;
     public FileLoader instructionFile;
     // current Time of the system
@@ -27,6 +29,8 @@ public class FloorSubSystem implements Runnable{
             floors[f] = new Floor(f, f == MIN_FLOOR, f == MAX_FLOOR);
         }
 
+        // Save scheduler
+        this.scheduler = scheduler;
         // Init instruction reader
         instructionFile = new FileLoader();
     }
@@ -36,7 +40,7 @@ public class FloorSubSystem implements Runnable{
         boolean instructionSent = false;
 
         // init current time based on time set on first instruction
-        curTime = instructionFile.getTime();
+//        curTime = instructionFile.getTime();
 
         while (true) {
             // send instruction if needed
@@ -45,9 +49,9 @@ public class FloorSubSystem implements Runnable{
                 nextInstruction();
             } else {
                 // compare time stamp
-                if (curTime.isAfter(instructionFile.getTime())) {
+                if (curTime.now().isAfter(instructionFile.getTime())) {
                     // send it now
-                    send(instructionFile.toString());
+                    send();
                     instructionSent = true;
                 }
             }
@@ -82,17 +86,20 @@ public class FloorSubSystem implements Runnable{
 
 
     // send method: send data to scheduler.
-    public void send(String data) {
-
-//        scheduler.AddRequest(Integer(1), data);
+    public void send() {
+        scheduler.floorAddRequest(instructionFile.departFloor(),
+                                    instructionFile.toString());
     }
 
     // receive method: save message from scheduler.
-    public byte[] receive() {
+    public void receive() {
         // process message from scheduler
-
-//        System.out.println(scheduler.checkRequest(Integer(1));
-        return null;
+        for (int i = 0; i < MAX_FLOOR; ++i){
+            String message = scheduler.floorCheckRequest(i);
+            if(message != null){
+                System.out.println("Floor received message: " + message);
+            }
+        }
     }
 
 }
