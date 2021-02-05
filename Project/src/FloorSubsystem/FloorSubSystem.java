@@ -15,7 +15,7 @@ public class FloorSubSystem implements Runnable{
     // current Time of the system
     public LocalTime curTime;
 
-    public FloorSubSystem(Scheduler scheduler,int maxFloor) throws Exception{
+    public FloorSubSystem(Scheduler scheduler, int maxFloor) throws Exception{
         // Error checking
         if (maxFloor <= 1) {
             throw new Exception("incompatible setting: maxFloor should be higher than 2.");
@@ -24,8 +24,9 @@ public class FloorSubSystem implements Runnable{
         // Init floors
         this.MIN_FLOOR = 1;
         this.MAX_FLOOR = maxFloor;
+
         floors = new Floor[MAX_FLOOR];
-        for (int f = 1; f <= maxFloor; ++maxFloor) {
+        for (int f = 0; f < maxFloor; ++f) {
             floors[f] = new Floor(f, f == MIN_FLOOR, f == MAX_FLOOR);
         }
 
@@ -44,9 +45,9 @@ public class FloorSubSystem implements Runnable{
         while (true) {
             // send instruction if needed
             if (instructionSent) {
+                instructionSent = !instructionFile.hasNextInstruction();
                 // read instruction
                 nextInstruction();
-                instructionSent = false;
             } else {
                 // compare time stamp
                 if (curTime.now().isAfter(instructionFile.getTime())) {

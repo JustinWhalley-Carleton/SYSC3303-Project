@@ -28,7 +28,7 @@ public class FileLoader {
         this.nextLine();
     }
 
-    private boolean hasNextInstruction(){
+    public boolean hasNextInstruction(){
         return !endOfFile && scanner.hasNextLine();
     }
 
