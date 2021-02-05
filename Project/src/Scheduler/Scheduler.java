@@ -28,17 +28,16 @@ public class Scheduler {
      * @return message for the elevator sub system
      */
     public synchronized String elevatorCheckRequest(Integer num) {
-        while (messageForElevator.get(num) == null) {
-            try {
-                wait();
-            } catch (InterruptedException e) {
-                return null;
-            }
-        }
-        String message = messageForElevator.get(num);
-        messageForElevator.remove(num);
-        notifyAll();
-        return message;
+    	
+    	if (messageForElevator.get(num) == null) {
+    		return null;
+    	}
+    	else {
+    		String message = messageForElevator.get(num);
+            messageForElevator.remove(num);
+            return message;
+    	}
+       
         
     }
  
@@ -63,18 +62,15 @@ public class Scheduler {
      * @return message for the floor sub system
      */
     public synchronized String floorCheckRequest(Integer num) {
-    	while (messageForFloor.get(num) == null) {
-            try {
-                wait();
-            } catch (InterruptedException e) {
-                return null;
-            }
-        }
-        String message = messageForFloor.get(num);
-        messageForFloor.remove(num);
-        notifyAll();
-        return message;
-        
+    	if (messageForFloor.get(num) == null) {
+    		return null;
+    	} else {
+    		String message = messageForFloor.get(num);
+            messageForFloor.remove(num);
+            return message;
+    	}
+    	
+    	
     }
     
     
