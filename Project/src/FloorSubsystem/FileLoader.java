@@ -51,7 +51,7 @@ public class FileLoader {
     }
 
     public LocalTime getTime(){
-        System.out.println(lineSplit[0]);
+//        System.out.println(lineSplit[0]);
         return LocalTime.parse(lineSplit[0], DateTimeFormatter.ISO_TIME);
     }
 

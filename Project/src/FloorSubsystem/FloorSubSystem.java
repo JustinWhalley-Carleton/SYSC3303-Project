@@ -36,7 +36,6 @@ public class FloorSubSystem implements Runnable{
     }
 
     public void run() {
-        nextInstruction();
         boolean instructionSent = false;
 
         // init current time based on time set on first instruction
