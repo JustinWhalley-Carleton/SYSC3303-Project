@@ -1,10 +1,12 @@
 Group Number: 5
 
-Group Members:
-Justin Whalley #101117127
-Yisheng Li #101028686
-Yixiang Huang #101071528
-Gurjit Gill #101110071
+Breakdown of responsibilities:
+
+Justin Whalley #101117127:   Test
+Yisheng Li     #101028686:   Scheduler	
+Yixiang Huang  #101071528:   FloorSubSystem
+Gurjit Gill    #101110071:   ElevatorSubsystem
+Everyone: 	            UML
 
 
 
