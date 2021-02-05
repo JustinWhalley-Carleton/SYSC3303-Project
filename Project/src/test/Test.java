@@ -9,6 +9,8 @@ import java.io.IOException;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Random;
+
+import ElevatorSubsystem.Elevator;
 import Scheduler.Scheduler;
 import FloorSubsystem.FloorSubSystem;
 //import ElevatorSubsystem.ElevatorSubsystem;
@@ -39,9 +41,9 @@ public class Test {
 		createFile();
 		scheduler = new Scheduler();
 		floorSubsystem = new Thread(new FloorSubSystem(scheduler, FLOORS), "Producer");
-//		elevatorSubsystem = new Thread(new ElevatorSubsystem(scheduler), "Consumer");
+		elevatorSubsystem = new Thread(new Elevator(scheduler), "Consumer");
 		floorSubsystem.start();
-//		elevatorSubsystem.start();
+		elevatorSubsystem.start();
 	}
 	/**
 	 * @param args

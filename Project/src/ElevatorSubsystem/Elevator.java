@@ -21,7 +21,7 @@ public class Elevator implements Runnable{
 		this.curFloor = 0;
 		this.doorStatus = true;
 		
-		scheduler = new Scheduler();
+		this.scheduler = scheduler;
 	}
 	
 	public void selectFloor(int floor) {
@@ -51,7 +51,22 @@ public class Elevator implements Runnable{
 	@Override
 	public void run() {
 		// TODO Auto-generated method stub
-		
+		while (true) {
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+
+			send();
+
+			for (int i = 0; i < 10; ++i){
+				String message = scheduler.elevatorCheckRequest(i);
+				if(message != null){
+					System.out.println("Elevator received message: " + message);
+				}
+			}
+		}
 	}
 	
 }
