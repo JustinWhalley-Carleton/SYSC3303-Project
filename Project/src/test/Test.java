@@ -11,7 +11,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.Random;
 import Scheduler.Scheduler;
 import FloorSubsystem.FloorSubSystem;
-import ElevatorSubsystem.ElevatorSubsystem;
+//import ElevatorSubsystem.ElevatorSubsystem;
 /**
  * Create a file of commands to test the system
  * 
@@ -35,20 +35,24 @@ public class Test {
 	/**
 	 * constructor to create the file
 	 */
-	public Test() {
+	public Test() throws Exception {
 		createFile();
 		scheduler = new Scheduler();
 		floorSubsystem = new Thread(new FloorSubSystem(scheduler, FLOORS), "Producer");
-		elevatorSubsystem = new Thread(new ElevatorSubsystem(scheduler), "Consumer");
+//		elevatorSubsystem = new Thread(new ElevatorSubsystem(scheduler), "Consumer");
 		floorSubsystem.start();
-		elevatorSubsystem.start();
+//		elevatorSubsystem.start();
 	}
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-		Test test = new Test();
+		try {
+			Test test = new Test();
+		} catch (Exception e){
+			e.printStackTrace();
+		}
 	}
 
 	/**
@@ -84,10 +88,10 @@ public class Test {
 	 * generate the data for the file. Floor and carButton are random integers and the time increments by 30 seconds each time
 	 */
 	private void generateData() {
-		LocalTime referenceTime = LocalTime.now().plus(1, ChronoUnit.MINUTES);
+		LocalTime referenceTime = LocalTime.now().plus(10, ChronoUnit.SECONDS);
 		for(int i = 0; i < ROWS; i++) {
-			String temp = (referenceTime.plus(30*i,ChronoUnit.SECONDS)).toString();
-			time[i] = temp.substring(0,temp.length() - 8);
+			String temp = (referenceTime.plus(10*i,ChronoUnit.SECONDS)).toString();
+			time[i] = temp;
 			floor[i] = rand.nextInt(10);
 			carButton[i] = rand.nextInt(10);
 			while(floor[i] == carButton[i]) {
