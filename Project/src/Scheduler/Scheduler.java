@@ -19,7 +19,6 @@ public class Scheduler {
     	System.out.println("Scheduler got request from Elevator# " + num + " request " + message );
     	requestFromElevator.put(num, message);
     	updateMessageForFloor(num);
-        notifyAll();
         return;
     }
     
@@ -53,7 +52,7 @@ public class Scheduler {
     	
     	requestFromFloor.put(num, message);
     	updateMessageForElevator(num);
-    	notifyAll();
+
     }
     
     /**

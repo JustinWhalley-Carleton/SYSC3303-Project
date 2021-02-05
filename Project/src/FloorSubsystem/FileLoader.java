@@ -7,7 +7,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Scanner;
 
 public class FileLoader {
-    private File instructionFile = new File("bin/test/testFile.txt");
+    private File instructionFile = new File("src/test/testFile.txt");
     private Scanner scanner;
 
     private boolean endOfFile;
@@ -28,7 +28,7 @@ public class FileLoader {
         this.nextLine();
     }
 
-    private boolean hasNextInstruction(){
+    public boolean hasNextInstruction(){
         return !endOfFile && scanner.hasNextLine();
     }
 
@@ -51,6 +51,7 @@ public class FileLoader {
     }
 
     public LocalTime getTime(){
+//        System.out.println(lineSplit[0]);
         return LocalTime.parse(lineSplit[0], DateTimeFormatter.ISO_TIME);
     }
 
