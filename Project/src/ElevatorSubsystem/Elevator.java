@@ -1,9 +1,6 @@
 package ElevatorSubsystem;
 import Scheduler.Scheduler;
 
-/**
- * 
- */
 
 /**
  * @author Gill
@@ -53,19 +50,17 @@ public class Elevator implements Runnable{
 		// TODO Auto-generated method stub
 		while (true) {
 			try {
-				Thread.sleep(1000);
+				Thread.sleep(5000);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
 
 			send();
-
-			for (int i = 0; i < 10; ++i){
-				String message = scheduler.elevatorCheckRequest(i);
-				if(message != null){
-					System.out.println("Elevator received message: " + message);
-				}
+			String message = scheduler.elevatorCheckRequest(1);
+			if(message != null){
+				System.out.println("Elevator received message: " + message);
 			}
+	
 		}
 	}
 	
