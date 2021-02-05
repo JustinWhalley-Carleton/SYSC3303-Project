@@ -38,13 +38,6 @@ public class Elevator implements Runnable{
 	
 	public void recieve(byte[] info) {
 		scheduler.elevatorCheckRequest(floorSelection);
-
-	public byte[] send() {
-		scheduler.elevatorAddRequest(Integer(1), curFloor);
-	}
-	
-	public void recieve(byte[] info) {
-		scheduler.elevatorCheckRequest(Integer(1), curFloor);
 	}
 	
 	private void openDoor() {
