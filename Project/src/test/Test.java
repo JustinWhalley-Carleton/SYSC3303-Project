@@ -9,7 +9,9 @@ import java.io.IOException;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Random;
-
+import Scheduler.Scheduler;
+import FloorSubsystem.FloorSubSystem;
+import ElevatorSubsystem.ElevatorSubsystem;
 /**
  * Create a file of commands to test the system
  * 
@@ -27,12 +29,19 @@ public class Test {
 	private String[] dir = new String[ROWS];
 	private int[] floor = new int[ROWS];
 	private int[] carButton = new int[ROWS];
+	private Scheduler scheduler;
+	private Thread floorSubsystem, elevatorSubsystem;
 	
 	/**
 	 * constructor to create the file
 	 */
 	public Test() {
 		createFile();
+		scheduler = new Scheduler();
+		floorSubsystem = new Thread(new FloorSubSystem(scheduler, FLOORS), "Producer");
+		elevatorSubsystem = new Thread(new ElevatorSubsystem(scheduler), "Consumer");
+		floorSubsystem.start();
+		elevatorSubsystem.start();
 	}
 	/**
 	 * @param args

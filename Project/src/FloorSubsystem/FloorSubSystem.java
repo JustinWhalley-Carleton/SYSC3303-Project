@@ -1,8 +1,7 @@
 package FloorSubsystem;
 
-import java.time.LocalTime;
-
-public class FloorSubSystem implements Runnable {
+import Scheduler.Scheduler;
+public class FloorSubSystem implements Runnable{
     // Constants
     private final int MIN_FLOOR;
     private final int MAX_FLOOR;
@@ -14,7 +13,7 @@ public class FloorSubSystem implements Runnable {
     // current Time of the system
     public LocalTime curTime;
 
-    public FloorSubSystem(int maxFloor) throws Exception {
+    public FloorSubSystem(Scheduler scheduler,int maxFloor) throws Exception{
         // Error checking
         if (maxFloor <= 1) {
             throw new Exception("incompatible setting: maxFloor should be higher than 2.");
