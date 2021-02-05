@@ -6,7 +6,12 @@ Yisheng Li #101028686
 Yixiang Huang #101071528
 Gurjit Gill #101110071
 
-Running Instruction:   Run Project/src/test/Test.java
+
+
+Running Instruction:   
+
+-Import Project
+-Run Project/src/test/Test.java
 
 FloorSubsystem:
 	- FileLoader.java
