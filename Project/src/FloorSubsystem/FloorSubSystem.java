@@ -12,8 +12,6 @@ public class FloorSubSystem implements Runnable{
     private Scheduler scheduler;
     //    private SchedulerSubsystem scheduler;
     public FileLoader instructionFile;
-    // current Time of the system
-    public LocalTime curTime;
 
     public FloorSubSystem(Scheduler scheduler, int maxFloor) throws Exception{
         // Error checking
@@ -50,7 +48,7 @@ public class FloorSubSystem implements Runnable{
                 nextInstruction();
             } else {
                 // compare time stamp
-                if (curTime.now().isAfter(instructionFile.getTime())) {
+                if (LocalTime.now().isAfter(instructionFile.getTime())) {
                     // send it now
                     send();
                     instructionSent = true;
