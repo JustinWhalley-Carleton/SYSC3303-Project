@@ -2,6 +2,11 @@ package Scheduler;
 
 import java.util.*;
 
+/**
+ * @author Yisheng Li
+ *
+ */
+
 public class Scheduler {
 	
 	private Hashtable<Integer, String> requestFromElevator = new Hashtable<Integer, String>();
@@ -36,11 +41,8 @@ public class Scheduler {
             messageForElevator.remove(num);
             return message;
     	}
-       
-        
     }
  
-    
     
     /**
      * 
@@ -57,7 +59,6 @@ public class Scheduler {
     
     /**
      * 
-     * 
      * @return message for the floor sub system
      */
     public synchronized String floorCheckRequest(Integer num) {
@@ -68,11 +69,8 @@ public class Scheduler {
             messageForFloor.remove(num);
             return message;
     	}
-    	
-    	
     }
-    
-    
+        
     /**
      * Update message for floor sub system. i.e. schedule for floors
      *
@@ -80,7 +78,7 @@ public class Scheduler {
     
     public void updateMessageForFloor(Integer num) {
     	messageForFloor.put(num, requestFromElevator.get(num));
-		System.out.println("Finished updating schedule");
+		System.out.println("Finished updating schedule for floors");
 	}
     
     /**
@@ -90,9 +88,8 @@ public class Scheduler {
     
     public void updateMessageForElevator(Integer num) {
     	messageForElevator.put(num, requestFromFloor.get(num));
-		System.out.println("Finished updating schedule");
+		System.out.println("Finished updating schedule for elevators ");
 	}
-    
    
     
 }
