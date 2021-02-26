@@ -91,15 +91,20 @@ public class FloorSubSystem implements Runnable{
         // turn on up/ down button correspondingly
         int departureFloor = instructionFile.departFloor();
 
-        floors[departureFloor - 1].register(instructionFile.requestUp());
+        // Error check
+        if(MIN_FLOOR <= departureFloor && departureFloor <= MAX_FLOOR){
+            // Register corresponding button
+            floors[departureFloor - 1].register(instructionFile.requestUp());
+        }else{
+            // Unexpected floor in instruction, ignore.
+            System.out.println("WARNING! Departure floor " + departureFloor + " out of range!");
+            return;
+        }
 
-        // send request to scheduler
+        // encode and send request to scheduler
         byte[] message = Common.encodeFloor(departureFloor, instructionFile.requestUp());
 
-//        scheduler.floorAddRequest(message);
-
-        scheduler.floorAddRequest(instructionFile.departFloor(),
-                                    instructionFile.toString());
+        scheduler.floorAddRequest(message);
     }
 
 
@@ -110,11 +115,17 @@ public class FloorSubSystem implements Runnable{
 
         int[] decodeMsg = Common.decode(message);
 
-        int floor = decodeMsg[1];
+        int arrivalFloor = decodeMsg[1];
         boolean dismissUp = decodeMsg[2] != 0;
 
-        // turn off up/ down light
-        floors[floor - 1].reached(dismissUp);
+        if(MIN_FLOOR <= arrivalFloor && arrivalFloor <= MAX_FLOOR) {
+            // Elevator reached requested floor
+            floors[arrivalFloor - 1].reached(dismissUp);
+        }else{
+            // Unexpected floor received, ignore.
+            System.out.println("WARNING! Arrival floor " + arrivalFloor + " out of range!");
+            return;
+        }
 
     }
 

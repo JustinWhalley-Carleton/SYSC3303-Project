@@ -21,7 +21,7 @@ public class Floor {
         this.IS_MAX_FLOOR = isMaxFloor;
 
         // Init floor buttons
-        this.BUTTON_UP   = isMaxFloor  ? null : new FloorButton();
+        this.BUTTON_UP = isMaxFloor  ? null : new FloorButton();
         this.BUTTON_DN = isBaseFloor ? null : new FloorButton();
 
     }
