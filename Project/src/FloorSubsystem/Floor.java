@@ -26,13 +26,24 @@ public class Floor {
 
     }
 
-    public void register(){
-
+    // Push button
+    public void register(boolean up){
+        if (up){
+            BUTTON_UP.turnOn();
+        }
+        else{
+            BUTTON_DN.turnOn();
+        }
     }
 
     // An elevator reached the floor: turn off button light.
-    public void reached(){
-
+    public void reached(boolean up){
+        if (up){
+            BUTTON_UP.turnOff();
+        }
+        else{
+            BUTTON_DN.turnOff();
+        }
     }
 
 }

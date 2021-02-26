@@ -1,5 +1,7 @@
 package FloorSubsystem;
 import Scheduler.Scheduler;
+import common.Common;
+
 import java.time.LocalTime;
 
 public class FloorSubSystem implements Runnable{
@@ -49,8 +51,8 @@ public class FloorSubSystem implements Runnable{
             } else {
                 // compare time stamp
                 if (LocalTime.now().isAfter(instructionFile.getTime())) {
-                    // send it now
-                    send();
+                    // read instruction now
+                    readInstruction();
                     instructionSent = true;
                 }
             }
@@ -85,20 +87,35 @@ public class FloorSubSystem implements Runnable{
 
 
     // send method: send data to scheduler.
-    public void send() {
+    public void readInstruction() {
+        // turn on up/ down button correspondingly
+        int departureFloor = instructionFile.departFloor();
+
+        floors[departureFloor - 1].register(instructionFile.requestUp());
+
+        // send request to scheduler
+        byte[] message = Common.encodeFloor(departureFloor, instructionFile.requestUp());
+
+//        scheduler.floorAddRequest(message);
+
         scheduler.floorAddRequest(instructionFile.departFloor(),
                                     instructionFile.toString());
     }
 
+
     // receive method: save message from scheduler.
     public void receive() {
         // process message from scheduler
-        for (int i = 0; i < MAX_FLOOR; ++i){
-            String message = scheduler.floorCheckRequest(i);
-            if(message != null){
-                System.out.println("Floor received message: " + message);
-            }
-        }
+        byte[] message = scheduler.floorCheckRequest();
+
+        int[] decodeMsg = Common.decode(message);
+
+        int floor = decodeMsg[1];
+        boolean dismissUp = decodeMsg[2] != 0;
+
+        // turn off up/ down light
+        floors[floor - 1].reached(dismissUp);
+
     }
 
 }
