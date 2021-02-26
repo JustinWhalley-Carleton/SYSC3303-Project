@@ -61,17 +61,21 @@ public class Common {
 	}
 	
 	/**
-	 * encode the data in the form: 2(for scheduler), 127(seperator), floor to go to, 127(seperator)
+	 * encode the data in the form: 2(for scheduler), 127(seperator), elevt#, 127(seperator), floor# (shared by floor and elevt), 127(seperator), floor button to dismiss 0(up) or 1(down), 127(seperator)
 	 * 
-	 * @param floor
+	 * @param elevt, floor, dir
 	 * @return message to send
 	 */
-	public static byte[] encodeScheduler(int floor) {
-		byte[] msg = new byte[4];
+	public static byte[] encodeScheduler(int elevt, int floor, int dir) {
+		byte[] msg = new byte[8];
 		msg[0] = (byte)2;
 		msg[1] = (byte)127;
-		msg[2] = (byte)floor;
+		msg[2] = (byte)elevt;
 		msg[3] = (byte)127;
+		msg[4] = (byte)floor;
+		msg[5] = (byte)127;
+		msg[6] = (byte)dir;
+		msg[7] = (byte)127;
 		return msg;
 	}
 	
