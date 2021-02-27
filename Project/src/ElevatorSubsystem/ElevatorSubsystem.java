@@ -25,8 +25,8 @@ public class ElevatorSubsystem implements Runnable{
 	private void send(byte[] info) {
 		//scheduler.elevatorAddRequest(1, "Going up");
 		
-		byte[] outgoingMsg = Common.encodeElevator(0, 0, null, 0);
-		scheduler.elevtSubAddMsg(outgoingMsg);
+		//byte[] outgoingMsg = Common.encodeElevator(0, 0, null, 0);
+		scheduler.elevtSubAddMsg(info);
 	}
 	
 	private void receive(byte[] receivedMsg) {
@@ -37,6 +37,7 @@ public class ElevatorSubsystem implements Runnable{
 		int floor = decodedMsg[1];
 		
 		elevator.addDest(floor);
+		send(Common.encodeElevator(1, floor, new Idle(), floor));
 	}
 
 	@Override
