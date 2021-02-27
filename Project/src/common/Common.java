@@ -129,7 +129,7 @@ public class Common {
 	}
 	
 	/**
-	 * decode scheduler message. return in the form index 0: floor
+	 * decode scheduler message. return in the form index 0: elevator number, index 1: floor, index 2: direction
 	 * 
 	 * @param msg
 	 * @return int[] containing decoded data

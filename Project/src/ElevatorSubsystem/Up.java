@@ -13,7 +13,7 @@ public class Up implements MotorState{
 	private boolean doorOpen;
 	double accelerateTime = 2.27;
 	double decelerateTime = 2.27;
-	double timePerFloor = 1.736;
+	protected double timePerFloor = 1.736;
 	private boolean moving = false;
 	private int state = 0;
 	

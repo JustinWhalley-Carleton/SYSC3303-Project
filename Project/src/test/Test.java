@@ -40,7 +40,7 @@ public class Test {
 	 */
 	public Test() throws Exception {
 		createFile();
-		scheduler = new Scheduler();
+		scheduler = new Scheduler(1,1);
 		floorSubsystem = new Thread(new FloorSubSystem(scheduler, FLOORS), "Producer");
 		elevatorSubsystem = new Thread(new Elevator(scheduler), "Consumer");
 		floorSubsystem.start();
@@ -104,10 +104,10 @@ public class Test {
 		for(int i = 0; i < ROWS; i++) {
 			String temp = (referenceTime.plus(10*i,ChronoUnit.SECONDS)).toString();
 			time[i] = temp;
-			floor[i] = rand.nextInt(10);
-			carButton[i] = rand.nextInt(10);
+			floor[i] = rand.nextInt(9)+1;
+			carButton[i] = rand.nextInt(9)+1;
 			while(floor[i] == carButton[i]) {
-				carButton[i] = rand.nextInt(10);
+				carButton[i] = rand.nextInt(9)+1;
 			}
 			if(floor[i] > carButton[i]) {
 				dir[i] = DOWN;
