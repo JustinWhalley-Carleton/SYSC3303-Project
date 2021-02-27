@@ -10,6 +10,7 @@ import common.*;
 
 public class Scheduler {
 
+	private int inState = 0; // 0 is wait; 1 is sending; -1 is receiving  
 	private ElevtState[] elevtStates; // also is the state of the scheduler
 	private FloorState[] floorStates;
 	private Queue<byte[]>   msgToElevtSub, msgToFloorSub;
@@ -42,9 +43,10 @@ public class Scheduler {
      * @param msg The message sent by the elevator subsystem.
      */
     public void elevtSubAddMsg (byte[] msg) {
+    	this.inState = -1;
     	int[] message = Common.decode(msg);
 		
-    	System.out.println("\nScheduler got message from elevtSub: " + Arrays.toString(message));
+    	System.out.println("Scheduler got message from elevtSub: " + Arrays.toString(message));
 	
 		
 		int elevt = message[0];
@@ -72,6 +74,7 @@ public class Scheduler {
 		}
 
     	updateSchedule();
+    	this.inState = 0;
         return;
     }
 
@@ -80,6 +83,7 @@ public class Scheduler {
 	 * @param msg The message sent by the floor subsystem.
 	 */
 	public void floorSubAddMsg (byte[] msg) {
+		this.inState = -1;
 		int[] message = Common.decode(msg);
 		System.out.println("Scheduler got message from floor sub: " + Arrays.toString(message) );
 		int floor = message[0];
@@ -92,6 +96,7 @@ public class Scheduler {
 		msgToElevtSub.offer(oneMsgToElevtSub);
 
 		updateSchedule();
+		this.inState = 0;
 		return;
 	}
 
@@ -104,7 +109,10 @@ public class Scheduler {
      * @return a message to the elevator subsystem
      */
     public byte[] elevtSubCheckMsg() {
-    	return msgToElevtSub.poll();
+    	this.inState = 1;
+    	byte[] msg = msgToElevtSub.poll();
+    	this.inState = 0;
+    	return msg;
 	}
 
 
@@ -113,7 +121,11 @@ public class Scheduler {
 	 * @return message to the floor sub system
 	 */
 	public byte[] floorSubCheckMsg() {
-		return msgToFloorSub.poll();
+    	this.inState = 1;
+    	byte[] msg = msgToFloorSub.poll();
+    	this.inState = 0;
+
+		return msg;
 	}
 
 
