@@ -27,6 +27,11 @@ class JunitTestCases {
 	static final String UP = "Up";
 	static final String DOWN = "Down";
 	
+	/**
+	 * create a new file to use as a test for file loader
+	 * 
+	 * @return string[] containing each line added to the file
+	 */
 	static String[] createFile() {
 		String[] lines = new String[ROWS];
 		int[] floor = new int[ROWS];
@@ -74,6 +79,9 @@ class JunitTestCases {
 		return lines;
 	}
 
+	/**
+	 * test the fileloader to ensure lines read properly
+	 */
 	@Test
 	void testFileReader() {
 		String[] lines = createFile();
@@ -92,6 +100,9 @@ class JunitTestCases {
 		
 	}
 	
+	/**
+	 * test the encode elevator message going up gives correct byte[]
+	 */
 	@Test
 	void testEncodeElevatorUp() {
 		int elevatorNum = 1;
@@ -109,6 +120,9 @@ class JunitTestCases {
 		assertTrue(dest == (int)msg[8], "returns correct destination floor");
 	}
 
+	/**
+	 * test the encode elevator message going Donw gives correct byte[]
+	 */
 	@Test
 	void testEncodeElevatorDown() {
 		int elevatorNum = 1;
@@ -126,6 +140,9 @@ class JunitTestCases {
 		assertTrue(dest == (int)msg[8], "returns correct destination floor");
 	}
 	
+	/**
+	 * test the encode elevator message in idle gives correct byte[]
+	 */
 	@Test
 	void testEncodeElevatorIdle() {
 		int elevatorNum = 1;
@@ -143,6 +160,9 @@ class JunitTestCases {
 		assertTrue(dest == (int)msg[8], "returns correct destination floor");
 	}
 	
+	/**
+	 * test the encode floor message up gives correct byte[]
+	 */
 	@Test
 	void testEncodeFloorUp() {
 		int floor = 5;
@@ -155,6 +175,9 @@ class JunitTestCases {
 		assertTrue(0 == (int)msg[4], "returns correct direction");
 	}
 	
+	/**
+	 * test the encode floor message down gives correct byte[]
+	 */
 	@Test
 	void testEncodeFloorDown() {
 		int floor = 5;
@@ -167,6 +190,9 @@ class JunitTestCases {
 		assertTrue(1 == (int)msg[4], "returns correct direction");
 	}
 	
+	/**
+	 * test the encode scheduler gives correct byte[]
+	 */
 	@Test
 	void testEncodeScheduler() {
 		int floor = 6;
@@ -181,6 +207,9 @@ class JunitTestCases {
 		assertTrue(dir == (int)msg[6], "returns correct direction");
 	}
 	
+	/**
+	 * test the decode elevator message going up gives correct int[]
+	 */
 	@Test
 	void testDecodeElevatorUp() {
 		int elevatorNum = 1;
@@ -200,6 +229,9 @@ class JunitTestCases {
 		assertTrue(dest == val[3], "returns the correct destination floor");
 	}
 	
+	/**
+	 * test the decode elevator message going down gives correct int[]
+	 */
 	@Test
 	void testDecodeElevatorDown() {
 		int elevatorNum = 1;
@@ -219,6 +251,9 @@ class JunitTestCases {
 		assertTrue(dest == val[3], "returns the correct destination floor");
 	}
 	
+	/**
+	 * test the decode elevator message in idle gives correct int[]
+	 */
 	@Test
 	void testDecodeElevatorIdle() {
 		int elevatorNum = 1;
@@ -238,6 +273,9 @@ class JunitTestCases {
 		assertTrue(dest == val[3], "returns the correct destination floor");
 	}
 	
+	/**
+	 * test the decode floor message up gives correct int[]
+	 */
 	@Test
 	void testDecodeFloorUp() {
 		int floor = 5;
@@ -252,6 +290,9 @@ class JunitTestCases {
 		assertTrue(0 == val[1], "returns the correct direction");
 	}
 	
+	/**
+	 * test the decode floor message down gives correct int[]
+	 */
 	@Test
 	void testDecodeFloorDown() {
 		int floor = 5;
@@ -266,6 +307,9 @@ class JunitTestCases {
 		assertTrue(1 == val[1], "returns the correct direction");
 	}
 	
+	/**
+	 * test the decode scheduler gives correct int[]
+	 */
 	@Test
 	void testDecodeScheduler() {
 		int floor = 6;
