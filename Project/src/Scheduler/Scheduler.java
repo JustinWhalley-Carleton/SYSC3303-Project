@@ -27,6 +27,9 @@ public class Scheduler {
 		floorStates = new FloorState[totalFloors];
 		msgToElevtSub = new LinkedList<byte[]>();
 		msgToFloorSub = new LinkedList<byte[]>();
+		
+		for (int i=0;i<elevtStates.length;i++) { elevtStates[i]= new ElevtState(i+1); }
+		for (int i=0;i<floorStates.length;i++) { floorStates[i]= new FloorState(i+1); }
 	}
 
 
