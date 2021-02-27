@@ -42,9 +42,11 @@ public class Scheduler {
      * @param msg The message sent by the elevator subsystem.
      */
     public void elevtSubAddMsg (byte[] msg) {
-    	System.out.println("Scheduler got message from elevt sub" );
-		int[] message = Common.decode(msg);
-
+    	int[] message = Common.decode(msg);
+		
+    	System.out.println("Scheduler got message from elevtSub: " + Arrays.toString(msg));
+	
+		
 		int elevt = message[0];
 		int floor = message[1];
 		int dir = message[2];
@@ -59,10 +61,12 @@ public class Scheduler {
 		if (dir == 0){
 			if (floor != 1) {
 				byte[] oneMsgToFloorSub = Common.encodeScheduler(1, floor,0);
+				System.out.println("Scheduler sent message to FloorSub: " +  Arrays.toString(Common.decode(oneMsgToFloorSub)));
 				msgToFloorSub.offer(oneMsgToFloorSub);
 			}
 			if (floor != floorStates.length) {
 				byte[] oneMsgToFloorSub = Common.encodeScheduler(1, floor,1);
+				System.out.println("Scheduler sent message to FloorSub: " +  Arrays.toString(Common.decode(oneMsgToFloorSub)));
 				msgToFloorSub.offer(oneMsgToFloorSub);
 			}
 		}
@@ -76,15 +80,15 @@ public class Scheduler {
 	 * @param msg The message sent by the floor subsystem.
 	 */
 	public void floorSubAddMsg (byte[] msg) {
-		System.out.println("Scheduler got message from floor sub" );
-
 		int[] message = Common.decode(msg);
-
+		System.out.println("Scheduler got message from floor sub: " + Arrays.toString(msg) );
 		int floor = message[0];
 		int dir = message[1];
 
 
 		byte[] oneMsgToElevtSub = Common.encodeScheduler(1, floor,0);
+		System.out.println("Scheduler sent message to ElevtSub: " +  Arrays.toString(Common.decode(oneMsgToElevtSub)));
+
 		msgToElevtSub.offer(oneMsgToElevtSub);
 
 		updateSchedule();
