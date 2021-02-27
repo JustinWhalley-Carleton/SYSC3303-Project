@@ -1,6 +1,7 @@
 package Scheduler;
 
 import java.util.*;
+import common.*;
 
 /**
  * @author Yisheng Li
@@ -8,88 +9,117 @@ import java.util.*;
  */
 
 public class Scheduler {
+
+	private ElevtState[] elevtStates; // also is the state of the scheduler
+	private FloorState[] floorStates;
+
+	private Queue<byte[]>   msgToElevtSub, msgToFloorSub;
 	
-	private Hashtable<Integer, String> requestFromElevator = new Hashtable<Integer, String>();
-	private Hashtable<Integer, String> requestFromFloor = new Hashtable<Integer, String>();
-	private Hashtable<Integer, String> messageForElevator = new Hashtable<Integer, String>();
-	private Hashtable<Integer, String> messageForFloor = new Hashtable<Integer, String>();
-	
+	private Common common = new Common();
+
+
+
+
+	/**
+	 * Constructor
+	 *
+	 * @param totalElevts total Elevts number
+	 * @param totalElevts total Floors number
+	 */
+	public Scheduler (int totalElevts, int totalFloors) {
+		elevtStates = new ElevtState[totalElevts];
+		floorStates = new FloorState[totalFloors];
+
+	}
+
+
+
+	// sub send:
 
     /**
-     * 
-     * @param num   which elevator
-     * @param message The message sent by the elevator object.
+	 * update
+	 *
+     * @param msg The message sent by the elevator subsystem.
      */
-    public synchronized void elevatorAddRequest(Integer num, String message) {
-    	System.out.println("Scheduler got request from Elevator# " + num + " request " + message );
-    	requestFromElevator.put(num, message);
-    	updateMessageForFloor(num);
+    public void elevtSubAddMsg (byte[] msg) {
+    	System.out.println("Scheduler got message from elevt sub" );
+		int[] message = common.decode(msg);
+
+		int elevt = message[0];
+		int floor = message[1];
+		int dir = message[2];
+		int dest = message[3];
+
+		elevtStates[elevt-1].setFloor(floor);
+		elevtStates[elevt-1].setDir(dir);
+		elevtStates[elevt-1].setDest(dest);
+
+
+    	updateSchedule();
         return;
     }
-    
-    /**
-     * 
-     * @return message for the elevator sub system
-     */
-    public synchronized String elevatorCheckRequest(Integer num) {
-    	
-    	if (messageForElevator.get(num) == null) {
-    		return null;
-    	}
-    	else {
-    		String message = messageForElevator.get(num);
-            messageForElevator.remove(num);
-            return message;
-    	}
-    }
- 
-    
-    /**
-     * 
-     * @param num   which floor
-     * @param message The message sent by the floor object.
-     */
-    public synchronized void floorAddRequest(Integer num, String message) {
-    	System.out.println("Scheduler got request from Floor# " + num + " request " + message );
-    	
-    	requestFromFloor.put(num, message);
-    	updateMessageForElevator(num);
 
-    }
-    
+	/**
+	 *
+	 * @param msg The message sent by the floor subsystem.
+	 */
+	public void floorSubAddMsg (byte[] msg) {
+		System.out.println("Scheduler got message from floor sub" );
+
+		int[] message = common.decode(msg);
+
+		int floor = message[0];
+		int dir = message[1];
+
+
+		byte[] oneMsgToElevtSub = common.encodeScheduler(1, floor,0);
+		msgToElevtSub.offer(oneMsgToElevtSub);
+
+		updateSchedule();
+		return;
+	}
+
+
+
+
+    // sub get:
     /**
      * 
-     * @return message for the floor sub system
+     * @return a message to the elevator subsystem
      */
-    public synchronized String floorCheckRequest(Integer num) {
-    	if (messageForFloor.get(num) == null) {
-    		return null;
-    	} else {
-    		String message = messageForFloor.get(num);
-            messageForFloor.remove(num);
-            return message;
-    	}
-    }
-        
-    /**
-     * Update message for floor sub system. i.e. schedule for floors
-     *
-     */
-    
-    public void updateMessageForFloor(Integer num) {
-    	messageForFloor.put(num, requestFromElevator.get(num));
-		System.out.println("Finished updating schedule for floors");
+    public byte[] elevtSubCheckMsg() {
+
+    	return msgToElevtSub.poll();
 	}
-    
-    /**
-     * Update message for floor sub system. i.e. schedule for Elevator
-     *
-     */
-    
-    public void updateMessageForElevator(Integer num) {
-    	messageForElevator.put(num, requestFromFloor.get(num));
-		System.out.println("Finished updating schedule for elevators ");
+
+
+	/**
+	 *
+	 * @return message to the floor sub system
+	 */
+	public byte[] floorSubCheckMsg() {
+
+		return msgToFloorSub.poll();
 	}
+
+
+
+
+    /**
+	 * Update elevtStates a msgToElevtSub Schedule based on all data
+	 *
+	 */
+	private void updateSchedule() {
+
+
+
+	}
+
+
+
+
+
+
    
     
 }

@@ -33,6 +33,7 @@ public class Test {
 	private int[] carButton = new int[ROWS];
 	private Scheduler scheduler;
 	private Thread floorSubsystem, elevatorSubsystem;
+	private String[] lines = new String[ROWS];
 	
 	/**
 	 * constructor to create the file
@@ -77,6 +78,7 @@ public class Test {
 			//write data to the file
 			FileWriter writer = new FileWriter(file.getAbsoluteFile());
 			for(int i = 0; i < ROWS; i++) {
+				lines[i] = time[i] + " " + Integer.toString(floor[i]) + " " + dir[i] + " " + Integer.toString(carButton[i]);
 				writer.write(time[i] + " " + Integer.toString(floor[i]) + " " + dir[i] + " " + Integer.toString(carButton[i])+"\n");
 			}
 			writer.close();
@@ -86,6 +88,14 @@ public class Test {
 		
 	}
 	
+	/**
+	 * getter for the lines added to the test file. Used for testing
+	 * 
+	 * @return String[] of lines for the file
+	 */
+	public String[] getLines() {
+		return lines;
+	}
 	/**
 	 * generate the data for the file. Floor and carButton are random integers and the time increments by 30 seconds each time
 	 */
