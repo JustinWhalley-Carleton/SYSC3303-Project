@@ -12,29 +12,31 @@ import ElevatorSubsystem.*;
 public class Common {
 
 	/**
-	 * encode the data in the form 0(for elevator), 127(seperator), current floor, 127(seperator), 1(Up) or -1(Down) or 0(Idle), 127(seperator), destination floor, 127(end file)
+	 * encode the data in the form 0(for elevator), 127(seperator), elevator number, 127(seperator), current floor, 127(seperator), 1(Up) or -1(Down) or 0(Idle), 127(seperator), destination floor, 127(end file)
 	 * 
 	 * @param curr
 	 * @param state
 	 * @param dest
 	 * @return message to send
 	 */
-	public static byte[] encodeElevator(int curr, MotorState state, int dest) {
-		byte[] msg = new byte[8];
+	public static byte[] encodeElevator(int elevatorNum, int curr, MotorState state, int dest) {
+		byte[] msg = new byte[10];
 		msg[0] = (byte)0;
 		msg[1] = (byte)127;
-		msg[2] = (byte)curr;
+		msg[2] = (byte)elevatorNum;
 		msg[3] = (byte)127;
-		if(state instanceof Up) {
-			msg[4] = (byte)1;
-		} else if (state instanceof Down) {
-			msg[4] = (byte)-1;
-		} else {
-			msg[4] = (byte)0;
-		}
+		msg[4] = (byte)curr;
 		msg[5] = (byte)127;
-		msg[6] = (byte)dest;
+		if(state instanceof Up) {
+			msg[6] = (byte)1;
+		} else if (state instanceof Down) {
+			msg[6] = (byte)-1;
+		} else {
+			msg[6] = (byte)0;
+		}
 		msg[7] = (byte)127;
+		msg[8] = (byte)dest;
+		msg[9] = (byte)127;
 		return msg;
 	}
 	
@@ -105,10 +107,11 @@ public class Common {
 	 * @return int[] containing the decoded data
 	 */
 	private static int[] decodeElevator(byte[] msg) {
-		int[] decodedMsg = new int[3];
+		int[] decodedMsg = new int[4];
 		decodedMsg[0] = (int)msg[2];
 		decodedMsg[1] = (int)msg[4];
 		decodedMsg[2] = (int)msg[6];
+		decodedMsg[3] = (int)msg[8];
 		return decodedMsg;
 	}
 	
@@ -132,8 +135,10 @@ public class Common {
 	 * @return int[] containing decoded data
 	 */
 	private static int[] decodeScheduler(byte[] msg) {
-		int[] decodedMsg = new int[1];
-		decodedMsg[0] = (int)2;
+		int[] decodedMsg = new int[3];
+		decodedMsg[0] = (int)msg[2];
+		decodedMsg[1] = (int)msg[4];
+		decodedMsg[2] = (int)msg[6];
 		return decodedMsg;
 	}
 }

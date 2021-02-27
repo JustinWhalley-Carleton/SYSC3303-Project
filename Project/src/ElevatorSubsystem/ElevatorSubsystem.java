@@ -15,7 +15,7 @@ public class ElevatorSubsystem implements Runnable{
 	/**
 	 * 
 	 */
-	public ElevatorSubsystem(Scheduler scehduler) {
+	public ElevatorSubsystem(Scheduler scheduler) {
 		// TODO Auto-generated constructor stub
 		this.scheduler = scheduler;
 	}
