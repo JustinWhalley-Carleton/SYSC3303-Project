@@ -113,6 +113,11 @@ public class FloorSubSystem implements Runnable{
         // process message from scheduler
         byte[] message = scheduler.floorSubCheckMsg();
 
+        // terminate if no message
+        if (message == null){
+            return;
+        }
+
         int[] decodeMsg = Common.decode(message);
 
         int arrivalFloor = decodeMsg[1];
