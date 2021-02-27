@@ -26,8 +26,8 @@ public class FloorSubSystem implements Runnable{
         this.MAX_FLOOR = maxFloor;
 
         floors = new Floor[MAX_FLOOR];
-        for (int f = 0; f < maxFloor; ++f) {
-            floors[f] = new Floor(f, f == MIN_FLOOR, f == MAX_FLOOR);
+        for (int f = 1; f <= maxFloor; ++f) {
+            floors[f - 1] = new Floor(f, f == MIN_FLOOR, f == MAX_FLOOR);
         }
 
         // Save scheduler
@@ -122,6 +122,8 @@ public class FloorSubSystem implements Runnable{
 
         int arrivalFloor = decodeMsg[1];
         boolean dismissUp = decodeMsg[2] != 0;
+
+        System.out.println("FLOOR: " + arrivalFloor + " Going " + (dismissUp ? "Up" : "Down"));
 
         if(MIN_FLOOR <= arrivalFloor && arrivalFloor <= MAX_FLOOR) {
             // Elevator reached requested floor
