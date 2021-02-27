@@ -44,7 +44,7 @@ public class Scheduler {
     public void elevtSubAddMsg (byte[] msg) {
     	int[] message = Common.decode(msg);
 		
-    	System.out.println("Scheduler got message from elevtSub: " + Arrays.toString(message));
+    	System.out.println("\nScheduler got message from elevtSub: " + Arrays.toString(message));
 	
 		
 		int elevt = message[0];
