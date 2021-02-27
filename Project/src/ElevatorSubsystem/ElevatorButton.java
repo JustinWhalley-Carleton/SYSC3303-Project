@@ -10,11 +10,12 @@ package ElevatorSubsystem;
  */
 public class ElevatorButton {
 	
+	//Constants
 	private int floorNum;
 	private boolean light;
 	
 	/**
-	 * 
+	 *
 	 */
 	public ElevatorButton() {
 		

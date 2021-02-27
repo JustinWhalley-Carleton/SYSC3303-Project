@@ -29,15 +29,18 @@ public class ElevatorSubsystem implements Runnable{
 		scheduler.elevtSubAddMsg(info);
 	}
 	
+	//Method receive that takes in a byte[] and then decodes it using Common.java
 	private void receive(byte[] receivedMsg) {
 		
-		int[] decodedMsg = Common.decode(receivedMsg);
+		int[] decodedMsg = Common.decode(receivedMsg);  //calls Common's decode method to receive and store int[] version of the msg
 		
-		int elevatorNum = decodedMsg[0];
+		int elevatorNum = decodedMsg[0];  //Set each index of the msg to its own variable, elevatorNum and floor
 		int floor = decodedMsg[1];
 		
-		elevator.addDest(floor);
-		send(Common.encodeElevator(1, floor, new Idle(), floor));
+		elevator.addDest(floor); //Add the received floor to the destination arraylist in elevator.java
+		
+		send(Common.encodeElevator(1, floor, new Idle(), floor));   //calls the send method to report back to the scheduler
+																	//encodes the msg into byte[] format using encode method in Common.java before sending
 	}
 
 	@Override
