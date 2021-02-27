@@ -12,12 +12,14 @@ import common.Common;
 public class ElevatorSubsystem implements Runnable{
 
 	private Scheduler scheduler;
+	private Elevator elevator;
 	/**
 	 * 
 	 */
-	public ElevatorSubsystem(Scheduler scehduler) {
+	public ElevatorSubsystem(Scheduler scheduler) {
 		// TODO Auto-generated constructor stub
 		this.scheduler = scheduler;
+		this.elevator = new Elevator(1, true);
 	}
 	
 	private void send(byte[] info) {
@@ -31,10 +33,10 @@ public class ElevatorSubsystem implements Runnable{
 		
 		int[] decodedMsg = Common.decode(receivedMsg);
 		
-		int currFloor = decodedMsg[0];
-		int direction = decodedMsg[1];
-		int destFloor = decodedMsg[2];
+		int elevatorNum = decodedMsg[0];
+		int floor = decodedMsg[1];
 		
+		elevator.addDest(floor);
 	}
 
 	@Override
@@ -42,15 +44,15 @@ public class ElevatorSubsystem implements Runnable{
 		// TODO Auto-generated method stub
 		while (true) {
 			try {
-				Thread.sleep(5000);
+				Thread.sleep(3000);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
 
-			//receive();
 			byte[] message = scheduler.elevtSubCheckMsg();
 			if(message != null){
 				System.out.println("Elevator received message: " + message);
+				receive(message);
 			}
 	
 		}
