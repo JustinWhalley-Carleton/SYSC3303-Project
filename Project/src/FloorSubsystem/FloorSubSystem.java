@@ -1,5 +1,7 @@
 package FloorSubsystem;
 import Scheduler.Scheduler;
+import common.Common;
+
 import java.time.LocalTime;
 
 public class FloorSubSystem implements Runnable{
@@ -49,8 +51,8 @@ public class FloorSubSystem implements Runnable{
             } else {
                 // compare time stamp
                 if (LocalTime.now().isAfter(instructionFile.getTime())) {
-                    // send it now
-                    send();
+                    // read instruction now
+                    readInstruction();
                     instructionSent = true;
                 }
             }
@@ -85,20 +87,46 @@ public class FloorSubSystem implements Runnable{
 
 
     // send method: send data to scheduler.
-    public void send() {
-        scheduler.floorAddRequest(instructionFile.departFloor(),
-                                    instructionFile.toString());
+    public void readInstruction() {
+        // turn on up/ down button correspondingly
+        int departureFloor = instructionFile.departFloor();
+
+        // Error check
+        if(MIN_FLOOR <= departureFloor && departureFloor <= MAX_FLOOR){
+            // Register corresponding button
+            floors[departureFloor - 1].register(instructionFile.requestUp());
+        }else{
+            // Unexpected floor in instruction, ignore.
+            System.out.println("WARNING! Departure floor " + departureFloor + " out of range!");
+            return;
+        }
+
+        // encode and send request to scheduler
+        byte[] message = Common.encodeFloor(departureFloor, instructionFile.requestUp());
+
+        scheduler.floorSubAddMsg(message);
     }
+
 
     // receive method: save message from scheduler.
     public void receive() {
         // process message from scheduler
-        for (int i = 0; i < MAX_FLOOR; ++i){
-            String message = scheduler.floorCheckRequest(i);
-            if(message != null){
-                System.out.println("Floor received message: " + message);
-            }
+        byte[] message = scheduler.floorSubCheckMsg();
+
+        int[] decodeMsg = Common.decode(message);
+
+        int arrivalFloor = decodeMsg[1];
+        boolean dismissUp = decodeMsg[2] != 0;
+
+        if(MIN_FLOOR <= arrivalFloor && arrivalFloor <= MAX_FLOOR) {
+            // Elevator reached requested floor
+            floors[arrivalFloor - 1].reached(dismissUp);
+        }else{
+            // Unexpected floor received, ignore.
+            System.out.println("WARNING! Arrival floor " + arrivalFloor + " out of range!");
+            return;
         }
+
     }
 
 }

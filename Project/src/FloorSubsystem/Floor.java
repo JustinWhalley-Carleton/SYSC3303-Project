@@ -21,18 +21,29 @@ public class Floor {
         this.IS_MAX_FLOOR = isMaxFloor;
 
         // Init floor buttons
-        this.BUTTON_UP   = isMaxFloor  ? null : new FloorButton();
+        this.BUTTON_UP = isMaxFloor  ? null : new FloorButton();
         this.BUTTON_DN = isBaseFloor ? null : new FloorButton();
 
     }
 
-    public void register(){
-
+    // Push button
+    public void register(boolean up){
+        if (up){
+            BUTTON_UP.turnOn();
+        }
+        else{
+            BUTTON_DN.turnOn();
+        }
     }
 
     // An elevator reached the floor: turn off button light.
-    public void reached(){
-
+    public void reached(boolean up){
+        if (up){
+            BUTTON_UP.turnOff();
+        }
+        else{
+            BUTTON_DN.turnOff();
+        }
     }
 
 }
