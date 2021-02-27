@@ -41,7 +41,7 @@ public class Common {
 	}
 	
 	/**
-	 * encode the data in the form: 1(floor message),127(seperator),floor clicked, 127(seperator), 0(up) or 1(down)
+	 * encode the data in the form: 1(floor message),127(seperator),floor clicked, 127(seperator), 0(down) or 1(up)
 	 * 
 	 * @param floor clicked
 	 * @param true for up, false for down
@@ -63,7 +63,7 @@ public class Common {
 	}
 	
 	/**
-	 * encode the data in the form: 2(for scheduler), 127(seperator), elevt#, 127(seperator), floor# (shared by floor and elevt), 127(seperator), floor button to dismiss 0(up) or 1(down), 127(seperator)
+	 * encode the data in the form: 2(for scheduler), 127(seperator), elevt#, 127(seperator), floor# (shared by floor and elevt), 127(seperator), floor button to dismiss 0(down) or 1(up), 127(seperator)
 	 * 
 	 * @param elevt, floor, dir
 	 * @return message to send
@@ -116,7 +116,7 @@ public class Common {
 	}
 	
 	/**
-	 * decode floor message. return in the form index 0: floor number, index 1: direction (0=up,-1=down)
+	 * decode floor message. return in the form index 0: floor number, index 1: direction 0(down) or 1(up)
 	 * 
 	 * @param msg
 	 * @return int[] containing decoded data

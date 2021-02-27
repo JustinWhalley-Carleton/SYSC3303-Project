@@ -57,11 +57,14 @@ public class Scheduler {
 
 		//if the the elevator stops on a floor, dismiss floor buttons
 		if (dir == 0){
-			byte[] oneMsgToFloorSub = Common.encodeScheduler(1, floor,0);
-			msgToFloorSub.offer(oneMsgToFloorSub);
-
-			oneMsgToFloorSub = Common.encodeScheduler(1, floor,1);
-			msgToFloorSub.offer(oneMsgToFloorSub);
+			if (floor != 1) {
+				byte[] oneMsgToFloorSub = Common.encodeScheduler(1, floor,0);
+				msgToFloorSub.offer(oneMsgToFloorSub);
+			}
+			if (floor != floorStates.length) {
+				byte[] oneMsgToFloorSub = Common.encodeScheduler(1, floor,1);
+				msgToFloorSub.offer(oneMsgToFloorSub);
+			}
 		}
 
     	updateSchedule();
