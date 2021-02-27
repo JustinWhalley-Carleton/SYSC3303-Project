@@ -26,24 +26,37 @@ public class Floor {
 
     }
 
-    // Push button
+    // Push button: turn on button light
     public void register(boolean up){
-        if (up){
-            BUTTON_UP.turnOn();
-        }
-        else{
-            BUTTON_DN.turnOn();
-        }
+        setButton(true, up);
     }
 
     // An elevator reached the floor: turn off button light.
     public void reached(boolean up){
+        setButton(false, up);
+    }
+
+    // Turn on/ off button light for current floor
+    private void setButton(boolean on, boolean up){
+        FloorButton targetButton;
+        // Check error, select button
         if (up){
-            BUTTON_UP.turnOff();
+            if (IS_MAX_FLOOR){
+                System.out.println("Warning! Max floor doesn't have up button!");
+                return;
+            }
+            targetButton = BUTTON_UP;
         }
         else{
-            BUTTON_DN.turnOff();
+            if (IS_MIN_FLOOR){
+                System.out.println("Warning! Min floor doesn't have down button!");
+                return;
+            }
+            targetButton = BUTTON_DN;
         }
+        // update button
+        if (on){ targetButton.turnOn(); }
+        else { targetButton.turnOff(); }
     }
 
 }
