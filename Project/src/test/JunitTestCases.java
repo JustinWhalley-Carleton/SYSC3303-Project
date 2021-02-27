@@ -172,7 +172,7 @@ class JunitTestCases {
 		assertTrue(msg instanceof byte[], "message is an array of bytes");
 		assertTrue(1==(int)msg[0], "Floor identifier correct");
 		assertTrue(floor == (int)msg[2], "returns correct floor");
-		assertTrue(0 == (int)msg[4], "returns correct direction");
+		assertTrue(1 == (int)msg[4], "returns correct direction");
 	}
 	
 	/**
@@ -187,7 +187,7 @@ class JunitTestCases {
 		assertTrue(msg instanceof byte[], "message is an array of bytes");
 		assertTrue(1==(int)msg[0], "Floor identifier correct");
 		assertTrue(floor == (int)msg[2], "returns correct floor");
-		assertTrue(1 == (int)msg[4], "returns correct direction");
+		assertTrue(0 == (int)msg[4], "returns correct direction");
 	}
 	
 	/**
@@ -287,7 +287,7 @@ class JunitTestCases {
 		assertTrue(val instanceof int[], "message is an array of int");
 		assertTrue(val.length == 2, "length of array is 2");
 		assertTrue(floor == val[0], "returns the correct floor");
-		assertTrue(0 == val[1], "returns the correct direction");
+		assertTrue(1 == val[1], "returns the correct direction");
 	}
 	
 	/**
@@ -304,7 +304,7 @@ class JunitTestCases {
 		assertTrue(val instanceof int[], "message is an array of int");
 		assertTrue(val.length == 2, "length of array is 2");
 		assertTrue(floor == val[0], "returns the correct floor");
-		assertTrue(1 == val[1], "returns the correct direction");
+		assertTrue(0 == val[1], "returns the correct direction");
 	}
 	
 	/**

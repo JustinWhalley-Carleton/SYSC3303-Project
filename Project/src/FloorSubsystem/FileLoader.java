@@ -46,6 +46,7 @@ public class FileLoader {
         }
         endOfFile = false;
 
+        destinations = new HashMap<Integer, ArrayList<Integer>>();
         // Call nextLine() to load the first instruction
         this.nextLine();
     }
