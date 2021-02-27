@@ -63,9 +63,9 @@ public class Common {
 	}
 	
 	/**
-	 * encode the data in the form: 2(for scheduler), 127(seperator), floor to go to, 127(seperator)
+	 * encode the data in the form: 2(for scheduler), 127(seperator), elevt#, 127(seperator), floor# (shared by floor and elevt), 127(seperator), floor button to dismiss 0(up) or 1(down), 127(seperator)
 	 * 
-	 * @param floor
+	 * @param elevt, floor, dir
 	 * @return message to send
 	 */
 	public static byte[] encodeScheduler(int elevatorNum, int floor, int dir) {
