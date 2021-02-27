@@ -12,36 +12,34 @@ import ElevatorSubsystem.*;
 public class Common {
 
 	/**
-	 * encode the data in the form 0(for elevator), 127(seperator), elevator number, 127(seperator), current floor, 127(seperator), 1(Up) or -1(Down) or 0(Idle), 127(seperator), destination floor, 127(end file)
+	 * encode the data in the form 0(for elevator), 127(seperator), current floor, 127(seperator), 1(Up) or -1(Down) or 0(Idle), 127(seperator), destination floor, 127(end file)
 	 * 
 	 * @param curr
 	 * @param state
 	 * @param dest
 	 * @return message to send
 	 */
-	public static byte[] encodeElevator(int elevatorNum, int curr, MotorState state, int dest) {
-		byte[] msg = new byte[10];
+	public static byte[] encodeElevator(int curr, MotorState state, int dest) {
+		byte[] msg = new byte[8];
 		msg[0] = (byte)0;
 		msg[1] = (byte)127;
-		msg[2] = (byte)elevatorNum;
+		msg[2] = (byte)curr;
 		msg[3] = (byte)127;
-		msg[4] = (byte)curr;
-		msg[5] = (byte)127;
 		if(state instanceof Up) {
-			msg[6] = (byte)1;
+			msg[4] = (byte)1;
 		} else if (state instanceof Down) {
-			msg[6] = (byte)-1;
+			msg[4] = (byte)-1;
 		} else {
-			msg[6] = (byte)0;
+			msg[4] = (byte)0;
 		}
+		msg[5] = (byte)127;
+		msg[6] = (byte)dest;
 		msg[7] = (byte)127;
-		msg[8] = (byte)dest;
-		msg[9] = (byte)127;
 		return msg;
 	}
 	
 	/**
-	 * encode the data in the form: 1(floor message),127(seperator),floor clicked, 127(seperator), 0(up) or 1(down), 127(seperator)
+	 * encode the data in the form: 1(floor message),127(seperator),floor clicked, 127(seperator), 0(up) or 1(down)
 	 * 
 	 * @param floor clicked
 	 * @param true for up, false for down
@@ -68,11 +66,11 @@ public class Common {
 	 * @param elevt, floor, dir
 	 * @return message to send
 	 */
-	public static byte[] encodeScheduler(int elevatorNum, int floor, int dir) {
+	public static byte[] encodeScheduler(int elevt, int floor, int dir) {
 		byte[] msg = new byte[8];
 		msg[0] = (byte)2;
 		msg[1] = (byte)127;
-		msg[2] = (byte) elevatorNum;
+		msg[2] = (byte)elevt;
 		msg[3] = (byte)127;
 		msg[4] = (byte)floor;
 		msg[5] = (byte)127;
@@ -101,17 +99,16 @@ public class Common {
 	}
 	
 	/**
-	 * decode an elevator message. return in form of index 0: elevator number, index 1: current floor, index 2: direction (1 = up,0=Idle,-1=down),index 3: destination floor
+	 * decode an elevator message. return in form of index 0: current floor, index 1: direction (1 = up,0=Idle,-1=down),index 2: destination floor
 	 * 
 	 * @param msg
 	 * @return int[] containing the decoded data
 	 */
 	private static int[] decodeElevator(byte[] msg) {
-		int[] decodedMsg = new int[4];
+		int[] decodedMsg = new int[3];
 		decodedMsg[0] = (int)msg[2];
 		decodedMsg[1] = (int)msg[4];
 		decodedMsg[2] = (int)msg[6];
-		decodedMsg[3] = (int)msg[8];
 		return decodedMsg;
 	}
 	
@@ -135,10 +132,8 @@ public class Common {
 	 * @return int[] containing decoded data
 	 */
 	private static int[] decodeScheduler(byte[] msg) {
-		int[] decodedMsg = new int[3];
-		decodedMsg[0] = (int)msg[2];
-		decodedMsg[1] = (int)msg[4];
-		decodedMsg[2] = (int)msg[6];
+		int[] decodedMsg = new int[1];
+		decodedMsg[0] = (int)2;
 		return decodedMsg;
 	}
 }
