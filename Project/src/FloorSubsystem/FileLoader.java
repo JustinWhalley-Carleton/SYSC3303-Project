@@ -27,6 +27,20 @@ public class FileLoader {
         // Call nextLine() to load the first instruction
         this.nextLine();
     }
+    
+    public FileLoader(String fileName) throws Exception{
+    	instructionFile = new File("src/test/"+fileName);
+        try {
+            scanner = new Scanner(instructionFile);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            endOfFile = true;
+        }
+        endOfFile = false;
+
+        // Call nextLine() to load the first instruction
+        this.nextLine();
+    }
 
     public boolean hasNextInstruction(){
         return !endOfFile && scanner.hasNextLine();
