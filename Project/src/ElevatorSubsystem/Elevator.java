@@ -42,6 +42,7 @@ public class Elevator {
 		}
 		System.out.println("IN IDLE");
 		removeFloor(floor);
+		curFloor = floor;
 	}
 	
 	public void removeFloor(int floor) {
