@@ -10,11 +10,29 @@ import common.*;
 
 public class Scheduler {
 
-	private ElevtState[] elevtStates;
-	private Queue<byte[]>  msgToElevtSub, msgToFloorSub;
+	private ElevtState[] elevtStates; // also is the state of the scheduler
+	private FloorState[] floorStates;
+
+	private Queue<byte[]>   msgToElevtSub, msgToFloorSub;
 	
 	private Common common = new Common();
-			
+
+
+
+
+	/**
+	 * Constructor
+	 *
+	 * @param totalElevts total Elevts number
+	 * @param totalElevts total Floors number
+	 */
+	public Scheduler (int totalElevts, int totalFloors) {
+		elevtStates = new ElevtState[totalElevts];
+		floorStates = new FloorState[totalFloors];
+
+	}
+
+
 
 	// sub send:
 
@@ -32,12 +50,11 @@ public class Scheduler {
 		int dir = message[2];
 		int dest = message[3];
 
+		elevtStates[elevt-1].setFloor(floor);
+		elevtStates[elevt-1].setDir(dir);
+		elevtStates[elevt-1].setDest(dest);
 
 
-		elevtStates[]
-
-
-		//msgFromElevtSub.offer(msg);
     	updateSchedule();
         return;
     }
@@ -48,7 +65,16 @@ public class Scheduler {
 	 */
 	public void floorSubAddMsg (byte[] msg) {
 		System.out.println("Scheduler got message from floor sub" );
-		//msgFromFloorSub.offer(msg);
+
+		int[] message = common.decode(msg);
+
+		int floor = message[0];
+		int dir = message[1];
+
+
+		byte[] oneMsgToElevtSub = common.encodeScheduler(1, floor,0);
+		msgToElevtSub.offer(oneMsgToElevtSub);
+
 		updateSchedule();
 		return;
 	}
@@ -84,7 +110,9 @@ public class Scheduler {
 	 *
 	 */
 	private void updateSchedule() {
-		while()
+
+
+
 	}
 
 

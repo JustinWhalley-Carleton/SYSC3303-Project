@@ -8,7 +8,7 @@ package Scheduler;
 public class ElevtState {
 	private int number; 
 	private int floor;
-	private Direction dir;
+	private int dir; // 1(Up) or -1(Down) or 0(Idle)
 	private int dest;
 	
 	
@@ -21,7 +21,7 @@ public class ElevtState {
 	public ElevtState (int number) {
 		this.number = number;
 		this.floor = 1;
-		this.dir = Direction.IDLE;
+		this.dir = 0;
 		this.dest = 1;
 
 	}
@@ -51,7 +51,7 @@ public class ElevtState {
 	 * 
 	 * @return the direction the elevator is moving
 	 */
-	public Direction getDir() {
+	public int getDir() {
 		return this.dir;
 	}
 
@@ -82,7 +82,7 @@ public class ElevtState {
 	 * 
 	 * @param dir  the direction the elevator is moving
 	 */
-	public void setDir(Direction dir) { this.dir = dir; }
+	public void setDir(int dir) { this.dir = dir; }
 
 
 	/**
