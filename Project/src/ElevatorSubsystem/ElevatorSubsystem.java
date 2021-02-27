@@ -23,8 +23,8 @@ public class ElevatorSubsystem implements Runnable{
 	private void send(byte[] info) {
 		//scheduler.elevatorAddRequest(1, "Going up");
 		
-		byte[] outgoingMsg = Common.encodeElevator(0, null, 0);
-		scheduler.elevatorAddRequest(outgoingMsg);
+		byte[] outgoingMsg = Common.encodeElevator(0, 0, null, 0);
+		scheduler.elevtSubAddMsg(outgoingMsg);
 	}
 	
 	private void receive(byte[] receivedMsg) {
@@ -48,7 +48,7 @@ public class ElevatorSubsystem implements Runnable{
 			}
 
 			//receive();
-			byte[] message = scheduler.elevatorCheckRequest();
+			byte[] message = scheduler.elevtSubCheckMsg();
 			if(message != null){
 				System.out.println("Elevator received message: " + message);
 			}
