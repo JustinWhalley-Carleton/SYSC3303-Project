@@ -44,7 +44,7 @@ public class Scheduler {
     public void elevtSubAddMsg (byte[] msg) {
     	int[] message = Common.decode(msg);
 		
-    	System.out.println("Scheduler got message from elevtSub: " + Arrays.toString(msg));
+    	System.out.println("Scheduler got message from elevtSub: " + Arrays.toString(message));
 	
 		
 		int elevt = message[0];
@@ -81,7 +81,7 @@ public class Scheduler {
 	 */
 	public void floorSubAddMsg (byte[] msg) {
 		int[] message = Common.decode(msg);
-		System.out.println("Scheduler got message from floor sub: " + Arrays.toString(msg) );
+		System.out.println("Scheduler got message from floor sub: " + Arrays.toString(message) );
 		int floor = message[0];
 		int dir = message[1];
 
