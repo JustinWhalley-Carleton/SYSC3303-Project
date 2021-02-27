@@ -44,7 +44,7 @@ public class Common {
 	 * encode the data in the form: 1(floor message),127(seperator),floor clicked, 127(seperator), 0(down) or 1(up)
 	 * 
 	 * @param floor clicked
-	 * @param true for up, false for down
+	 * @param dir true for up, false for down
 	 * @return message to send
 	 */
 	public static byte[] encodeFloor(int floor, boolean dir) {
@@ -53,11 +53,7 @@ public class Common {
 		msg[1] = (byte)127;
 		msg[2] = (byte)floor;
 		msg[3] = (byte)127;
-		if(dir) {
-			msg[4]=(byte)0;
-		} else {
-			msg[4] = (byte)1;
-		}
+		msg[4] = dir ? (byte) 1 : (byte) 0;
 		msg[5]=(byte)127;
 		return msg;
 	}
