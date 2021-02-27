@@ -104,14 +104,14 @@ public class FloorSubSystem implements Runnable{
         // encode and send request to scheduler
         byte[] message = Common.encodeFloor(departureFloor, instructionFile.requestUp());
 
-        scheduler.floorAddRequest(message);
+        scheduler.floorSubAddMsg(message);
     }
 
 
     // receive method: save message from scheduler.
     public void receive() {
         // process message from scheduler
-        byte[] message = scheduler.floorCheckRequest();
+        byte[] message = scheduler.floorSubCheckMsg();
 
         int[] decodeMsg = Common.decode(message);
 
