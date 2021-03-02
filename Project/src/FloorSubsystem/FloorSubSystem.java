@@ -123,7 +123,7 @@ public class FloorSubSystem implements Runnable{
         int arrivalFloor = decodeMsg[1];
         boolean dismissUp = decodeMsg[2] != 0;
 
-        System.out.println("FLOOR: " + arrivalFloor + " Going " + (dismissUp ? "Up" : "Down"));
+        System.out.println("FLOOR: " + arrivalFloor + " Going " + (dismissUp ? "Up" : "Down") + " @ time = " + LocalTime.now());
 
         if(MIN_FLOOR <= arrivalFloor && arrivalFloor <= MAX_FLOOR) {
             // Elevator reached requested floor
