@@ -4,11 +4,13 @@
 package test;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Random;
+import java.util.Scanner;
 
 import ElevatorSubsystem.ElevatorSubsystem;
 import Scheduler.Scheduler;
@@ -22,23 +24,31 @@ import FloorSubsystem.FloorSubSystem;
  */
 public class Test {
 
-	static final int ROWS = 20;
-	static final int FLOORS = 10;
+	private File instructionFile = new File("src/test/settings.txt");
+	private int ROWS;
+	private int ELEVATORS;
+	private int FLOORS;
 	static final String UP = "Up";
 	static final String DOWN = "Down";
 	private Random rand = new Random();
-	private String[] time = new String[ROWS];
-	private String[] dir = new String[ROWS];
-	private int[] floor = new int[ROWS];
-	private int[] carButton = new int[ROWS];
+	private String[] time;
+	private String[] dir;
+	private int[] floor;
+	private int[] carButton;
 	private Scheduler scheduler;
 	private Thread floorSubsystem, elevatorSubsystem;
-	private String[] lines = new String[ROWS];
+	private String[] lines;
 	
 	/**
 	 * constructor to create the file
 	 */
 	public Test() throws Exception {
+		readSettings();
+		time = new String[ROWS];
+		dir = new String[ROWS];
+		floor = new int[ROWS];
+		carButton = new int[ROWS];
+		lines = new String[ROWS];
 		createFile();
 		scheduler = new Scheduler(1,9);
 		floorSubsystem = new Thread(new FloorSubSystem(scheduler, FLOORS), "Producer");
@@ -58,6 +68,28 @@ public class Test {
 		}
 	}
 
+	public void readSettings() {
+		try {
+			Scanner scanner = new Scanner(instructionFile);
+			for (int i = 0; i < 3; i++) {
+				String line = scanner.nextLine();
+				String[] splitStr = line.trim().split("\\s+");
+				if(splitStr[0].trim().equals("ELEVATORS:")) {
+					this.ELEVATORS = Integer.parseInt(splitStr[1]);
+				} else if (splitStr[0].trim().equals("ROWS:")) {
+					this.ROWS = Integer.parseInt(splitStr[1]);
+				} else if (splitStr[0].trim().equals("FLOORS:")) {
+					this.FLOORS = Integer.parseInt(splitStr[1]);
+				}
+			}
+			System.out.println(ROWS + " " + ELEVATORS + " " + FLOORS);
+			scanner.close();
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
 	/**
 	 * create the file and write to it
 	 */

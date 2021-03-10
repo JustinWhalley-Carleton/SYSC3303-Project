@@ -6,7 +6,6 @@ public class TimerThread implements Runnable{
 	private int time;
 	
 	public TimerThread(int time, TimerController classCalled) {
-		System.out.println("constructer");
 		this.classCalled = classCalled;
 		this.time = time;
 	}

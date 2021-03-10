@@ -16,6 +16,7 @@ import org.junit.jupiter.api.Test;
 import ElevatorSubsystem.*;
 import FloorSubsystem.FileLoader;
 import common.Common;
+import Timer.TimerController;
 
 /**
  * @author jcwha
@@ -325,4 +326,83 @@ class JunitTestCases {
 	}
 	
 	
+	/**
+	 * test the timer gets interrupted before completion
+	 */
+	@Test
+	void testTimerInterrupt() {
+		TimerController timer = new TimerController(10000);
+		timer.start();
+		assertTrue(timer.isRunning());
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		timer.stop();
+		try {
+			Thread.sleep(100);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		assertFalse(timer.isRunning());
+	}
+	
+	/**
+	 * test the timer completes 
+	 */
+	@Test
+	void testTimerNoInterrupt() {
+		TimerController timer = new TimerController(1000);
+		timer.start();
+		assertTrue(timer.isRunning());
+		try {
+			Thread.sleep(1100);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		assertFalse(timer.isRunning());
+	}
+	
+	/**
+	 * test the timer stop will not trigger a start interrupt when not started
+	 */
+	@Test
+	void testTimerNoStartStop() {
+		TimerController timer = new TimerController(2000);
+		timer.stop();
+		try {
+			Thread.sleep(200);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		assertFalse(timer.isRunning());
+	}
+	
+	/**
+	 * test the timer double start will not trigger a stop interrupt
+	 */
+	@Test
+	void testTimerDoubleStart() {
+		TimerController timer = new TimerController(2000);
+		timer.start();
+		try {
+			Thread.sleep(200);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		timer.start();
+		try {
+			Thread.sleep(200);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		assertTrue(timer.isRunning());
+	}
 }
