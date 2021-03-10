@@ -1,9 +1,9 @@
 package FloorSubsystem;
-import Scheduler.Scheduler;
 import common.Common;
+import common.RPC;
 
+import java.net.InetAddress;
 import java.time.LocalTime;
-
 public class FloorSubSystem implements Runnable{
     // Constants
     private final int MIN_FLOOR;
@@ -11,11 +11,11 @@ public class FloorSubSystem implements Runnable{
     private byte[] requestedDir;
     private Floor[] floors;
 
-    private Scheduler scheduler;
-    //    private SchedulerSubsystem scheduler;
     public FileLoader instructionFile;
+    
+    public RPC rpc;
 
-    public FloorSubSystem(Scheduler scheduler, int maxFloor) throws Exception{
+    public FloorSubSystem(int maxFloor) throws Exception{
         // Error checking
         if (maxFloor <= 1) {
             throw new Exception("incompatible setting: maxFloor should be higher than 2.");
@@ -30,10 +30,10 @@ public class FloorSubSystem implements Runnable{
             floors[f - 1] = new Floor(f, f == MIN_FLOOR, f == MAX_FLOOR);
         }
 
-        // Save scheduler
-        this.scheduler = scheduler;
         // Init instruction reader
         instructionFile = new FileLoader();
+        
+        rpc = new RPC(InetAddress.getLocalHost(),10002,10000);
     }
 
     public void run() {
@@ -104,14 +104,14 @@ public class FloorSubSystem implements Runnable{
         // encode and send request to scheduler
         byte[] message = Common.encodeFloor(departureFloor, instructionFile.requestUp());
 
-        scheduler.floorSubAddMsg(message);
+        rpc.sendPacket(message);
     }
 
 
     // receive method: save message from scheduler.
     public void receive() {
         // process message from scheduler
-        byte[] message = scheduler.floorSubCheckMsg();
+        byte[] message = rpc.receivePacket();
 
         // terminate if no message
         if (message == null){
