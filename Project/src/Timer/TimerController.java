@@ -13,6 +13,7 @@ public class TimerController {
 	Thread timer;
 	public TimerController(int time) {
 		timer = new Thread(new TimerThread(time,this));
+		timer.start();
 		running = false;
 	}
 	
@@ -35,25 +36,5 @@ public class TimerController {
 	public void receiveTimerNotification() {
 		running = false;
 		System.out.println("STOPPED");
-	}
-	
-	public static void main(String[] args) {
-		TimerController t = new TimerController(5000);
-		t.start();
-		System.out.println("RUNNING");
-		try {
-			Thread.sleep(1000);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		t.start();
-		try {
-			Thread.sleep(1000);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		t.stop();
 	}
 }
