@@ -1,5 +1,6 @@
 package Scheduler;
 
+import java.time.LocalTime;
 import java.util.*;
 import common.*;
 
@@ -63,12 +64,12 @@ public class Scheduler {
 		if (dir == 0){
 			if (floor != 1) {
 				byte[] oneMsgToFloorSub = Common.encodeScheduler(1, floor,0);
-				System.out.println("Scheduler sent message to FloorSub: " +  Arrays.toString(Common.decode(oneMsgToFloorSub)));
+				System.out.println("Scheduler sent message to FloorSub: " +  Arrays.toString(Common.decode(oneMsgToFloorSub)) + " @ time = " + LocalTime.now());
 				msgToFloorSub.offer(oneMsgToFloorSub);
 			}
 			if (floor != floorStates.length) {
 				byte[] oneMsgToFloorSub = Common.encodeScheduler(1, floor,1);
-				System.out.println("Scheduler sent message to FloorSub: " +  Arrays.toString(Common.decode(oneMsgToFloorSub)));
+				System.out.println("Scheduler sent message to FloorSub: " +  Arrays.toString(Common.decode(oneMsgToFloorSub)) + " @ time = " + LocalTime.now());
 				msgToFloorSub.offer(oneMsgToFloorSub);
 			}
 		}
@@ -85,13 +86,13 @@ public class Scheduler {
 	public void floorSubAddMsg (byte[] msg) {
 		this.inState = -1;
 		int[] message = Common.decode(msg);
-		System.out.println("Scheduler got message from floor sub: " + Arrays.toString(message) );
+		System.out.println("Scheduler got message from floor sub: " + Arrays.toString(message)  + " @ time = " + LocalTime.now());
 		int floor = message[0];
 		int dir = message[1];
 
 
 		byte[] oneMsgToElevtSub = Common.encodeScheduler(1, floor,0);
-		System.out.println("Scheduler sent message to ElevtSub: " +  Arrays.toString(Common.decode(oneMsgToElevtSub)));
+		System.out.println("Scheduler sent message to ElevtSub: " +  Arrays.toString(Common.decode(oneMsgToElevtSub)) + " @ time = " + LocalTime.now());
 
 		msgToElevtSub.offer(oneMsgToElevtSub);
 
