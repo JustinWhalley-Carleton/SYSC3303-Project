@@ -51,7 +51,7 @@ public class Test {
 		lines = new String[ROWS];
 		createFile();
 		scheduler = new Scheduler(1,9);
-		floorSubsystem = new Thread(new FloorSubSystem(scheduler, FLOORS), "Producer");
+		floorSubsystem = new Thread(new FloorSubSystem(FLOORS), "Producer");
 		elevatorSubsystem = new Thread(new ElevatorSubsystem(scheduler), "Consumer");
 		floorSubsystem.start();
 		elevatorSubsystem.start();
