@@ -1,13 +1,17 @@
 package ElevatorSubsystem;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import common.RPC;
+import common.Common;
 
 /**
  * @author Gill
  *
  */
-public class Elevator {
+public class Elevator implements Runnable {
 	// Constants
 	public int curFloor;
 	private ArrayList<Integer> destFloors; //ArrayList to store the floors to stop at
@@ -16,13 +20,18 @@ public class Elevator {
 	private Up up = new Up();
 	private Down down = new Down();    // The 3 states as per the motor interface
 	private Idle idle = new Idle();
+	private RPC transmitter;
+	private final InetAddress addr;
 
 	// Constructor
-	public Elevator(int curFloor, boolean doorStatus) {   
+	public Elevator(int curFloor, boolean doorStatus, int destPort, int recPort) throws UnknownHostException {   
 		this.curFloor = curFloor;     
 		this.doorStatus = doorStatus;            //Initializing variables
+		addr = InetAddress.getLocalHost();
 		destFloors = new ArrayList<Integer>();
 		state = idle;   // setting motor state to idle
+		transmitter = new RPC(addr, destPort, recPort);
+		
 	}
 	
 	//Method selectFloor adds more floors to stop at into the destination arrayList "destFloors"
@@ -80,7 +89,7 @@ public class Elevator {
 		this.doorStatus = true;
 	}
 	
-	// Getter getCurrState to retreive the current motor state
+	// Getter getCurrState to retrieve the current motor state
 	public MotorState getCurrState() {
 		return state;
 	}
@@ -88,5 +97,23 @@ public class Elevator {
 	//getter getCurrFloor to return the current floor number
 	public int getCurrFloor() {
 		return curFloor;
+	}
+
+	@Override
+	public void run() {
+		// TODO Auto-generated method stub
+		
+		while (true) {
+			try {
+				Thread.sleep(5000);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			
+			transmitter.sendPacket(null);
+			transmitter.receivePacket();
+			
+		}
+		
 	}
 }
