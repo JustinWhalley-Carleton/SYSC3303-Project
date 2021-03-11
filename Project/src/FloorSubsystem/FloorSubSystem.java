@@ -34,6 +34,7 @@ public class FloorSubSystem implements Runnable{
         instructionFile = new FileLoader();
         
         rpc = new RPC(InetAddress.getLocalHost(),10002,10000);
+        rpc.setTimeout(2000);
     }
 
     public void run() {
