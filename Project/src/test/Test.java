@@ -82,7 +82,6 @@ public class Test {
 					this.FLOORS = Integer.parseInt(splitStr[1]);
 				}
 			}
-			System.out.println(ROWS + " " + ELEVATORS + " " + FLOORS);
 			scanner.close();
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block

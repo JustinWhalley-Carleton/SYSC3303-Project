@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.net.InetAddress;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Random;
@@ -17,6 +18,7 @@ import ElevatorSubsystem.*;
 import FloorSubsystem.FileLoader;
 import common.Common;
 import Timer.TimerController;
+import common.RPC;
 
 /**
  * @author jcwha
@@ -404,5 +406,18 @@ class JunitTestCases {
 			e.printStackTrace();
 		}
 		assertTrue(timer.isRunning());
+	}
+	
+	/**
+	 * test rpc send and receive
+	 */
+	@Test
+	void testRPCSendAndReceive() {
+		RPC rpc1 = new RPC(InetAddress.getLocalHost(),1,2);
+		RPC rpc2 = new RPC(InetAddress.getLocalHost(),2,1);
+		byte[] data = Common.encodeFloor(10, false);
+		rpc1.sendPacket(data);
+		byte[] received = rpc2.receivePacket();
+		assertArrayEquals(data,received);
 	}
 }
