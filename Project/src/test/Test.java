@@ -28,6 +28,7 @@ public class Test {
 	private int ROWS;
 	private int ELEVATORS;
 	private int FLOORS;
+	private int SPEED;
 	static final String UP = "Up";
 	static final String DOWN = "Down";
 	private Random rand = new Random();
@@ -71,7 +72,7 @@ public class Test {
 	public void readSettings() {
 		try {
 			Scanner scanner = new Scanner(instructionFile);
-			for (int i = 0; i < 3; i++) {
+			for (int i = 0; i < 4; i++) {
 				String line = scanner.nextLine();
 				String[] splitStr = line.trim().split("\\s+");
 				if(splitStr[0].trim().equals("ELEVATORS:")) {
@@ -80,6 +81,8 @@ public class Test {
 					this.ROWS = Integer.parseInt(splitStr[1]);
 				} else if (splitStr[0].trim().equals("FLOORS:")) {
 					this.FLOORS = Integer.parseInt(splitStr[1]);
+				} else if (splitStr[0].trim().equals("SPEED:")) {
+					this.SPEED = Integer.parseInt(splitStr[1]);
 				}
 			}
 			scanner.close();
@@ -133,7 +136,7 @@ public class Test {
 	private void generateData() {
 		LocalTime referenceTime = LocalTime.now().plus(10, ChronoUnit.SECONDS);
 		for(int i = 0; i < ROWS; i++) {
-			String temp = (referenceTime.plus(10*i,ChronoUnit.SECONDS)).toString();
+			String temp = (referenceTime.plus(10*i/SPEED,ChronoUnit.SECONDS)).toString();
 			time[i] = temp;
 			floor[i] = rand.nextInt(9)+1;
 			carButton[i] = rand.nextInt(9)+1;

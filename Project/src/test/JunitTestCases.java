@@ -6,12 +6,16 @@ package test;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Random;
+import java.util.Scanner;
+
 import org.junit.jupiter.api.Test;
 
 import ElevatorSubsystem.*;
@@ -80,6 +84,48 @@ class JunitTestCases {
 			e.printStackTrace();
 		}
 		return lines;
+	}
+	
+	static void createSettingsFile(int rows, int floors, int elevators) {
+		try {
+			String path = System.getProperty("user.dir")+System.getProperty("file.separator")+"src"+System.getProperty("file.separator")+"test"+System.getProperty("file.separator")+"settings.txt";
+			File file = new File(path);
+			if(file.exists()) {
+				file.delete();
+				file = new File(path);
+			}
+			file.createNewFile();
+			FileWriter writer = new FileWriter(file.getAbsoluteFile());
+			writer.write("FLOORS: "+floors+"\n");
+			writer.write("ROWS: "+rows+"\n");
+			writer.write("ELEVATORS: "+elevators+"\n");
+			writer.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	static int[] readSettingsFile() {
+		int[] data = new int[3];
+		try {
+			Scanner scanner = new Scanner(new File("src/test/settings.txt"));
+			for (int i = 0; i < 3; i++) {
+				String line = scanner.nextLine();
+				String[] splitStr = line.trim().split("\\s+");
+				if(splitStr[0].trim().equals("ELEVATORS:")) {
+					data[0] = Integer.parseInt(splitStr[1]);
+				} else if (splitStr[0].trim().equals("ROWS:")) {
+					data[1] = Integer.parseInt(splitStr[1]);
+				} else if (splitStr[0].trim().equals("FLOORS:")) {
+					data[2] = Integer.parseInt(splitStr[1]);
+				}
+			}
+			scanner.close();
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return data;
 	}
 
 	/**
@@ -413,11 +459,54 @@ class JunitTestCases {
 	 */
 	@Test
 	void testRPCSendAndReceive() {
-		RPC rpc1 = new RPC(InetAddress.getLocalHost(),1,2);
-		RPC rpc2 = new RPC(InetAddress.getLocalHost(),2,1);
-		byte[] data = Common.encodeFloor(10, false);
-		rpc1.sendPacket(data);
-		byte[] received = rpc2.receivePacket();
-		assertArrayEquals(data,received);
+		RPC rpc1;
+		try {
+			rpc1 = new RPC(InetAddress.getLocalHost(),1,2);
+			RPC rpc2 = new RPC(InetAddress.getLocalHost(),2,1);
+			byte[] data = Common.encodeFloor(10, false);
+			rpc1.sendPacket(data);
+			byte[] received = rpc2.receivePacket();
+			assertArrayEquals(data,received);
+		} catch (UnknownHostException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+	}
+	
+	/**
+	 * test read from settings rows
+	 */
+	@Test
+	void testReadSettingsRows() {
+		int[] prevData = readSettingsFile();
+		createSettingsFile(10,5,15);
+		int[] newData = readSettingsFile();
+		assertEquals(newData[1], 10);
+		createSettingsFile(prevData[1],prevData[2],prevData[0]);
+	}
+	
+	/**
+	 * test read from settings floors
+	 */
+	@Test
+	void testReadSettingsFloors() {
+		int[] prevData = readSettingsFile();
+		createSettingsFile(10,5,15);
+		int[] newData = readSettingsFile();
+		assertEquals(newData[2], 5);
+		createSettingsFile(prevData[1],prevData[2],prevData[0]);
+	}
+	
+	/**
+	 * test read from settings elevators
+	 */
+	@Test
+	void testReadSettingselevators() {
+		int[] prevData = readSettingsFile();
+		createSettingsFile(10,5,15);
+		int[] newData = readSettingsFile();
+		assertEquals(newData[0], 15);
+		createSettingsFile(prevData[1],prevData[2],prevData[0]);
 	}
 }
