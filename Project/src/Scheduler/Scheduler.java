@@ -1,6 +1,8 @@
 package Scheduler;
 
 import java.time.LocalTime;
+import java.io.IOException;
+import java.net.*;
 import java.util.*;
 import common.*;
 
@@ -9,14 +11,14 @@ import common.*;
  *
  */
 
-public class Scheduler {
+public class Scheduler implements Runnable {
 
 	private int inState = 0; // 0 is wait; 1 is sending; -1 is receiving  
 	private ElevtState[] elevtStates; // also is the state of the scheduler
 	private FloorState[] floorStates;
-	private Queue<byte[]>   msgToElevtSub, msgToFloorSub;
+	private Queue<byte[]>   msgFromFloorSub, msgToElevtSub, msgToFloorSub;
 
-
+	public RPC rpcFloor, rpcElevt;
 
 	/**
 	 * Constructor
@@ -24,14 +26,19 @@ public class Scheduler {
 	 * @param totalElevts total Elevts number
 	 * @param totalElevts total Floors number
 	 */
-	public Scheduler (int totalElevts, int totalFloors) {
+	public Scheduler (int totalElevts, int totalFloors) throws Exception {
 		elevtStates = new ElevtState[totalElevts];
 		floorStates = new FloorState[totalFloors];
+		msgFromFloorSub = new LinkedList<byte[]>();
 		msgToElevtSub = new LinkedList<byte[]>();
 		msgToFloorSub = new LinkedList<byte[]>();
 		
 		for (int i=0;i<elevtStates.length;i++) { elevtStates[i]= new ElevtState(i+1); }
 		for (int i=0;i<floorStates.length;i++) { floorStates[i]= new FloorState(i+1); }
+
+		rpcElevt = new RPC(InetAddress.getLocalHost(),10001,10000);
+		rpcFloor = new RPC(InetAddress.getLocalHost(),10002,10000);
+
 	}
 
 
@@ -85,6 +92,10 @@ public class Scheduler {
 	 */
 	public void floorSubAddMsg (byte[] msg) {
 		this.inState = -1;
+
+
+
+
 		int[] message = Common.decode(msg);
 		System.out.println("Scheduler got message from floor sub: " + Arrays.toString(message)  + " @ time = " + LocalTime.now());
 		int floor = message[0];
@@ -133,14 +144,46 @@ public class Scheduler {
 
     /**
 	 * Update elevtStates a msgToElevtSub Schedule based on all data
-	 * for iteration#3
+	 *
 	 */
 	private void updateSchedule() {
 
 	}
+	/**
+	 * Recevice massgaes from FloorSub and ElevtSub
+	 */
+	private void receive() {
+		byte[] message1 = rpcFloor.receivePacket();
+		if (message1 != null){
+			floorSubAddMsg(message1);
+		}
 
+		byte[] message2 = rpcElevt.receivePacket();
+		if (message2 != null){
+			elevtSubAddMsg(message2);
+		}
+		return;
+	}
 
+	/**
+	 * Send massgaes to FloorSub and ElevtSub if there is any
+	 */
+	private void send(){
+		byte[] msg = floorSubCheckMsg();
+		if ( msg != null) {
+			rpcFloor.sendPacket(msg);
+		}
+		msg = elevtSubCheckMsg();
+		if ( msg != null) {
+			rpcElevt.sendPacket(msg);
+		}
+	}
 
-   
-    
+	@Override
+	public void run() {
+		while (true) {
+			receive();
+			send();
+		}
+	}
 }
