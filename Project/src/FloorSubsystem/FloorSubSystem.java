@@ -18,7 +18,7 @@ public class FloorSubSystem implements Runnable{
     public FloorSubSystem(int maxFloor) throws Exception{
         // Error checking
         if (maxFloor <= 1) {
-            throw new Exception("incompatible setting: maxFloor should be higher than 2.");
+            throw new Exception("incompatible setting: maxFloor should be at least 2.");
         }
 
         // Init floors
