@@ -379,7 +379,7 @@ class JunitTestCases {
 	 */
 	@Test
 	void testTimerInterrupt() {
-		TimerController timer = new TimerController(10000);
+		TimerController timer = new TimerController(2000, new Elevator(1,false));
 		timer.start();
 		assertTrue(timer.isRunning());
 		try {
@@ -403,7 +403,7 @@ class JunitTestCases {
 	 */
 	@Test
 	void testTimerNoInterrupt() {
-		TimerController timer = new TimerController(1000);
+		TimerController timer = new TimerController(2000, new Elevator(1,false));
 		timer.start();
 		assertTrue(timer.isRunning());
 		try {
@@ -420,7 +420,7 @@ class JunitTestCases {
 	 */
 	@Test
 	void testTimerNoStartStop() {
-		TimerController timer = new TimerController(2000);
+		TimerController timer = new TimerController(2000, new Elevator(1,false));
 		timer.stop();
 		try {
 			Thread.sleep(200);
@@ -436,7 +436,7 @@ class JunitTestCases {
 	 */
 	@Test
 	void testTimerDoubleStart() {
-		TimerController timer = new TimerController(2000);
+		TimerController timer = new TimerController(2000, new Elevator(1,false));
 		timer.start();
 		try {
 			Thread.sleep(200);

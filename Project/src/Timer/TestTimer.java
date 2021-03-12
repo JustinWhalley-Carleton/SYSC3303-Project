@@ -1,12 +1,14 @@
 package Timer;
 
+import ElevatorSubsystem.Elevator;
+
 public class TestTimer{
 
 	private static final int TIME = 5000;
 	public static TestTimer testTimer;
 	private TimerController timer;
 	public TestTimer() {
-		timer = new TimerController(TIME); //create a 5second timer
+		timer = new TimerController(TIME,new Elevator(1,false)); //create a 5second timer
 	}
 	
 	public void run() {

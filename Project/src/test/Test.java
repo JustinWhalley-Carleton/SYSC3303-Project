@@ -28,7 +28,7 @@ public class Test {
 	private int ROWS;
 	private int ELEVATORS;
 	private int FLOORS;
-	private int SPEED;
+	public static int SPEED;
 	static final String UP = "Up";
 	static final String DOWN = "Down";
 	private Random rand = new Random();
@@ -82,7 +82,7 @@ public class Test {
 				} else if (splitStr[0].trim().equals("FLOORS:")) {
 					this.FLOORS = Integer.parseInt(splitStr[1]);
 				} else if (splitStr[0].trim().equals("SPEED:")) {
-					this.SPEED = Integer.parseInt(splitStr[1]);
+					SPEED = Integer.parseInt(splitStr[1]);
 				}
 			}
 			scanner.close();

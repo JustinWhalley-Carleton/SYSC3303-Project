@@ -3,6 +3,8 @@
  */
 package Timer;
 
+import ElevatorSubsystem.Elevator;
+
 /**
  * @author jcwha
  *
@@ -11,10 +13,12 @@ public class TimerController {
 
 	boolean running;
 	Thread timer;
-	public TimerController(int time) {
+	Elevator elev;
+	public TimerController(int time,Elevator elev) {
 		timer = new Thread(new TimerThread(time,this));
 		timer.start();
 		running = false;
+		this.elev = elev;
 	}
 	
 	public void start() {
@@ -35,6 +39,7 @@ public class TimerController {
 	}
 	public void receiveTimerNotification() {
 		running = false;
+		//elev.notify();
 		System.out.println("STOPPED");
 	}
 }
