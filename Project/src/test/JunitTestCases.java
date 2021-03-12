@@ -407,7 +407,7 @@ class JunitTestCases {
 		timer.start();
 		assertTrue(timer.isRunning());
 		try {
-			Thread.sleep(1100);
+			Thread.sleep(1200);
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
