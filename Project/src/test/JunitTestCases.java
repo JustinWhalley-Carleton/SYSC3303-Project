@@ -381,7 +381,7 @@ class JunitTestCases {
 	void testTimerInterrupt() {
 		TimerController timer;
 		try {
-			timer = new TimerController(2000, new Elevator(1,false,1,2));
+			timer = new TimerController(2000, new Elevator(1,false,12,22));
 			timer.start();
 			assertTrue(timer.isRunning());
 			try {
@@ -412,7 +412,7 @@ class JunitTestCases {
 	void testTimerNoInterrupt() {
 		TimerController timer;
 		try {
-			timer = new TimerController(2000, new Elevator(1,false,1,2));
+			timer = new TimerController(1000, new Elevator(1,false,100,200));
 			timer.start();
 			assertTrue(timer.isRunning());
 			try {
@@ -436,7 +436,7 @@ class JunitTestCases {
 	void testTimerNoStartStop() {
 		TimerController timer;
 		try {
-			timer = new TimerController(2000, new Elevator(1,false,1,2));
+			timer = new TimerController(2000, new Elevator(1,false,10,20));
 			timer.stop();
 			try {
 				Thread.sleep(200);
@@ -489,8 +489,8 @@ class JunitTestCases {
 	void testRPCSendAndReceive() {
 		RPC rpc1;
 		try {
-			rpc1 = new RPC(InetAddress.getLocalHost(),1,2);
-			RPC rpc2 = new RPC(InetAddress.getLocalHost(),2,1);
+			rpc1 = new RPC(InetAddress.getLocalHost(),3,4);
+			RPC rpc2 = new RPC(InetAddress.getLocalHost(),4,3);
 			byte[] data = Common.encodeFloor(10, false);
 			rpc1.sendPacket(data);
 			byte[] received = rpc2.receivePacket();
@@ -536,5 +536,93 @@ class JunitTestCases {
 		int[] newData = readSettingsFile();
 		assertEquals(newData[0], 15);
 		createSettingsFile(prevData[1],prevData[2],prevData[0]);
+	}
+	
+	/**
+	 * test common enum confirmation
+	 */
+	@Test
+	void testEnumConfirmation() {
+		byte[] msg = Common.encodeConfirmation(Common.CONFIRMATION.RECEIVED);
+		Common.TYPE type = Common.findType(msg);
+		assertEquals(type, Common.TYPE.CONFIRMATION);
+	}
+	
+	/**
+	 * test common enum confirmation check
+	 */
+	@Test
+	void testEnumConfirmationCheck() {
+		byte[] msg = Common.encodeConfirmation(Common.CONFIRMATION.CHECK);
+		Common.TYPE type = Common.findType(msg);
+		assertEquals(type, Common.TYPE.CONFIRMATION);
+		Common.CONFIRMATION confirmation = Common.findConfirmation(msg);
+		assertEquals(confirmation, Common.CONFIRMATION.CHECK);
+	}
+	
+	/**
+	 * test common enum confirmation received
+	 */
+	@Test
+	void testEnumConfirmationReceived() {
+		byte[] msg = Common.encodeConfirmation(Common.CONFIRMATION.RECEIVED);
+		Common.TYPE type = Common.findType(msg);
+		assertEquals(type, Common.TYPE.CONFIRMATION);
+		Common.CONFIRMATION confirmation = Common.findConfirmation(msg);
+		assertEquals(confirmation, Common.CONFIRMATION.RECEIVED);
+	}
+	
+	/**
+	 * test common enum confirmation no msg
+	 */
+	@Test
+	void testEnumConfirmationNoMsg() {
+		byte[] msg = Common.encodeConfirmation(Common.CONFIRMATION.NO_MSG);
+		Common.TYPE type = Common.findType(msg);
+		assertEquals(type, Common.TYPE.CONFIRMATION);
+		Common.CONFIRMATION confirmation = Common.findConfirmation(msg);
+		assertEquals(confirmation, Common.CONFIRMATION.NO_MSG);
+	}
+	
+	/**
+	 * test common enum Scheduler
+	 */
+	@Test
+	void testEnumScheduler() {
+		byte[] msg = Common.encodeScheduler(1,2,3);
+		Common.TYPE type = Common.findType(msg);
+		assertEquals(type, Common.TYPE.SCHEDULER);
+	}
+	
+	/**
+	 * test common enum floor
+	 */
+	@Test
+	void testEnumFloor() {
+		byte[] msg = Common.encodeFloor(1,true);
+		Common.TYPE type = Common.findType(msg);
+		assertEquals(type, Common.TYPE.FLOOR);
+	}
+	
+	/**
+	 * test common enum elevator
+	 */
+	@Test
+	void testEnumElevator() {
+		byte[] msg = Common.encodeElevator(1,2,(MotorState)new Idle(),3);
+		Common.TYPE type = Common.findType(msg);
+		assertEquals(type, Common.TYPE.ELEVATOR);
+	}
+	
+	/**
+	 * test common enum invalid
+	 */
+	@Test
+	void testEnumInvalid() {
+		byte[] msg = Common.encodeConfirmation(Common.CONFIRMATION.INVALID);
+		Common.TYPE type = Common.findType(msg);
+		assertEquals(type, Common.TYPE.CONFIRMATION);
+		Common.CONFIRMATION confirmation = Common.findConfirmation(msg);
+		assertEquals(confirmation, Common.CONFIRMATION.INVALID);
 	}
 }
