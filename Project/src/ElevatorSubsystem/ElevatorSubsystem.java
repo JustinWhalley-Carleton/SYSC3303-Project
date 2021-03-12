@@ -58,8 +58,10 @@ public class ElevatorSubsystem implements Runnable{
 		// Init elevators
 		this.NUM_ELEV = numElev;
 		elevators = new Elevator[NUM_ELEV];
-		for (int i = 0; i < NUM_ELEV; ++i){
-			elevators[i] = new Elevator(1, true);
+		for (int i = 1; i <= NUM_ELEV; ++i){
+			elevators[i] = new Elevator(1, true,
+									ELEV_SUB_ELEV_RECV_PORT + NUM_ELEV,
+									ELEV_RECV_PORT + NUM_ELEV);
 		}
 
 		// Init Buffer
@@ -103,6 +105,7 @@ public class ElevatorSubsystem implements Runnable{
 	// Add msg to elevator queue
 	private synchronized void sendToElevator(byte[] msg){
 		// TODO: find out which elevator should receive this message
+		
 		Integer serialNum = 0;
 		// add msg to elevator's queue
 		msgToElevators.get(serialNum).add(msg);
@@ -139,16 +142,30 @@ public class ElevatorSubsystem implements Runnable{
 			// 2. scheduler have a message for one of the elevators
 			msg = transmitter.receivePacket();
 
-			// check: if msg is for elevator
-			// make received message available for elevator
-			sendToElevator(msg);
+			if(Common.findType(msg) == Common.TYPE.CONFIRMATION){
+				// Received confirmation
+				Common.CONFIRMATION confirmationType = Common.findConfirmation(msg);
+				if(confirmationType == Common.CONFIRMATION.CHECK){
+					// Scheduler wants to check message
+					// send anything needs to be sent to scheduler
+					msg = getMsgScheduler();
+					if (msg == null){
+						// no message for scheduler, send a confirmation instead
+						msg = Common.encodeConfirmation(Common.CONFIRMATION.NO_MSG);
+					}
 
-			// send anything needs to be sent to scheduler
-			msg = getMsgScheduler();
-			if (msg == null){
-				// no message for scheduler, send a confirmation instead
+				}else{
+					System.out.println("Unexpected msg from Scheduler: " + confirmationType);
+					msg = Common.encodeConfirmation(Common.CONFIRMATION.RECEIVED);
+				}
 
+			}else{
+				// Received message for elevator
+				// make received message available for elevator
+				sendToElevator(msg);
+				msg = Common.encodeConfirmation(Common.CONFIRMATION.RECEIVED);
 			}
+			// Reply to Scheduler
 			transmitter.sendPacket(msg);
 		}
 	}
@@ -174,15 +191,31 @@ public class ElevatorSubsystem implements Runnable{
 			// 2. elevator have a message for scheduler
 			msg = transmitter.receivePacket();
 
-			// check: if msg if for scheduler
-			// make received message available for scheduler
-			sendToScheduler(msg);
+			if(Common.findType(msg) == Common.TYPE.CONFIRMATION){
+				// Received confirmation
+				Common.CONFIRMATION confirmationType = Common.findConfirmation(msg);
+				if(confirmationType == Common.CONFIRMATION.CHECK) {
+					// Elevator wants to check message
+					// send anything needs to be sent to elevator
+					msg = getMsgElevator(serialNum);
+					if (msg == null) {
+						// no message for elevator, send a confirmation instead
+						msg = Common.encodeConfirmation(Common.CONFIRMATION.NO_MSG);
+					}
 
-			msg = getMsgElevator(serialNum);
-			if (msg == null){
-				// no message for elevator, send a confirmation instead
+				}else{
+					System.out.println("Unexpected msg from Elevator " + serialNum + ": " + confirmationType);
+					msg = Common.encodeConfirmation(Common.CONFIRMATION.RECEIVED);
+				}
+
+			}else{
+				// Elevator wants to send message
+				// make received message available for scheduler
+				sendToScheduler(msg);
+				msg = Common.encodeConfirmation(Common.CONFIRMATION.RECEIVED);
 
 			}
+			// Reply to Elevator
 			transmitter.sendPacket(msg);
 		}
 	}
@@ -194,9 +227,7 @@ public class ElevatorSubsystem implements Runnable{
 	// Spawn elevator subsystem
 	public static void main(String[] args) throws Exception{
 		ElevatorSubsystem elevatorSubsystem = new ElevatorSubsystem(3);
-		Thread elevSubSystemThread = new Thread(elevatorSubsystem);
-
-		elevSubSystemThread.run();
+		elevatorSubsystem.run();
 	}
 
 }
