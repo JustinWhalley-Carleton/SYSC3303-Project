@@ -85,8 +85,7 @@ public class ElevatorSubsystem implements Runnable{
 
 	// ONLY used when starting new elevator communicators
 	private synchronized int getNewSerial(){
-		serial += 1;
-		return serial;
+		return ++serial;
 	}
 
 	// Initialize buffer for elevator with serialNumber
