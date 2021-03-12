@@ -15,7 +15,7 @@ public class Scheduler implements Runnable {
 	private int inState = 0; // 0 is wait; 1 is sending; -1 is receiving  
 	private ElevtState[] elevtStates; // also is the state of the scheduler
 	private FloorState[] floorStates;
-	private Queue<byte[]>   msgToElevtSub, msgToFloorSub;
+	private Queue<byte[]>   msgFromFloorSub, msgToElevtSub, msgToFloorSub;
 
 	public RPC rpcFloor, rpcElevt;
 
@@ -28,6 +28,7 @@ public class Scheduler implements Runnable {
 	public Scheduler (int totalElevts, int totalFloors) throws Exception {
 		elevtStates = new ElevtState[totalElevts];
 		floorStates = new FloorState[totalFloors];
+		msgFromFloorSub = new LinkedList<byte[]>();
 		msgToElevtSub = new LinkedList<byte[]>();
 		msgToFloorSub = new LinkedList<byte[]>();
 		
@@ -90,6 +91,10 @@ public class Scheduler implements Runnable {
 	 */
 	public void floorSubAddMsg (byte[] msg) {
 		this.inState = -1;
+
+
+
+
 		int[] message = Common.decode(msg);
 		System.out.println("Scheduler got message from floor sub: " + Arrays.toString(message) );
 		int floor = message[0];
@@ -98,7 +103,7 @@ public class Scheduler implements Runnable {
 
 		byte[] oneMsgToElevtSub = Common.encodeScheduler(1, floor,0);
 		System.out.println("Scheduler sent message to ElevtSub: " +  Arrays.toString(Common.decode(oneMsgToElevtSub)));
-
+		
 		msgToElevtSub.offer(oneMsgToElevtSub);
 
 		updateSchedule();
