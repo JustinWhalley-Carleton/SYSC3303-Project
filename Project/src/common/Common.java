@@ -11,6 +11,51 @@ import ElevatorSubsystem.*;
  */
 public class Common {
 
+	/* Message types */
+	public enum TYPE{
+		INVALID			((byte) -1),
+		ELEVATOR		((byte) 0),
+		FLOOR			((byte) 1),
+		SCHEDULER		((byte) 2),
+		CONFIRMATION	((byte) 3);
+
+		// Enum initializer
+		private final byte value;
+		private TYPE(byte b){
+			this.value = b;
+		}
+
+		// Determine which type the byte corresponds to
+		public static TYPE findType(byte b){
+			for (TYPE type: TYPE.values()){
+				if(type.value == b) return type;
+			}
+			return INVALID;
+		}
+	}
+
+	/* Confirmation messages types */
+	public enum CONFIRMATION{
+		INVALID			((byte) -1),
+		CHECK			((byte) 0),
+		RECEIVED		((byte) 1),
+		NO_MSG			((byte) 2);
+
+		// Enum initializer
+		private final byte value;
+		private CONFIRMATION(byte b){
+			this.value = b;
+		}
+
+		// Determine which type the byte corresponds to
+		public static CONFIRMATION findConfirmation(byte b){
+			for (CONFIRMATION conf: CONFIRMATION.values()){
+				if(conf.value == b) return conf;
+			}
+			return INVALID;
+		}
+	}
+
 	/**
 	 * encode the data in the form 0(for elevator), 127(seperator), elevator number, 127(seperator), current floor, 127(seperator), 1(Up) or -1(Down) or 0(Idle), 127(seperator), destination floor, 127(end file)
 	 * 
@@ -21,7 +66,7 @@ public class Common {
 	 */
 	public static byte[] encodeElevator(int elevatorNum, int curr, MotorState state, int dest) {
 		byte[] msg = new byte[10];
-		msg[0] = (byte)0;
+		msg[0] = TYPE.ELEVATOR.value;
 		msg[1] = (byte)127;
 		msg[2] = (byte)elevatorNum;
 		msg[3] = (byte)127;
@@ -49,7 +94,7 @@ public class Common {
 	 */
 	public static byte[] encodeFloor(int floor, boolean dir) {
 		byte[] msg = new byte[6];
-		msg[0] = (byte)1;
+		msg[0] = TYPE.FLOOR.value;
 		msg[1] = (byte)127;
 		msg[2] = (byte)floor;
 		msg[3] = (byte)127;
@@ -66,7 +111,7 @@ public class Common {
 	 */
 	public static byte[] encodeScheduler(int elevt, int floor, int dir) {
 		byte[] msg = new byte[8];
-		msg[0] = (byte)2;
+		msg[0] = TYPE.SCHEDULER.value;
 		msg[1] = (byte)127;
 		msg[2] = (byte)elevt;
 		msg[3] = (byte)127;
@@ -78,15 +123,24 @@ public class Common {
 	}
 	
 	/**
-	 * encode check
+	 * encode confirmation message into byte[]
 	 */
-	public static byte[] encodeCheck() {
+	public static byte[] encodeConfirmation(CONFIRMATION conf) {
 		byte[] msg = new byte[2];
-		msg[0] = (byte)3;
-		msg[1] = (byte)3;
+		msg[0] = (byte) TYPE.CONFIRMATION.value;
+		msg[1] = (byte) conf.value;
 		return msg;
 	}
-	
+
+	/**
+	 *
+	 * @param msg byte[] of message
+	 * @return TYPE that this message belongs to
+	 */
+	public static TYPE findType(byte[] msg){
+		return TYPE.findType(msg[0]);
+	}
+
 	/**
 	 * decode the byte array received by a subsystem. See specialized decode methods for return format
 	 * 
@@ -94,15 +148,15 @@ public class Common {
 	 * @return int[] of what was received
 	 */
 	public static int[] decode(byte[] msg) {
-		switch((int)msg[0]) {
-			case 0:
+		switch(findType(msg)) {
+			case ELEVATOR:
 				return decodeElevator(msg);
-			case 1:
+			case FLOOR:
 				return decodeFloor(msg);
-			case 2:
+			case SCHEDULER:
 				return decodeScheduler(msg);
-			case 3:
-				return decodeCheck(msg);
+			case CONFIRMATION:
+				return decodeConfirmation(msg);
 			default:
 				return null;
 		}
@@ -120,12 +174,6 @@ public class Common {
 		decodedMsg[1] = (int)msg[4];
 		decodedMsg[2] = (int)msg[6];
 		decodedMsg[3] = (int)msg[8];
-		return decodedMsg;
-	}
-	
-	private static int[] decodeCheck(byte[] msg) {
-		int[] decodedMsg = new int[1];
-		decodedMsg[0]=1;
 		return decodedMsg;
 	}
 	
@@ -154,5 +202,22 @@ public class Common {
 		decodedMsg[1] = (int)msg[4];
 		decodedMsg[2] = (int)msg[6];
 		return decodedMsg;
+	}
+
+
+	private static int[] decodeConfirmation(byte[] msg) {
+		int[] decodedMsg = new int[1];
+		decodedMsg[0] = 1;
+		return decodedMsg;
+	}
+
+
+	/**
+	 *
+	 * @param msg byte[] of message
+	 * @return CONFIRMATION that this message belongs to
+	 */
+	public static CONFIRMATION findConfirmation(byte[] msg){
+		return CONFIRMATION.findConfirmation(msg[1]);
 	}
 }
