@@ -54,7 +54,7 @@ public class Elevator implements Runnable {
 			System.out.println("Elevator State Change: GOING UP @ time = " + LocalTime.now());  //Going up if target floor is higher
 			state = down;
 		} else {
-			System.out.println("Same floor. No state change");  //No movement if same floor
+			System.out.println("Same floor. No state change\n");  //No movement if same floor
 			removeFloor(floor);
 			return;
 		}

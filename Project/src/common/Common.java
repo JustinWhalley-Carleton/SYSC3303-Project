@@ -78,6 +78,16 @@ public class Common {
 	}
 	
 	/**
+	 * encode check
+	 */
+	public static byte[] encodeCheck() {
+		byte[] msg = new byte[2];
+		msg[0] = (byte)3;
+		msg[1] = (byte)3;
+		return msg;
+	}
+	
+	/**
 	 * decode the byte array received by a subsystem. See specialized decode methods for return format
 	 * 
 	 * @param msg
@@ -91,6 +101,8 @@ public class Common {
 				return decodeFloor(msg);
 			case 2:
 				return decodeScheduler(msg);
+			case 3:
+				return decodeCheck(msg);
 			default:
 				return null;
 		}
@@ -108,6 +120,12 @@ public class Common {
 		decodedMsg[1] = (int)msg[4];
 		decodedMsg[2] = (int)msg[6];
 		decodedMsg[3] = (int)msg[8];
+		return decodedMsg;
+	}
+	
+	private static int[] decodeCheck(byte[] msg) {
+		int[] decodedMsg = new int[1];
+		decodedMsg[0]=1;
 		return decodedMsg;
 	}
 	
