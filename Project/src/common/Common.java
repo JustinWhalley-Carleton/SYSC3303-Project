@@ -127,8 +127,8 @@ public class Common {
 	 */
 	public static byte[] encodeConfirmation(CONFIRMATION conf) {
 		byte[] msg = new byte[2];
-		msg[0] = (byte) TYPE.CONFIRMATION.value;
-		msg[1] = (byte) conf.value;
+		msg[0] = TYPE.CONFIRMATION.value;
+		msg[1] = conf.value;
 		return msg;
 	}
 
@@ -219,5 +219,62 @@ public class Common {
 	 */
 	public static CONFIRMATION findConfirmation(byte[] msg){
 		return CONFIRMATION.findConfirmation(msg[1]);
+	}
+
+
+	/* ONLY for Testing enum usage */
+	public static void main(String[] args){
+		byte[] msg;
+
+		/* Test all different msg types */
+
+		// Encode a confirmation to a byte[]
+		msg = encodeConfirmation(CONFIRMATION.RECEIVED);
+
+		// Encode an elevatorMsg to byte[]
+		// msg = encodeElevator(1,2,new Idle(), 3);
+
+		// Encode a schedulerMsg to byte[]
+		// msg = encodeScheduler(1,2,3);
+
+		// Encode a floorMsg to byte[]
+		// msg = encodeFloor(1, false);
+
+
+
+		/* Determine the type of the msg when received a byte[] */
+
+		TYPE type = findType(msg);
+
+		if(type == TYPE.CONFIRMATION){
+			System.out.println("msg is a confirmationMessage");
+
+			// Determine which type of confirmation msg it is
+			CONFIRMATION conf = findConfirmation(msg);
+
+			// Method 1: Use a switch to determine conf type.
+			switch (conf){
+				case CHECK 		-> System.out.println("CHECK    confirmation!");
+				case RECEIVED 	-> System.out.println("RECEIVED confirmation!");
+				case NO_MSG 	-> System.out.println("NO_MSG   confirmation!");
+				default 		-> System.out.println("NO MATCH");
+			}
+
+			// Method 2: Use if statement to determine conf type.
+			if(conf == CONFIRMATION.CHECK) 		System.out.println("CHECK    confirmation!");
+			if(conf == CONFIRMATION.RECEIVED) 	System.out.println("RECEIVED confirmation!");
+			if(conf == CONFIRMATION.NO_MSG)		System.out.println("NO_MSG   confirmation!");
+
+		}
+		else if(type == TYPE.ELEVATOR){
+			System.out.println("msg is an elevatorMessage");
+		}
+		else if(type == TYPE.SCHEDULER){
+			System.out.println("msg is a schedulerMessage");
+		}
+		else if(type == TYPE.FLOOR){
+			System.out.println("msg is a floorMessage");
+		}
+
 	}
 }
