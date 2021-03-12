@@ -379,23 +379,30 @@ class JunitTestCases {
 	 */
 	@Test
 	void testTimerInterrupt() {
-		TimerController timer = new TimerController(2000, new Elevator(1,false));
-		timer.start();
-		assertTrue(timer.isRunning());
+		TimerController timer;
 		try {
-			Thread.sleep(1000);
-		} catch (InterruptedException e) {
+			timer = new TimerController(2000, new Elevator(1,false,1,2));
+			timer.start();
+			assertTrue(timer.isRunning());
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			timer.stop();
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			assertFalse(timer.isRunning());
+		} catch (UnknownHostException e1) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			e1.printStackTrace();
 		}
-		timer.stop();
-		try {
-			Thread.sleep(100);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		assertFalse(timer.isRunning());
+		
 	}
 	
 	/**
@@ -403,16 +410,23 @@ class JunitTestCases {
 	 */
 	@Test
 	void testTimerNoInterrupt() {
-		TimerController timer = new TimerController(2000, new Elevator(1,false));
-		timer.start();
-		assertTrue(timer.isRunning());
+		TimerController timer;
 		try {
-			Thread.sleep(1200);
-		} catch (InterruptedException e) {
+			timer = new TimerController(2000, new Elevator(1,false,1,2));
+			timer.start();
+			assertTrue(timer.isRunning());
+			try {
+				Thread.sleep(1200);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			assertFalse(timer.isRunning());
+		} catch (UnknownHostException e1) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			e1.printStackTrace();
 		}
-		assertFalse(timer.isRunning());
+		
 	}
 	
 	/**
@@ -420,15 +434,22 @@ class JunitTestCases {
 	 */
 	@Test
 	void testTimerNoStartStop() {
-		TimerController timer = new TimerController(2000, new Elevator(1,false));
-		timer.stop();
+		TimerController timer;
 		try {
-			Thread.sleep(200);
-		} catch (InterruptedException e) {
+			timer = new TimerController(2000, new Elevator(1,false,1,2));
+			timer.stop();
+			try {
+				Thread.sleep(200);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			assertFalse(timer.isRunning());
+		} catch (UnknownHostException e1) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			e1.printStackTrace();
 		}
-		assertFalse(timer.isRunning());
+		
 	}
 	
 	/**
@@ -436,22 +457,29 @@ class JunitTestCases {
 	 */
 	@Test
 	void testTimerDoubleStart() {
-		TimerController timer = new TimerController(2000, new Elevator(1,false));
-		timer.start();
+		TimerController timer;
 		try {
-			Thread.sleep(200);
-		} catch (InterruptedException e) {
+			timer = new TimerController(2000, new Elevator(1,false,1,2));
+			timer.start();
+			try {
+				Thread.sleep(200);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			timer.start();
+			try {
+				Thread.sleep(200);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			assertTrue(timer.isRunning());
+		} catch (UnknownHostException e1) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			e1.printStackTrace();
 		}
-		timer.start();
-		try {
-			Thread.sleep(200);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		assertTrue(timer.isRunning());
+		
 	}
 	
 	/**

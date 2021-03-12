@@ -4,6 +4,7 @@ import common.RPC;
 
 import java.net.InetAddress;
 import java.time.LocalTime;
+import java.util.LinkedList;
 public class FloorSubSystem implements Runnable{
     // Constants
     private final int MIN_FLOOR;
@@ -15,6 +16,7 @@ public class FloorSubSystem implements Runnable{
     
     public RPC rpc;
 
+    private LinkedList<byte[]> messageQueue;
     public FloorSubSystem(int maxFloor) throws Exception{
         // Error checking
         if (maxFloor <= 1) {
@@ -35,6 +37,7 @@ public class FloorSubSystem implements Runnable{
         
         rpc = new RPC(InetAddress.getLocalHost(),10002,10000);
         rpc.setTimeout(2000);
+        messageQueue = new LinkedList<byte[]>();
     }
 
     public void run() {
@@ -105,9 +108,19 @@ public class FloorSubSystem implements Runnable{
         // encode and send request to scheduler
         byte[] message = Common.encodeFloor(departureFloor, instructionFile.requestUp());
 
-        rpc.sendPacket(message);
+        addToQueue(message);
     }
 
+    private void addToQueue(byte[] msg) {
+    	messageQueue.add(msg);
+    }
+    
+    private byte[] getMessageFromQueue() {
+    	if(messageQueue.isEmpty()) {
+    		return null;
+    	}
+    	return messageQueue.pop();
+    }
 
     // receive method: save message from scheduler.
     public void receive() {
@@ -118,22 +131,32 @@ public class FloorSubSystem implements Runnable{
         if (message == null){
             return;
         }
+        byte[] msg;
+        if(Common.findType(message) == Common.TYPE.CONFIRMATION){ 
+        	msg = getMessageFromQueue();
+        	if(msg == null) {
+        		msg = Common.encodeConfirmation(Common.CONFIRMATION.NO_MSG);
+        	}
+        } else {
+        
 
-        int[] decodeMsg = Common.decode(message);
-
-        int arrivalFloor = decodeMsg[1];
-        boolean dismissUp = decodeMsg[2] != 0;
-
-        System.out.println("FLOOR: " + arrivalFloor + " Going " + (dismissUp ? "Up" : "Down") + " @ time = " + LocalTime.now());
-
-        if(MIN_FLOOR <= arrivalFloor && arrivalFloor <= MAX_FLOOR) {
-            // Elevator reached requested floor
-            floors[arrivalFloor - 1].reached(dismissUp);
-        }else{
-            // Unexpected floor received, ignore.
-            System.out.println("WARNING! Arrival floor " + arrivalFloor + " out of range!");
-            return;
+	        int[] decodeMsg = Common.decode(message);
+	
+	        int arrivalFloor = decodeMsg[1];
+	        boolean dismissUp = decodeMsg[2] != 0;
+	
+	        System.out.println("FLOOR: " + arrivalFloor + " Going " + (dismissUp ? "Up" : "Down") + " @ time = " + LocalTime.now());
+	        msg = Common.encodeConfirmation(Common.CONFIRMATION.RECEIVED);
+	        if(MIN_FLOOR <= arrivalFloor && arrivalFloor <= MAX_FLOOR) {
+	            // Elevator reached requested floor
+	            floors[arrivalFloor - 1].reached(dismissUp);
+	        }else{
+	            // Unexpected floor received, ignore.
+	            System.out.println("WARNING! Arrival floor " + arrivalFloor + " out of range!");
+	            return;
+	        }
         }
+        rpc.sendPacket(msg);
 
     }
 

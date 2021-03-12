@@ -1,14 +1,21 @@
 package Timer;
 
+import java.net.UnknownHostException;
+
 import ElevatorSubsystem.Elevator;
 
 public class TestTimer{
-
+ 
 	private static final int TIME = 5000;
 	public static TestTimer testTimer;
 	private TimerController timer;
 	public TestTimer() {
-		timer = new TimerController(TIME,new Elevator(1,false)); //create a 5second timer
+		try {
+			timer = new TimerController(TIME,new Elevator(1, false, 1, 2));
+		} catch (UnknownHostException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} //create a 5second timer
 	}
 	
 	public void run() {
