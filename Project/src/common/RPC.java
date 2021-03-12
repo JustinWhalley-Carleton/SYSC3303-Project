@@ -46,7 +46,15 @@ public class RPC {
         System.out.println();
     }
 
-
+    public void setTimeout(int millis) {
+    	try {
+			sendReceiveSocket.setSoTimeout(millis);
+		} catch (SocketException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    }
+    
     public byte[] receivePacket(){
         byte[] data = new byte[BUF_SIZE];
         // Init receive packet
@@ -55,6 +63,8 @@ public class RPC {
         // Receive Packet
         try {
             sendReceiveSocket.receive(receivePacket);
+        } catch (SocketTimeoutException e) {
+        	return null;
         } catch (IOException e){
             e.printStackTrace();
             System.exit(1);
