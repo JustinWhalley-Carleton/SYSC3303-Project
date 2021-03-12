@@ -34,6 +34,7 @@ public class FloorSubSystem implements Runnable{
         instructionFile = new FileLoader();
         
         rpc = new RPC(InetAddress.getLocalHost(),10002,10000);
+        rpc.setTimeout(2000);
     }
 
     public void run() {
@@ -123,7 +124,7 @@ public class FloorSubSystem implements Runnable{
         int arrivalFloor = decodeMsg[1];
         boolean dismissUp = decodeMsg[2] != 0;
 
-        System.out.println("FLOOR: " + arrivalFloor + " Going " + (dismissUp ? "Up" : "Down"));
+        System.out.println("FLOOR: " + arrivalFloor + " Going " + (dismissUp ? "Up" : "Down") + " @ time = " + LocalTime.now());
 
         if(MIN_FLOOR <= arrivalFloor && arrivalFloor <= MAX_FLOOR) {
             // Elevator reached requested floor
