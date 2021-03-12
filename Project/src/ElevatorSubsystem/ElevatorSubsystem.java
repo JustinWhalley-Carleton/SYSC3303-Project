@@ -58,10 +58,11 @@ public class ElevatorSubsystem implements Runnable{
 		// Init elevators
 		this.NUM_ELEV = numElev;
 		elevators = new Elevator[NUM_ELEV];
-		for (int i = 1; i <= NUM_ELEV; ++i){
+		for (int i = 0; i < NUM_ELEV; ++i){
+			int serialNum = i + 1;
 			elevators[i] = new Elevator(1, true,
-									ELEV_SUB_ELEV_RECV_PORT + NUM_ELEV,
-									ELEV_RECV_PORT + NUM_ELEV);
+									ELEV_SUB_ELEV_RECV_PORT + serialNum,
+									ELEV_RECV_PORT + serialNum);
 		}
 
 		// Init Buffer
@@ -86,7 +87,7 @@ public class ElevatorSubsystem implements Runnable{
 	/* Synchronized functions */
 
 	// ONLY used when starting new elevator communicators
-	private synchronized int getNewSerial(){
+	private synchronized int assignSerial(){
 		return ++serial;
 	}
 
@@ -104,11 +105,16 @@ public class ElevatorSubsystem implements Runnable{
 
 	// Add msg to elevator queue
 	private synchronized void sendToElevator(byte[] msg){
-		// TODO: find out which elevator should receive this message
-		
-		Integer serialNum = 0;
-		// add msg to elevator's queue
-		msgToElevators.get(serialNum).add(msg);
+		// message should be a scheduler msg
+		Common.TYPE messageType = Common.findType(msg);
+		if(messageType == Common.TYPE.SCHEDULER){
+			// decodeScheduler: index 0 corresponds to elev number
+			Integer elevatorNum = Common.decode(msg)[0];
+			// add msg to elevator's queue
+			msgToElevators.get(elevatorNum).add(msg);
+		}else{
+			System.out.println("ERR! Unexpected msg from Scheduler: " + messageType);
+		}
 	}
 
 	// Get msg for scheduler
@@ -176,7 +182,7 @@ public class ElevatorSubsystem implements Runnable{
 	// This thread communicates with a single elevator
 	private void elevatorCommunicator(){
 		// serialNumber = elevator number
-		int serialNum = getNewSerial();
+		int serialNum = assignSerial();
 		// Enable buffer for current elevator
 		initElevatorsBuffer(serialNum);
 		// initialize vars

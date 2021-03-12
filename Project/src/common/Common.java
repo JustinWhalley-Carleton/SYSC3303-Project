@@ -127,8 +127,8 @@ public class Common {
 	 */
 	public static byte[] encodeConfirmation(CONFIRMATION conf) {
 		byte[] msg = new byte[2];
-		msg[0] = (byte) TYPE.CONFIRMATION.value;
-		msg[1] = (byte) conf.value;
+		msg[0] = TYPE.CONFIRMATION.value;
+		msg[1] = conf.value;
 		return msg;
 	}
 
