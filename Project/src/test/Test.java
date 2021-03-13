@@ -50,9 +50,9 @@ public class Test {
 		carButton = new int[ROWS];
 		lines = new String[ROWS];
 		createFile();
-		scheduler = new Thread(new Scheduler(1,9));
+		scheduler = new Thread(new Scheduler(ELEVATORS,9));
 		floorSubsystem = new Thread(new FloorSubSystem(FLOORS), "Producer");
-		elevatorSubsystem = new Thread(new ElevatorSubsystem(1), "Consumer");
+		elevatorSubsystem = new Thread(new ElevatorSubsystem(ELEVATORS), "Consumer");
 		floorSubsystem.start();
 		elevatorSubsystem.start();
 		scheduler.start();

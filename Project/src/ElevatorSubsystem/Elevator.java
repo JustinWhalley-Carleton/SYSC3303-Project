@@ -28,15 +28,12 @@ public class Elevator implements Runnable {
 	private RPC transmitter;
 	private final InetAddress addr;
 	private TimerController timer;
-	private int destPort;
-	private int recPort;
 
 	// Constructor
 	public Elevator(int elevNum, int curFloor, boolean doorStatus, int destPort, int recPort) throws UnknownHostException {   
 		this.curFloor = curFloor;     
 		this.doorStatus = doorStatus;            //Initializing variables
-		this.destPort = destPort;
-		this.recPort = recPort;
+
 		addr = InetAddress.getLocalHost();
 		destFloors = new ArrayList<Integer>();
 		state = idle;   // setting motor state to idle
@@ -57,14 +54,14 @@ public class Elevator implements Runnable {
 		
 		targetFloor = floor;
 		destFloors.add((Integer)floor);
-		System.out.println("\nGoing from floor " + curFloor + " to floor " + floor);
+		System.out.println("\n Elevator " + elevNum + " going from floor " + curFloor + " to floor " + floor);
 
 		//If statements to checks the location of the destination floor relative to the current floor
 		if(curFloor > floor) {
-			System.out.println("Elevator State Change: GOING DOWN @ time = " + LocalTime.now());  //Going down if target floor is lower
+			System.out.println("Elevator " + elevNum + " State Change: GOING DOWN @ time = " + LocalTime.now());  //Going down if target floor is lower
 			state = up;
 		} else if (floor > curFloor) {
-			System.out.println("Elevator State Change: GOING UP @ time = " + LocalTime.now());  //Going up if target floor is higher
+			System.out.println("Elevator " + elevNum + " State Change: GOING UP @ time = " + LocalTime.now());  //Going up if target floor is higher
 			state = down;
 		} else {
 			System.out.println("Same floor. No state change\n");  //No movement if same floor
@@ -85,10 +82,14 @@ public class Elevator implements Runnable {
 
 	public void notifyElev() {
 		openDoor();
-		System.out.println("Elevator State Change: IN IDLE @ time = " + LocalTime.now() + "\n");  //Printing time stamps
+		System.out.println("Elevator " + elevNum + " State Change: IN IDLE @ time = " + LocalTime.now() + "\n");  //Printing time stamps
 		state = idle;    // set state to idle
 		removeFloor(targetFloor);  //calls method remove floor to remove it from the arraylist
 		curFloor = targetFloor;  //sets the new current floor
+
+		byte[] msg = Common.encodeElevator(elevNum, curFloor, state, targetFloor);
+		transmitter.sendPacket(msg);
+		msg = transmitter.receivePacket();
 	}
 
 	//Method removeFloor takes chosen floor and removes it from the Arraylist of destination floors
@@ -126,6 +127,7 @@ public class Elevator implements Runnable {
 		byte[] receiveMsg;
 		checkMsg = Common.encodeConfirmation(Common.CONFIRMATION.CHECK);
 		transmitter.sendPacket(checkMsg);
+
 		receiveMsg = transmitter.receivePacket();
 		
 		if (receiveMsg == null) {

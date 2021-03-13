@@ -2,11 +2,11 @@ Group Number: 5
 
 Breakdown of responsibilities:
 
-Justin Whalley #101117127:   Test, JunitTestCases, Common
+Justin Whalley #101117127:   Test, JunitTestCases, Common, Timer, TimerController, FloorSubSystem UDP
 Yisheng Li     #101028686:   Scheduler
-Yixiang Huang  #101071528:   FloorSubSystem
-Gurjit Gill    #101110071:   ElevatorSubsystem
-Everyone: 	            UML
+Yixiang Huang  #101071528:   ElevatorSubSystem, Common, RPC
+Gurjit Gill    #101110071:   Elevator
+Everyone: 	   UML
 
 
 
@@ -46,10 +46,17 @@ Scheduler:
 	-Scheduler.java
 		*send/receive messages to/from elevator and floor subsystems
 		*store states
+		*scheduling for elevators
 	-ElevtState.java
 		*store a state of an elevator
 	-FloorState.java
 		*store a state of a Floor
+
+Timer:
+    - TimerController.java
+        *intermediate between timer and elevator
+    - TimerThread.java
+        *sleep until interrupted for specified time & notify timer controller on completion
 
 test:
 	- Test.java
@@ -57,6 +64,8 @@ test:
 		*initialize FloorSubsystem, Elevator and scheduler
 	- testFile.txt
 		*hold the data
+	- settings.txt
+	    *hold # elev # floor # speed # command
 		
 Junit:
 	- run junit test cases on common and file loader 

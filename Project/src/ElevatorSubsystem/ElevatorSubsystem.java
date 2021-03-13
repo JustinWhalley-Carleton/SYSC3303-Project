@@ -82,6 +82,7 @@ public class ElevatorSubsystem implements Runnable{
 			elevatorCommunicators[i] = new Thread(this::elevatorCommunicator);
 			elevatorCommunicators[i].start();
 			// start elevator thread
+			System.out.println("Starting elevator " + (i + 1) + " thread.");
 			elevators[i].start();
 		}
 	}
