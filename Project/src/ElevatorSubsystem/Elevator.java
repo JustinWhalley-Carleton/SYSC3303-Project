@@ -70,13 +70,6 @@ public class Elevator implements Runnable {
 		}
 		timer = new TimerController(1000 * (Math.abs(curFloor - floor))/Test.SPEED, this);
 		timer.start();
-
-		//		try {
-		//			Thread.sleep(1000 * (Math.abs(curFloor - floor)));  //delay
-		//		} catch (InterruptedException e) {
-		//			// TODO Auto-generated catch block
-		//			e.printStackTrace();
-		//		}
 		
 	}
 
@@ -122,26 +115,28 @@ public class Elevator implements Runnable {
 		return curFloor;
 	}
 	
+	// receive method that first sends a check request to elevatorSubsystem
+	// and then receives instructions for a specific elevator
 	public void receive() {
 		
-		byte[] checkMsg;
+		byte[] checkMsg;  //byte array variables for the msgs
 		byte[] receiveMsg;
-		checkMsg = Common.encodeConfirmation(Common.CONFIRMATION.CHECK);
-		transmitter.sendPacket(checkMsg);
+		checkMsg = Common.encodeConfirmation(Common.CONFIRMATION.CHECK); //using the Common.java to encode check msg
+		transmitter.sendPacket(checkMsg);  //sends the msg request to elevator subsystem using UDP
 
-		receiveMsg = transmitter.receivePacket();
+		receiveMsg = transmitter.receivePacket();  //stores the elevatorSubsystem's response in byte array
 		
 		if (receiveMsg == null) {
 			return;
 		}
-		if (Common.findType(receiveMsg) == Common.TYPE.CONFIRMATION){
+		if (Common.findType(receiveMsg) == Common.TYPE.CONFIRMATION){     // checks to determine the type of msg using Common.java
 			if( Common.findConfirmation(receiveMsg) == Common.CONFIRMATION.NO_MSG) {
 				// System.out.println("no msg");
 			}
 
 		} else{
-			int received[] = Common.decode(receiveMsg);
-			addDest(received[1]);
+			int received[] = Common.decode(receiveMsg);  //decode the received msg that stores the info in an integer array
+			addDest(received[1]);   //Common.java identifies msg[1] as destination floor
 
 		}
 	}
@@ -159,9 +154,7 @@ public class Elevator implements Runnable {
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-//			transmitter.sendPacket(null);
-//			transmitter.receivePacket();
-			//Common.type.Confiormation.check
+			
 		}
 
 	}
