@@ -39,7 +39,7 @@ public class TimerController {
 	}
 	public void receiveTimerNotification() {
 		running = false;
-		//elev.notify();
+		elev.notifyElev();
 		System.out.println("STOPPED");
 	}
 }
