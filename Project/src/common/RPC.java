@@ -12,6 +12,8 @@ public class RPC {
     private DatagramSocket sendReceiveSocket;
     private final int BUF_SIZE = 100;
 
+    private static boolean PRINT_DEBUG_MSG = false;
+
 
     public RPC(InetAddress addr, int destPort, int recvPort) {
         DEST_ADDR = addr;
@@ -33,7 +35,7 @@ public class RPC {
         // Create datagramPacket
         DatagramPacket sendPacket = new DatagramPacket(msg, msg.length, DEST_ADDR, DEST_PORT);
         // Print Packet information
-        System.out.println("Sending packet:");
+        if(PRINT_DEBUG_MSG) System.out.println("Sending packet:");
         // Send Packet
         try {
             sendReceiveSocket.send(sendPacket);
@@ -42,8 +44,8 @@ public class RPC {
             System.exit(1);
         }
         // Packet sent
-        System.out.println("*** Packet Sent ***");
-        System.out.println();
+        if(PRINT_DEBUG_MSG) System.out.println("*** Packet Sent ***");
+        if(PRINT_DEBUG_MSG) System.out.println();
     }
 
     public void setTimeout(int millis) {
@@ -59,7 +61,7 @@ public class RPC {
         byte[] data = new byte[BUF_SIZE];
         // Init receive packet
         DatagramPacket receivePacket = new DatagramPacket(data, data.length);
-        System.out.println(" Waiting to receive packet...");
+        if(PRINT_DEBUG_MSG) System.out.println(" Waiting to receive packet...");
         // Receive Packet
         try {
             sendReceiveSocket.receive(receivePacket);
@@ -70,8 +72,8 @@ public class RPC {
             System.exit(1);
         }
         // Print Packet information
-        System.out.println("Received packet:");
-        System.out.println();
+        if(PRINT_DEBUG_MSG) System.out.println("Received packet:");
+        if(PRINT_DEBUG_MSG) System.out.println();
         // Trim data & return
         byte[] result = new byte[receivePacket.getLength()];
         for(int i = 0; i < result.length; ++i) result[i] = data[i];

@@ -5,7 +5,6 @@ import java.net.UnknownHostException;
 import java.time.LocalTime;
 import java.util.ArrayList;
 
-import Timer.TestTimer;
 import Timer.TimerController;
 import common.RPC;
 import common.Common;
@@ -43,7 +42,7 @@ public class Elevator implements Runnable {
 		state = idle;   // setting motor state to idle
 		transmitter = new RPC(addr, destPort, recPort);
 		this.elevNum = elevNum;
-		timer = new TimerController(1000/Test.SPEED, new Elevator(elevNum, curFloor, false, destPort, recPort));
+		timer = new TimerController(1000/Test.SPEED, this);
 	}
 
 	//Method selectFloor adds more floors to stop at into the destination arrayList "destFloors"
@@ -54,7 +53,7 @@ public class Elevator implements Runnable {
 	}
 
 	//Method addDest sets the new target floor to move towards
-	public void addDest(int floor) throws UnknownHostException {
+	public void addDest(int floor) {
 		
 		targetFloor = floor;
 		destFloors.add((Integer)floor);
@@ -72,7 +71,7 @@ public class Elevator implements Runnable {
 			removeFloor(floor);
 			return;
 		}
-		timer = new TimerController(1000 * (Math.abs(curFloor - floor))/Test.SPEED, new Elevator(elevNum, curFloor, false, destPort, recPort));
+		timer = new TimerController(1000 * (Math.abs(curFloor - floor))/Test.SPEED, this);
 		timer.start();
 
 		//		try {
@@ -125,15 +124,22 @@ public class Elevator implements Runnable {
 		
 		byte[] checkMsg;
 		byte[] receiveMsg;
-		checkMsg = encodeConfirmation(CONFIRMATION.CHECK);
+		checkMsg = Common.encodeConfirmation(Common.CONFIRMATION.CHECK);
 		transmitter.sendPacket(checkMsg);
 		receiveMsg = transmitter.receivePacket();
 		
 		if (receiveMsg == null) {
 			return;
 		}
-		if (Common.findType(receiveMsg) == Common.CONFIRMATION.NO_MSG) {
-			System.out.println("no msg");
+		if (Common.findType(receiveMsg) == Common.TYPE.CONFIRMATION){
+			if( Common.findConfirmation(receiveMsg) == Common.CONFIRMATION.NO_MSG) {
+				// System.out.println("no msg");
+			}
+
+		} else{
+			int received[] = Common.decode(receiveMsg);
+			addDest(received[1]);
+
 		}
 	}
 
@@ -141,16 +147,17 @@ public class Elevator implements Runnable {
 	public void run() {
 		// TODO Auto-generated method stub
 
+
 		while (true) {
+
+			receive();
 			try {
-				Thread.sleep(5000);
+				Thread.sleep(200);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-
-			receive();
-			transmitter.sendPacket(null);
-			transmitter.receivePacket();
+//			transmitter.sendPacket(null);
+//			transmitter.receivePacket();
 			//Common.type.Confiormation.check
 		}
 

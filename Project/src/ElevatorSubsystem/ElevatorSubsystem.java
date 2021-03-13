@@ -16,8 +16,8 @@ public class ElevatorSubsystem implements Runnable{
 	// Ports (maybe move this to Common class?)
 	private final InetAddress SCHEDULER_ADDR;
 	private final InetAddress ELEVATOR_ADDR;
-	private static final int SCHEDULER_RECV_PORT = 10000;
-	private static final int ELEV_SUB_RECV_PORT  = 10001;
+	private static final int SCHEDULER_RECV_PORT = 10004;
+	private static final int ELEV_SUB_RECV_PORT  = 10003;
 
 	/* The Initial port number used for receiving from elevator
 	*  (max 100 elevators)
@@ -37,7 +37,7 @@ public class ElevatorSubsystem implements Runnable{
 
 	// Class vars
 	private final int NUM_ELEV;
-	private Elevator[] elevators;
+	private Thread[] elevators;
 	private int serial = 0;
 
 	// Buffer
@@ -57,12 +57,13 @@ public class ElevatorSubsystem implements Runnable{
 
 		// Init elevators
 		this.NUM_ELEV = numElev;
-		elevators = new Elevator[NUM_ELEV];
+		elevators = new Thread[NUM_ELEV];
 		for (int i = 0; i < NUM_ELEV; ++i){
 			int serialNum = i + 1;
-			elevators[i] = new Elevator(1, true,
+			elevators[i] = new Thread (new
+									Elevator(serialNum, 1, true,
 									ELEV_SUB_ELEV_RECV_PORT + serialNum,
-									ELEV_RECV_PORT + serialNum);
+									ELEV_RECV_PORT + serialNum));
 		}
 
 		// Init Buffer
@@ -80,6 +81,8 @@ public class ElevatorSubsystem implements Runnable{
 		for(int i = 0; i < NUM_ELEV; ++i){
 			elevatorCommunicators[i] = new Thread(this::elevatorCommunicator);
 			elevatorCommunicators[i].start();
+			// start elevator thread
+			elevators[i].start();
 		}
 	}
 
@@ -99,12 +102,14 @@ public class ElevatorSubsystem implements Runnable{
 
 	// Add msg to scheduler queue
 	private synchronized void sendToScheduler(byte[] msg){
+//		System.out.println("ElevSub holding msg for Scheduler...");
 		// add msg to scheduler's queue
 		msgToScheduler.add(msg);
 	}
 
 	// Add msg to elevator queue
 	private synchronized void sendToElevator(byte[] msg){
+//		System.out.println("ElevSub holding msg for Elevator...");
 		// message should be a scheduler msg
 		Common.TYPE messageType = Common.findType(msg);
 		if(messageType == Common.TYPE.SCHEDULER){
@@ -122,6 +127,7 @@ public class ElevatorSubsystem implements Runnable{
 		if(msgToScheduler.isEmpty()){
 			return null;
 		}
+//		System.out.println("ElevSub sending msg to Scheduler...");
 		return msgToScheduler.pop();
 	}
 
@@ -130,6 +136,7 @@ public class ElevatorSubsystem implements Runnable{
 		if(msgToElevators.get(serialNum).isEmpty()){
 			return null;
 		}
+//		System.out.println("ElevSub sending msg to Elevator...");
 		return msgToElevators.get(serialNum).pop();
 	}
 

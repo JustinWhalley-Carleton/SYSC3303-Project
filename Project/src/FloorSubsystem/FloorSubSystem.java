@@ -35,7 +35,7 @@ public class FloorSubSystem implements Runnable{
         // Init instruction reader
         instructionFile = new FileLoader();
         
-        rpc = new RPC(InetAddress.getLocalHost(),10002,10000);
+        rpc = new RPC(InetAddress.getLocalHost(),10002,10001);
         rpc.setTimeout(2000);
         messageQueue = new LinkedList<byte[]>();
     }

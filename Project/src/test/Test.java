@@ -36,8 +36,7 @@ public class Test {
 	private String[] dir;
 	private int[] floor;
 	private int[] carButton;
-	private Scheduler scheduler;
-	private Thread floorSubsystem, elevatorSubsystem;
+	private Thread floorSubsystem, elevatorSubsystem, scheduler;
 	private String[] lines;
 	
 	/**
@@ -51,11 +50,12 @@ public class Test {
 		carButton = new int[ROWS];
 		lines = new String[ROWS];
 		createFile();
-		scheduler = new Scheduler(1,9);
+		scheduler = new Thread(new Scheduler(1,9));
 		floorSubsystem = new Thread(new FloorSubSystem(FLOORS), "Producer");
 		elevatorSubsystem = new Thread(new ElevatorSubsystem(1), "Consumer");
 		floorSubsystem.start();
 		elevatorSubsystem.start();
+		scheduler.start();
 	}
 	/**
 	 * @param args

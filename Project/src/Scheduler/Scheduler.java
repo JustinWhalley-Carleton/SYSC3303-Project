@@ -16,7 +16,7 @@ public class Scheduler implements Runnable {
 	private final byte[] CheckMSG = Common.encodeConfirmation(Common.CONFIRMATION.CHECK);
 
 	private int inState = 0; // 0 is wait; 1 is sending; -1 is receiving
-	private int totalElevts = 0;
+	private int totalElevts;
 	private int totalFloors = 0;
 	private ElevtState[] elevtStates; // also is the state of the scheduler
 	private FloorState[] floorStates;
@@ -32,6 +32,7 @@ public class Scheduler implements Runnable {
 	 */
 	public Scheduler (int totalElevts, int totalFloors) throws Exception {
 		this.inState = 0;
+		this.totalElevts = totalElevts;
 		this.totalFloors = totalFloors;
 		this.elevtStates = new ElevtState[totalElevts];
 		this.floorStates = new FloorState[totalFloors];
@@ -41,8 +42,8 @@ public class Scheduler implements Runnable {
 		for (int i=0;i<elevtStates.length;i++) { elevtStates[i]= new ElevtState(i+1); }
 		for (int i=0;i<floorStates.length;i++) { floorStates[i]= new FloorState(i+1); }
 
-		rpcElevt = new RPC(InetAddress.getLocalHost(),10001,10000);
-		rpcFloor = new RPC(InetAddress.getLocalHost(),10002,10000);
+		rpcElevt = new RPC(InetAddress.getLocalHost(),10003, 10004);
+		rpcFloor = new RPC(InetAddress.getLocalHost(),10001,10002);
 
 	}
 
@@ -218,13 +219,12 @@ public class Scheduler implements Runnable {
 
 	@Override
 	public void run() {
-
 		while (true) {
 			try {
 				sendReceiveFloorSub();
-				this.wait(200);
+				Thread.sleep(200);
 				sendReceiveElevtSub();
-				this.wait(200);
+				Thread.sleep(200);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}

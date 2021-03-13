@@ -14,7 +14,7 @@ public class TimerController {
 	boolean running;
 	Thread timer;
 	Elevator elev;
-	public TimerController(int time,Elevator elev) {
+	public TimerController(int time, Elevator elev) {
 		timer = new Thread(new TimerThread(time,this));
 		timer.start();
 		running = false;
@@ -37,9 +37,9 @@ public class TimerController {
 	public boolean isRunning() {
 		return running;
 	}
+
 	public void receiveTimerNotification() {
 		running = false;
 		elev.notifyElev();
-		System.out.println("STOPPED");
 	}
 }
