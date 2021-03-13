@@ -72,11 +72,11 @@ public class Scheduler implements Runnable {
 				msgToFloorSub.offer(oneMsgToFloorSub);
 			}
 
-			if ((floor != 1 && dest < floor) || dest == floor) {
+			if (floor != 1 && (dest < floor || dest == floor)) {
 				byte[] oneMsgToFloorSub = Common.encodeScheduler(1, floor,0);
 				msgToFloorSub.offer(oneMsgToFloorSub);
 			}
-			if (floor != floorStates.length && dest > floor || dest == floor) {
+			if (floor != floorStates.length && (dest > floor || dest == floor)) {
 				byte[] oneMsgToFloorSub = Common.encodeScheduler(1, floor,1);
 				msgToFloorSub.offer(oneMsgToFloorSub);
 			}
