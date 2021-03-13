@@ -15,10 +15,12 @@ public class Scheduler implements Runnable {
 
 	private final byte[] CheckMSG = Common.encodeConfirmation(Common.CONFIRMATION.CHECK);
 
-	private int inState = 0; // 0 is wait; 1 is sending; -1 is receiving  
+	private int inState = 0; // 0 is wait; 1 is sending; -1 is receiving
+	private int totalElevts = 0;
+	private int totalFloors = 0;
 	private ElevtState[] elevtStates; // also is the state of the scheduler
 	private FloorState[] floorStates;
-	private Queue<byte[]>   msgFromFloorSub, msgToElevtSub, msgToFloorSub;
+	private Queue<byte[]> msgToElevtSub, msgToFloorSub;
 
 	private RPC rpcFloor, rpcElevt;
 
@@ -29,11 +31,12 @@ public class Scheduler implements Runnable {
 	 * @param totalElevts total Floors number
 	 */
 	public Scheduler (int totalElevts, int totalFloors) throws Exception {
-		elevtStates = new ElevtState[totalElevts];
-		floorStates = new FloorState[totalFloors];
-		msgFromFloorSub = new LinkedList<byte[]>();
-		msgToElevtSub = new LinkedList<byte[]>();
-		msgToFloorSub = new LinkedList<byte[]>();
+		this.inState = 0;
+		this.totalFloors = totalFloors;
+		this.elevtStates = new ElevtState[totalElevts];
+		this.floorStates = new FloorState[totalFloors];
+		this.msgToElevtSub = new LinkedList<byte[]>();
+		this.msgToFloorSub = new LinkedList<byte[]>();
 		
 		for (int i=0;i<elevtStates.length;i++) { elevtStates[i]= new ElevtState(i+1); }
 		for (int i=0;i<floorStates.length;i++) { floorStates[i]= new FloorState(i+1); }
@@ -51,8 +54,6 @@ public class Scheduler implements Runnable {
      */
 	private void elevtSubAddMsg (byte[] msg) {
 		int[] message = Common.decode(msg);
-		
-    	//System.out.println("Scheduler got message from elevtSub: " + Arrays.toString(message));
 		int elevt = message[0];
 		int floor = message[1];
 		int dir = message[2];
@@ -65,18 +66,20 @@ public class Scheduler implements Runnable {
 
 		//if the the elevator stops on a floor, dismiss floor buttons
 		if (dir == 0){
-			//TO-DO: find which (uyp/down) button to dismiss
-			if (floor != 1) {
+
+			if (dest < floor){
 				byte[] oneMsgToFloorSub = Common.encodeScheduler(1, floor,0);
-				System.out.println("Scheduler sent message to FloorSub: " +  Arrays.toString(Common.decode(oneMsgToFloorSub)) + " @ time = " + LocalTime.now());
-				msgToFloorSub.offer(oneMsgToFloorSub);
-			}
-			if (floor != floorStates.length) {
-				byte[] oneMsgToFloorSub = Common.encodeScheduler(1, floor,1);
-				System.out.println("Scheduler sent message to FloorSub: " +  Arrays.toString(Common.decode(oneMsgToFloorSub)) + " @ time = " + LocalTime.now());
 				msgToFloorSub.offer(oneMsgToFloorSub);
 			}
 
+			if ((floor != 1 && dest < floor) || dest == floor) {
+				byte[] oneMsgToFloorSub = Common.encodeScheduler(1, floor,0);
+				msgToFloorSub.offer(oneMsgToFloorSub);
+			}
+			if (floor != floorStates.length && dest > floor || dest == floor) {
+				byte[] oneMsgToFloorSub = Common.encodeScheduler(1, floor,1);
+				msgToFloorSub.offer(oneMsgToFloorSub);
+			}
 
 		}
 
@@ -89,31 +92,86 @@ public class Scheduler implements Runnable {
 	 */
 	private void floorSubAddMsg (byte[] msg) {
 		int[] message = Common.decode(msg);
-		//System.out.println("Scheduler got message from floor sub: " + Arrays.toString(message)  + " @ time = " + LocalTime.now());
 		int floor = message[0];
 		int dir = message[1];
 
-
-		//System.out.println("Scheduler sent message to ElevtSub: " +  Arrays.toString(Common.decode(oneMsgToElevtSub)) + " @ time = " + LocalTime.now());
-		//msgFromFloorSub.offer(oneMsgFromFloorSub);
 		int closestElevt = findClosestElevt(floor,dir);
-		
 		byte[] oneMsgToElevtSub = Common.encodeScheduler(closestElevt, floor,dir);
 		msgToElevtSub.offer(oneMsgToElevtSub);
 		return;
 	}
 
 
+	/**
+	 *
+	 * @param floor floor# of a pressed floor button
+	 * @param dir direction of a pressed floor button
+	 *
+	 * @return the elevator# of which has the smallest distance to the floor
+	 */
+
+	private int findClosestElevt(int floor, int dir) {
+		int result = 0;
+		int[] distances = new int[totalElevts];
+		// find distance for all elevators
+		for (int i = 0; i < totalElevts; i++) {
+			int dis = findDistance(floor,dir,elevtStates[i]);
+			distances[i] = dis;
+		}
+
+		// get the elevt# of which has the smallest distance to the floor
+		int index = 0;
+		int min = distances[result];
+		for (int i = 1; i < distances.length; i++){
+			if (distances[i] <= min){
+				min = distances[i];
+				index = i;
+			}
+		}
+		result = index + 1;
+		return result;
+	}
+
 
 	/**
-	 * Send massgaes to FloorSub and ElevtSub if there is any
+	 *
+	 * @param floor floor# of a pressed floor button
+	 * @param dir direction of a pressed floor button
+	 * @param es state of an elevator
+	 *
+	 * @return the distance of the floor and the elevator
 	 */
+	private int findDistance(int floor, int dir, ElevtState es){
+		int distance = 0;
+		int elevtFloor = es.getFloor();
+		int elevtDir = 	es.getDir();
+		int elevtDest = es.getDest();
+
+		int floorDiff = elevtFloor - floor; // positive means floor is below the elevt; negative means above ;
+		if (elevtFloor == elevtDest){
+			distance = Math.abs(floorDiff);
+		} else if ((floorDiff < 0 && dir == -1 && elevtDir == -1) || (floorDiff > 0 && dir == 1 && elevtDir == 1)) { // on elevt's way
+			distance = Math.min(Math.abs(elevtFloor - floor),Math.abs(elevtDest - floor));
+		} else { // elevt needs turn around
+			if (elevtDir == -1) { // elevt is going down
+				distance = elevtFloor + floor;
+			} else{ // elevt is going up
+				distance = (this.totalFloors - elevtFloor) + (this.totalFloors - floor);
+			}
+		}
+		return distance;
+	}
+
+
+	// communicate with FloorSub
 	private void sendReceiveFloorSub() {
 		// send to FloorSub
 		this.inState = 1;
 		byte[] msgSend = msgToFloorSub.poll();
 		if (msgSend != null) {
 			rpcFloor.sendPacket(msgSend);
+			System.out.println("Scheduler sent message to FloorSub: " +  Arrays.toString(Common.decode(msgSend)) + " @ time = " + LocalTime.now());
+
 		} else {
 			rpcFloor.sendPacket(CheckMSG);
 		}
@@ -124,50 +182,37 @@ public class Scheduler implements Runnable {
 		byte[] msgReceive = rpcFloor.receivePacket();
 		if (Common.findType(msgReceive) != Common.TYPE.CONFIRMATION) {
 			floorSubAddMsg(msgReceive);
+			System.out.println("Scheduler received message from FloorSub: " + Arrays.toString(msgReceive)  + " @ time = " + LocalTime.now());
+
 		}
 		this.inState = 0;
 	}
 
+	// communicate with ElevtSub
 	private void sendReceiveElevtSub(){
 		// check ElevtSub
 		this.inState = 1;
 		byte[] msgSend = msgToElevtSub.poll();
 		if ( msgSend != null) {
 			rpcElevt.sendPacket(msgSend);
+			System.out.println("Scheduler sent message to ElevtSub: " +  Arrays.toString(Common.decode(msgSend)) + " @ time = " + LocalTime.now());
+
 		} else{
 			rpcElevt.sendPacket(CheckMSG);
 		}
 		this.inState = 0;
-		// receive from ElevtSub
 
+		// receive from ElevtSub
 		this.inState = -1;
 		byte[] msgReceive = rpcElevt.receivePacket();
 		if (Common.findType(msgReceive) != Common.TYPE.CONFIRMATION){
 			elevtSubAddMsg(msgReceive);
+			System.out.println("Scheduler received message from ElevtSub: " + Arrays.toString(msgReceive)  + " @ time = " + LocalTime.now());
+
 		}
 		this.inState = 0;
 
 	}
-
-
-	/**
-	 * Update elevtStates a msgToElevtSub Schedule based on all data
-	 *
-	 */
-	private int findClosestElevt(int floor, int dir) {
-		int result = 0;
-
-		return result;
-	}
-
-
-
-
-
-
-
-
-
 
 
 
