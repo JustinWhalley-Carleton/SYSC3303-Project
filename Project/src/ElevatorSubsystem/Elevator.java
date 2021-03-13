@@ -28,7 +28,13 @@ public class Elevator implements Runnable {
 	private RPC transmitter;
 	private final InetAddress addr;
 	private TimerController timer;
+	private boolean testing = false;
 
+	/**
+	 * no port elevator for junit testing
+	 */
+	public Elevator() {addr=null;testing=true;}
+	
 	// Constructor
 	public Elevator(int elevNum, int curFloor, boolean doorStatus, int destPort, int recPort) throws UnknownHostException {   
 		this.curFloor = curFloor;     
@@ -74,6 +80,7 @@ public class Elevator implements Runnable {
 	}
 
 	public void notifyElev() {
+		if(testing) return;
 		openDoor();
 		System.out.println("Elevator " + elevNum + " State Change: IN IDLE @ time = " + LocalTime.now() + "\n");  //Printing time stamps
 		state = idle;    // set state to idle

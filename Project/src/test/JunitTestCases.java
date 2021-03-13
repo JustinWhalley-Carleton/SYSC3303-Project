@@ -86,7 +86,7 @@ class JunitTestCases {
 		return lines;
 	}
 	
-	static void createSettingsFile(int rows, int floors, int elevators) {
+	static void createSettingsFile(int rows, int floors, int elevators, int speed) {
 		try {
 			String path = System.getProperty("user.dir")+System.getProperty("file.separator")+"src"+System.getProperty("file.separator")+"test"+System.getProperty("file.separator")+"settings.txt";
 			File file = new File(path);
@@ -99,6 +99,7 @@ class JunitTestCases {
 			writer.write("FLOORS: "+floors+"\n");
 			writer.write("ROWS: "+rows+"\n");
 			writer.write("ELEVATORS: "+elevators+"\n");
+			writer.write("SPEED: "+speed+"\n");
 			writer.close();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -106,10 +107,10 @@ class JunitTestCases {
 	}
 	
 	static int[] readSettingsFile() {
-		int[] data = new int[3];
+		int[] data = new int[4];
 		try {
 			Scanner scanner = new Scanner(new File("src/test/settings.txt"));
-			for (int i = 0; i < 3; i++) {
+			for (int i = 0; i < 4; i++) {
 				String line = scanner.nextLine();
 				String[] splitStr = line.trim().split("\\s+");
 				if(splitStr[0].trim().equals("ELEVATORS:")) {
@@ -118,6 +119,8 @@ class JunitTestCases {
 					data[1] = Integer.parseInt(splitStr[1]);
 				} else if (splitStr[0].trim().equals("FLOORS:")) {
 					data[2] = Integer.parseInt(splitStr[1]);
+				} else if (splitStr[0].trim().equals("SPEED:")) {
+					data[3] = Integer.parseInt(splitStr[1]);
 				}
 			}
 			scanner.close();
@@ -125,6 +128,7 @@ class JunitTestCases {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
 		return data;
 	}
 
@@ -380,28 +384,23 @@ class JunitTestCases {
 	@Test
 	void testTimerInterrupt() {
 		TimerController timer;
+		timer = new TimerController(2000, new Elevator());
+		timer.start();
+		assertTrue(timer.isRunning());
 		try {
-			timer = new TimerController(2000, new Elevator(1,1,false,12,22));
-			timer.start();
-			assertTrue(timer.isRunning());
-			try {
-				Thread.sleep(1000);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			timer.stop();
-			try {
-				Thread.sleep(100);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			assertFalse(timer.isRunning());
-		} catch (UnknownHostException e1) {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
-			e1.printStackTrace();
+			e.printStackTrace();
 		}
+		timer.stop();
+		try {
+			Thread.sleep(100);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		assertFalse(timer.isRunning());
 		
 	}
 	
@@ -411,21 +410,16 @@ class JunitTestCases {
 	@Test
 	void testTimerNoInterrupt() {
 		TimerController timer;
+		timer = new TimerController(1000, new Elevator());
+		timer.start();
+		assertTrue(timer.isRunning());
 		try {
-			timer = new TimerController(1000, new Elevator(1,1,false,100,200));
-			timer.start();
-			assertTrue(timer.isRunning());
-			try {
-				Thread.sleep(1200);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			assertFalse(timer.isRunning());
-		} catch (UnknownHostException e1) {
+			Thread.sleep(1200);
+		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
-			e1.printStackTrace();
+			e.printStackTrace();
 		}
+		assertFalse(timer.isRunning());
 		
 	}
 	
@@ -435,20 +429,15 @@ class JunitTestCases {
 	@Test
 	void testTimerNoStartStop() {
 		TimerController timer;
+		timer = new TimerController(2000, new Elevator());
+		timer.stop();
 		try {
-			timer = new TimerController(2000, new Elevator(1,1,false,10,20));
-			timer.stop();
-			try {
-				Thread.sleep(200);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			assertFalse(timer.isRunning());
-		} catch (UnknownHostException e1) {
+			Thread.sleep(200);
+		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
-			e1.printStackTrace();
+			e.printStackTrace();
 		}
+		assertFalse(timer.isRunning());
 		
 	}
 	
@@ -458,27 +447,22 @@ class JunitTestCases {
 	@Test
 	void testTimerDoubleStart() {
 		TimerController timer;
+		timer = new TimerController(2000, new Elevator());
+		timer.start();
 		try {
-			timer = new TimerController(2000, new Elevator(1,1,false,1,2));
-			timer.start();
-			try {
-				Thread.sleep(200);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			timer.start();
-			try {
-				Thread.sleep(200);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			assertTrue(timer.isRunning());
-		} catch (UnknownHostException e1) {
+			Thread.sleep(200);
+		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
-			e1.printStackTrace();
+			e.printStackTrace();
 		}
+		timer.start();
+		try {
+			Thread.sleep(200);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		assertTrue(timer.isRunning());
 		
 	}
 	
@@ -508,10 +492,10 @@ class JunitTestCases {
 	@Test
 	void testReadSettingsRows() {
 		int[] prevData = readSettingsFile();
-		createSettingsFile(10,5,15);
+		createSettingsFile(10,5,15,3);
 		int[] newData = readSettingsFile();
 		assertEquals(newData[1], 10);
-		createSettingsFile(prevData[1],prevData[2],prevData[0]);
+		createSettingsFile(prevData[1],prevData[2],prevData[0],prevData[3]);
 	}
 	
 	/**
@@ -520,22 +504,34 @@ class JunitTestCases {
 	@Test
 	void testReadSettingsFloors() {
 		int[] prevData = readSettingsFile();
-		createSettingsFile(10,5,15);
+		createSettingsFile(10,5,15,3);
 		int[] newData = readSettingsFile();
 		assertEquals(newData[2], 5);
-		createSettingsFile(prevData[1],prevData[2],prevData[0]);
+		createSettingsFile(prevData[1],prevData[2],prevData[0],prevData[3]);
 	}
 	
 	/**
 	 * test read from settings elevators
 	 */
 	@Test
-	void testReadSettingselevators() {
+	void testReadSettingsElevators() {
 		int[] prevData = readSettingsFile();
-		createSettingsFile(10,5,15);
+		createSettingsFile(10,5,15,3);
 		int[] newData = readSettingsFile();
 		assertEquals(newData[0], 15);
-		createSettingsFile(prevData[1],prevData[2],prevData[0]);
+		createSettingsFile(prevData[1],prevData[2],prevData[0],prevData[3]);
+	}
+	
+	/**
+	 * test read from settings speed
+	 */
+	@Test
+	void testReadSettingsSpeed() {
+		int[] prevData = readSettingsFile();
+		createSettingsFile(10,5,15,3);
+		int[] newData = readSettingsFile();
+		assertEquals(newData[3], 3);
+		createSettingsFile(prevData[1],prevData[2],prevData[0],prevData[3]);
 	}
 	
 	/**
