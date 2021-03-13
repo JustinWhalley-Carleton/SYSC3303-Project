@@ -69,6 +69,9 @@ public class Test {
 		}
 	}
 
+	/**
+	 * read the settings file and assign variables locally
+	 */
 	public void readSettings() {
 		try {
 			Scanner scanner = new Scanner(instructionFile);
