@@ -17,7 +17,8 @@ public class Common {
 		ELEVATOR		((byte) 0),
 		FLOOR			((byte) 1),
 		SCHEDULER		((byte) 2),
-		CONFIRMATION	((byte) 3);
+		CONFIRMATION	((byte) 3),
+		ELEV_ERROR		((byte) 4);
 
 		// Enum initializer
 		private final byte value;
@@ -43,9 +44,7 @@ public class Common {
 
 		// Enum initializer
 		private final byte value;
-		private CONFIRMATION(byte b){
-			this.value = b;
-		}
+		private CONFIRMATION(byte b){ this.value = b; }
 
 		// Determine which type the byte corresponds to
 		public static CONFIRMATION findConfirmation(byte b){
@@ -53,6 +52,53 @@ public class Common {
 				if(conf.value == b) return conf;
 			}
 			return INVALID;
+		}
+	}
+
+	/* Elevator error reporting messages types */
+	public enum ELEV_ERROR{
+		INVALID			((byte) -1),
+		UNKNOWN			((byte) 0),
+		STUCK			((byte) 1),
+		DOOR_OPEN		((byte) 2),
+		DOOR_CLOSE		((byte) 3);
+
+		// Enum initializer
+		private final byte value;
+		private byte elevNum;
+		private byte curFloor;
+		private byte destFloor;
+		private boolean rescheduleRequired;
+
+		private ELEV_ERROR(byte b){ this.value = b; }
+
+		private byte[] encode(){
+			byte[] msg = new byte[6];
+			msg[0] = TYPE.ELEV_ERROR.value;
+			msg[1] = value;
+			msg[2] = elevNum;
+			msg[3] = curFloor;
+			msg[4] = destFloor;
+			msg[5] = (byte) (rescheduleRequired ? 1 : 0);
+			return msg;
+		}
+
+		// Determine which type the byte corresponds to
+		public static ELEV_ERROR findError(byte b){
+			for (ELEV_ERROR err: ELEV_ERROR.values()){
+				if(err.value == b) return err;
+			}
+			return INVALID;
+		}
+
+		// Determine which type the byte corresponds to & init details.
+		public static ELEV_ERROR decode(byte[] msg){
+			ELEV_ERROR elevError = findError(msg[1]);
+			elevError.elevNum 				= msg[2];
+			elevError.curFloor 				= msg[3];
+			elevError.destFloor 			= msg[4];
+			elevError.rescheduleRequired 	= (msg[5] != 0);
+			return elevError;
 		}
 	}
 
@@ -133,6 +179,22 @@ public class Common {
 	}
 
 	/**
+	 * encode elevator error message into byte[]
+	 */
+	public static byte[] encodeElevError(ELEV_ERROR err,
+										 int elevNum,
+										 int curFloor,
+										 int destFloor,
+										 boolean rescheduleRequired) {
+		ELEV_ERROR elevError 			= err;
+		elevError.elevNum 				= (byte) elevNum;
+		elevError.curFloor 				= (byte) curFloor;
+		elevError.destFloor 			= (byte) destFloor;
+		elevError.rescheduleRequired 	= rescheduleRequired;
+		return err.encode();
+	}
+
+	/**
 	 *
 	 * @param msg byte[] of message
 	 * @return TYPE that this message belongs to
@@ -156,7 +218,11 @@ public class Common {
 			case SCHEDULER:
 				return decodeScheduler(msg);
 			case CONFIRMATION:
-				return decodeConfirmation(msg);
+				// Please use findConfirmation(byte[] msg) to get its type.
+			case ELEV_ERROR:
+				// Please use findElevError(byte[] msg) to get its type.
+				// Or use decodeElevError(byte[] msg) to get detail info of the error.
+				return new int[]{1};
 			default:
 				return null;
 		}
@@ -204,14 +270,6 @@ public class Common {
 		return decodedMsg;
 	}
 
-
-	private static int[] decodeConfirmation(byte[] msg) {
-		int[] decodedMsg = new int[1];
-		decodedMsg[0] = 1;
-		return decodedMsg;
-	}
-
-
 	/**
 	 *
 	 * @param msg byte[] of message
@@ -221,4 +279,82 @@ public class Common {
 		return CONFIRMATION.findConfirmation(msg[1]);
 	}
 
+	/**
+	 *
+	 * @param msg byte[] of message
+	 * @return ELEV_ERROR that this message belongs to
+	 */
+	public static ELEV_ERROR findElevError(byte[] msg){
+		return ELEV_ERROR.decode(msg);
+	}
+
+
+	public static void main(String[] args){
+
+		// How to use ELEV_ERROR msg?
+		// For example: When the elevator Stuck/ Door Open/ Door Close
+		// There are 2 ways of doing it:
+
+
+		// First way: Manual
+		// Create an ELEV_ERROR
+		ELEV_ERROR errorMsg_1 = ELEV_ERROR.STUCK;
+		// Fill in details of this error message:
+		errorMsg_1.elevNum 				= 1;
+		errorMsg_1.curFloor 			= 2;
+		errorMsg_1.destFloor 			= 3;
+		errorMsg_1.rescheduleRequired 	= true;
+		// Encode to byte array
+		byte[] errorMsg_1_byte = errorMsg_1.encode();
+
+
+		// Second way: Automatic
+		// Let the encoder do the job
+		byte[] errorMsg_2_byte = encodeElevError(ELEV_ERROR.DOOR_OPEN,
+												4,
+												5,
+												6,
+												false);
+
+
+		/**
+		 *    errorMsg_byte ---> UDP ---> errorMsg_byte
+		 */
+
+
+		// Change this to test the other encoding method:
+		byte[] errorMsg_byte = errorMsg_1_byte;
+
+		// Decode the message:
+
+		// Check if the message type is ELEV_ERROR
+		if (findType(errorMsg_byte) == TYPE.ELEV_ERROR){
+
+			// Generate a new ELEV_ERROR that's identical to the one sent.
+			ELEV_ERROR errorMsg_receive = ELEV_ERROR.decode(errorMsg_byte);
+
+			// Determine the type of the error
+			if (errorMsg_receive == ELEV_ERROR.STUCK){
+				System.out.println("This is a STUCK error.");
+			}
+			if (errorMsg_receive == ELEV_ERROR.DOOR_OPEN){
+				System.out.println("This is a DOOR_OPEN error.");
+			}
+			if (errorMsg_receive == ELEV_ERROR.DOOR_CLOSE){
+				System.out.println("This is a DOOR_CLOSE error.");
+			}
+
+			// Get detail of the error.
+			int elevNum 				= errorMsg_receive.elevNum;
+			int curFloor 				= errorMsg_receive.curFloor;
+			int destFloor				= errorMsg_receive.destFloor;
+			boolean rescheduleRequired 	= errorMsg_receive.rescheduleRequired;
+
+			System.out.println("elevNum: " + elevNum +
+								", curFloor: " + curFloor +
+								", destFloor: " + destFloor +
+								", reschedule: " + (rescheduleRequired ? "required" : "not required"));
+
+		}
+	}
 }
