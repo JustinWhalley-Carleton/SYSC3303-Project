@@ -25,7 +25,7 @@ public class ElevatorSubsystem implements Runnable{
 	*  2nd elevator = 10012
 	*  3rd elevator = 10013
 	*  etc... */
-	private static final int ELEV_SUB_ELEV_RECV_PORT = 10010;
+	private static final int ELEV_SUB_ELEV_RECV_PORT = 10005;
 
 	/* The Initial port number used for receiving by elevator
 	 *  (max 100 elevators)
