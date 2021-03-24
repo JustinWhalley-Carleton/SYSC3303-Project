@@ -4,9 +4,12 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.NoSuchElementException;
 
 import Timer.TimerController;
 import common.RPC;
+import common.Common.ELEV_ERROR;
 import common.Common;
 import test.Test;
 
@@ -31,6 +34,7 @@ public class Elevator implements Runnable {
 	private boolean testing = false;
 	private int NUM_FLOORS = Test.FLOORS;
 	private ElevatorButton[] buttons;
+	private boolean stuck=false;
 
 	/**
 	 * no port elevator for junit testing
@@ -51,6 +55,7 @@ public class Elevator implements Runnable {
 		for(int i = 0; i < NUM_FLOORS; i++) {
 			buttons[i] = new ElevatorButton(i,false);
 		}
+		timer = new TimerController(1000/Test.SPEED,this);
 	}
 
 	//Method selectFloor adds more floors to stop at into the destination arrayList "destFloors"
@@ -65,37 +70,56 @@ public class Elevator implements Runnable {
 		
 		targetFloor = floor;
 		destFloors.add((Integer)floor);
-		System.out.println("\n Elevator " + elevNum + " going from floor " + curFloor + " to floor " + floor);
-
+		System.out.println("\nElevator " + elevNum + " going from floor " + curFloor + " to floor " + floor);
+		buttons[floor-1].register();
 		//If statements to checks the location of the destination floor relative to the current floor
 		if(curFloor > floor) {
 			System.out.println("Elevator " + elevNum + " State Change: GOING DOWN @ time = " + LocalTime.now());  //Going down if target floor is lower
-			state = up;
+			state = down;
 		} else if (floor > curFloor) {
 			System.out.println("Elevator " + elevNum + " State Change: GOING UP @ time = " + LocalTime.now());  //Going up if target floor is higher
-			state = down;
+			state = up;
 		} else {
 			System.out.println("Same floor. No state change\n");  //No movement if same floor
 			removeFloor(floor);
 			return;
 		}
-		timer = new TimerController(1000 * (Math.abs(curFloor - floor))/Test.SPEED, this);
+		//timer = new TimerController(1000 * (Math.abs(curFloor - floor))/Test.SPEED, this);
 		timer.start();
 		
 	}
 
 	public void notifyElev() {
 		if(testing) return;
-		openDoor();
-		System.out.println("Elevator " + elevNum + " State Change: IN IDLE @ time = " + LocalTime.now() + "\n");  //Printing time stamps
-		state = idle;    // set state to idle
-		removeFloor(targetFloor);  //calls method remove floor to remove it from the arraylist
-		curFloor = targetFloor;  //sets the new current floor
-
-		byte[] msg = Common.encodeElevator(elevNum, curFloor, state, targetFloor);
-		transmitter.sendPacket(msg);
-		msg = transmitter.receivePacket();
-		closeDoor();
+		if(stuck) {
+			//if stuck do nothing
+			return;
+		} else if(curFloor != getFloor() && getFloor() != -1) {
+			// continue going in current direction
+			if(state == up) {
+				curFloor++;
+				timer.start();
+			} else if(state == down) {
+				curFloor--;
+				timer.start();
+			}
+		} else {
+			// arrived at floor 
+			openDoor();
+			System.out.println("Elevator " + elevNum + " State Change: IN IDLE @ time = " + LocalTime.now() + "\n");  //Printing time stamps
+			state = idle;    // set state to idle
+			removeFloor(targetFloor);  //calls method remove floor to remove it from the arraylist
+			curFloor = targetFloor;  //sets the new current floor
+			buttons[curFloor-1].reached();
+			byte[] msg = Common.encodeElevator(elevNum, curFloor, state, targetFloor);
+			transmitter.sendPacket(msg);
+			msg = transmitter.receivePacket();
+			closeDoor();
+		}
+		
+		
+		
+		
 	}
 
 	//Method removeFloor takes chosen floor and removes it from the Arraylist of destination floors
@@ -106,7 +130,33 @@ public class Elevator implements Runnable {
 	public byte[] getInfo() {
 		return null;
 	}
+	
+	private boolean pollStop() {
+		/**
+		if(getFloor() != -1) {
+			stuck = true;
+			byte[] msg = Common.encodeElevError(Common.ELEV_ERROR.STUCK, elevNum,curFloor,targetFloor, !buttons[targetFloor-1].isOn());
+			transmitter.sendPacket(msg);
+			transmitter.receivePacket();
+		}
+		**/
+		return false;
+	}
 
+	public Integer getFloor() {
+		int target = -1;
+		try {
+			if(state==up) {
+				target = Collections.min(destFloors);
+			} else {
+				target = Collections.max(destFloors);
+			}
+			return target;
+		} catch (NoSuchElementException e) {
+			return -1;
+		}
+	}
+	
 	//Method openDoor sets the door status to false to signify an open door
 	private void openDoor() {
 		this.doorStatus = false;
@@ -130,7 +180,7 @@ public class Elevator implements Runnable {
 	// receive method that first sends a check request to elevatorSubsystem
 	// and then receives instructions for a specific elevator
 	public void receive() {
-		
+		pollStop();
 		byte[] checkMsg;  //byte array variables for the msgs
 		byte[] receiveMsg;
 		checkMsg = Common.encodeConfirmation(Common.CONFIRMATION.CHECK); //using the Common.java to encode check msg
@@ -151,6 +201,7 @@ public class Elevator implements Runnable {
 			addDest(received[1]);   //Common.java identifies msg[1] as destination floor
 
 		}
+		pollStop();
 	}
 
 	@Override
