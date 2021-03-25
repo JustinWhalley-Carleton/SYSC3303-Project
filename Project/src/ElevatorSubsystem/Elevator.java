@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.NoSuchElementException;
 
+import FloorSubsystem.FileLoader;
 import Timer.TimerController;
 import common.RPC;
 import common.Common.ELEV_ERROR;
@@ -33,6 +34,7 @@ public class Elevator implements Runnable {
 	private int NUM_FLOORS = Test.FLOORS;
 	private ElevatorButton[] buttons;
 	private boolean stuck=false;
+	private FileLoader fileLoader;
 
 	/**
 	 * no port elevator for junit testing
@@ -52,11 +54,13 @@ public class Elevator implements Runnable {
 			buttons[i] = new ElevatorButton(i+1,false);
 		}
 		timer = new TimerController(1000/Test.SPEED,this);
+		//this.filLoader = fileLoader;
 	}
 
 	//Method addDest sets the new target floor to move towards
 	public void addDest(int floor) {
 		destFloors.add((Integer)floor);
+		move();
 	}
 
 	public void move() {
@@ -117,9 +121,10 @@ public class Elevator implements Runnable {
 		destFloors.remove((Integer)floor);
 	}
 	
-	private boolean pollStop() {
+	private void pollStop() {
 		/**
-		if(getFloor() != -1) {
+		String msgFile = fileLoader.getStop(elevnum);
+		if(msgFile!=null) {
 			stuck = true;
 			byte[] msg = Common.encodeElevError(Common.ELEV_ERROR.STUCK, elevNum,curFloor,getFloor(), !buttons[getFloor()-1].isOn());
 			transmitter.sendPacket(msg);
@@ -128,7 +133,6 @@ public class Elevator implements Runnable {
 		}
 		timer.stop();
 		**/
-		return false;
 	}
 
 	public Integer getFloor() {
