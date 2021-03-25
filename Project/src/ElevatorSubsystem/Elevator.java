@@ -21,7 +21,6 @@ public class Elevator implements Runnable {
 	// Constants
 	public int curFloor;
 	private int elevNum;
-	private int targetFloor;
 	private ArrayList<Integer> destFloors; //ArrayList to store the floors to stop at
 	private boolean doorStatus;  //True means door is closed, false for open door
 	private MotorState state;         
@@ -29,7 +28,6 @@ public class Elevator implements Runnable {
 	private Down down = new Down();    // The 3 states as per the motor interface
 	private Idle idle = new Idle();
 	private RPC transmitter;
-	private final InetAddress addr;
 	private TimerController timer;
 	private boolean testing = false;
 	private int NUM_FLOORS = Test.FLOORS;
@@ -39,56 +37,49 @@ public class Elevator implements Runnable {
 	/**
 	 * no port elevator for junit testing
 	 */
-	public Elevator() {addr=null;testing=true;}
+	public Elevator() {testing=true;}
 	
 	// Constructor
 	public Elevator(int elevNum, int curFloor, boolean doorStatus, int destPort, int recPort) throws UnknownHostException {   
 		this.curFloor = curFloor;     
 		this.doorStatus = doorStatus;            //Initializing variables
-
-		addr = InetAddress.getLocalHost();
 		destFloors = new ArrayList<Integer>();
 		state = idle;   // setting motor state to idle
-		transmitter = new RPC(addr, destPort, recPort);
+		transmitter = new RPC(InetAddress.getLocalHost(), destPort, recPort);
 		this.elevNum = elevNum;
 		buttons = new ElevatorButton[NUM_FLOORS];
 		for(int i = 0; i < NUM_FLOORS; i++) {
-			buttons[i] = new ElevatorButton(i,false);
+			buttons[i] = new ElevatorButton(i+1,false);
 		}
 		timer = new TimerController(1000/Test.SPEED,this);
 	}
 
-	//Method selectFloor adds more floors to stop at into the destination arrayList "destFloors"
-	public void selectFloor(int[] floors) {
-		for(int i : floors) {
-			destFloors.add((Integer)i);
-		}
-	}
-
 	//Method addDest sets the new target floor to move towards
 	public void addDest(int floor) {
-		
-		targetFloor = floor;
 		destFloors.add((Integer)floor);
-		System.out.println("\nElevator " + elevNum + " going from floor " + curFloor + " to floor " + floor);
-		buttons[floor-1].register();
-		//If statements to checks the location of the destination floor relative to the current floor
-		if(curFloor > floor) {
-			System.out.println("Elevator " + elevNum + " State Change: GOING DOWN @ time = " + LocalTime.now());  //Going down if target floor is lower
-			state = down;
-		} else if (floor > curFloor) {
-			System.out.println("Elevator " + elevNum + " State Change: GOING UP @ time = " + LocalTime.now());  //Going up if target floor is higher
-			state = up;
-		} else {
-			System.out.println("Same floor. No state change\n");  //No movement if same floor
-			removeFloor(floor);
-			return;
-		}
-		//timer = new TimerController(1000 * (Math.abs(curFloor - floor))/Test.SPEED, this);
-		timer.start();
-		
 	}
 
+	public void move() {
+		int floor = getFloor();
+		if(floor!=-1 && state == idle && !stuck) {
+			System.out.println("\nElevator " + elevNum + " going from floor " + curFloor + " to floor " + floor);
+			buttons[floor-1].register();
+			//If statements to checks the location of the destination floor relative to the current floor
+			if(curFloor > floor) {
+				System.out.println("Elevator " + elevNum + " State Change: GOING DOWN @ time = " + LocalTime.now());  //Going down if target floor is lower
+				state = down;
+			} else if (floor > curFloor) {
+				System.out.println("Elevator " + elevNum + " State Change: GOING UP @ time = " + LocalTime.now());  //Going up if target floor is higher
+				state = up;
+			} else {
+				System.out.println("Same floor. No state change\n");  //No movement if same floor
+				removeFloor(floor);
+				return;
+			}
+			timer.start();
+		}
+	}
+	
 	public void notifyElev() {
 		if(testing) return;
 		if(stuck) {
@@ -108,10 +99,9 @@ public class Elevator implements Runnable {
 			openDoor();
 			System.out.println("Elevator " + elevNum + " State Change: IN IDLE @ time = " + LocalTime.now() + "\n");  //Printing time stamps
 			state = idle;    // set state to idle
-			removeFloor(targetFloor);  //calls method remove floor to remove it from the arraylist
-			curFloor = targetFloor;  //sets the new current floor
+			removeFloor(curFloor);  //calls method remove floor to remove it from the arraylist
 			buttons[curFloor-1].reached();
-			byte[] msg = Common.encodeElevator(elevNum, curFloor, state, targetFloor);
+			byte[] msg = Common.encodeElevator(elevNum, curFloor, state,curFloor);
 			transmitter.sendPacket(msg);
 			msg = transmitter.receivePacket();
 			closeDoor();
@@ -126,19 +116,17 @@ public class Elevator implements Runnable {
 	public void removeFloor(int floor) {
 		destFloors.remove((Integer)floor);
 	}
-
-	public byte[] getInfo() {
-		return null;
-	}
 	
 	private boolean pollStop() {
 		/**
 		if(getFloor() != -1) {
 			stuck = true;
-			byte[] msg = Common.encodeElevError(Common.ELEV_ERROR.STUCK, elevNum,curFloor,targetFloor, !buttons[targetFloor-1].isOn());
+			byte[] msg = Common.encodeElevError(Common.ELEV_ERROR.STUCK, elevNum,curFloor,getFloor(), !buttons[getFloor()-1].isOn());
 			transmitter.sendPacket(msg);
 			transmitter.receivePacket();
+			removeFloor(getFloor());
 		}
+		timer.stop();
 		**/
 		return false;
 	}
@@ -177,6 +165,11 @@ public class Elevator implements Runnable {
 		return curFloor;
 	}
 	
+	//getter to return door status
+	public boolean getDoorStatus() {
+		return doorStatus;
+	}
+	
 	// receive method that first sends a check request to elevatorSubsystem
 	// and then receives instructions for a specific elevator
 	public void receive() {
@@ -210,7 +203,7 @@ public class Elevator implements Runnable {
 
 
 		while (true) {
-
+			move();
 			receive();
 			try {
 				Thread.sleep(200);
