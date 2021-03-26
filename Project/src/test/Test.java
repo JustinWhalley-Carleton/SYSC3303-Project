@@ -27,7 +27,7 @@ public class Test {
 	private File instructionFile = new File("src/test/settings.txt");
 	private int ROWS;
 	private int ELEVATORS;
-	private int FLOORS;
+	public static int FLOORS;
 	public static int SPEED;
 	static final String UP = "Up";
 	static final String DOWN = "Down";

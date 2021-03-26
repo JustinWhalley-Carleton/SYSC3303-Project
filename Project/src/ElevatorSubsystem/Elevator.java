@@ -29,6 +29,8 @@ public class Elevator implements Runnable {
 	private final InetAddress addr;
 	private TimerController timer;
 	private boolean testing = false;
+	private int NUM_FLOORS = Test.FLOORS;
+	private ElevatorButton[] buttons;
 
 	/**
 	 * no port elevator for junit testing
@@ -45,7 +47,10 @@ public class Elevator implements Runnable {
 		state = idle;   // setting motor state to idle
 		transmitter = new RPC(addr, destPort, recPort);
 		this.elevNum = elevNum;
-		timer = new TimerController(1000/Test.SPEED, this);
+		buttons = new ElevatorButton[NUM_FLOORS];
+		for(int i = 0; i < NUM_FLOORS; i++) {
+			buttons[i] = new ElevatorButton(i,false);
+		}
 	}
 
 	//Method selectFloor adds more floors to stop at into the destination arrayList "destFloors"

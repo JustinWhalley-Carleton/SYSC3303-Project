@@ -14,16 +14,6 @@ public class ElevatorButton {
 	private int floorNum;
 	private boolean light;
 	
-	/**
-	 *
-	 */
-	public ElevatorButton() {
-		
-		this.floorNum = 0;
-		this.light = false;
-		
-	}
-	
 	public ElevatorButton(int floorNum, boolean light) {
 		
 		this.floorNum = floorNum;
@@ -31,7 +21,7 @@ public class ElevatorButton {
 	}
 	
 	public void register() {
-		
+		turnOn();
 	}
 	
 	public void reached() {
