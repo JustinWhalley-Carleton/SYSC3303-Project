@@ -87,6 +87,35 @@ public class Scheduler implements Runnable {
         return;
     }
 
+
+	/**
+	 *
+	 *
+	 * @param msg The ERROR message sent by the elevator subsystem.
+	 */
+	private void elevtSubAddErrorMsg (byte[] msg) {
+		int[] message = Common.decode(msg);
+		int elevNum   = message[2];
+		int curFloor  = message[3];
+		int destFloor = message[4];
+		int dirFloor  = message[5];
+
+
+		// remove the stuck elev from scheduling list
+		for (int i = 0; i < totalElevts; i++) {
+			if (i ==  elevNum-1){
+				elevtStates[i] = null;
+			}
+		}
+
+		int closestElevt = findClosestElevt(destFloor,dirFloor);
+		byte[] oneMsgToElevtSub = Common.encodeScheduler(closestElevt, destFloor, dirFloor);
+		msgToElevtSub.offer(oneMsgToElevtSub);
+
+		return;
+	}
+
+
 	/**
 	 *
 	 * @param msg The message sent by the floor subsystem.
@@ -116,8 +145,11 @@ public class Scheduler implements Runnable {
 		int[] distances = new int[totalElevts];
 		// find distance for all elevators
 		for (int i = 0; i < totalElevts; i++) {
-			int dis = findDistance(floor,dir,elevtStates[i]);
-			distances[i] = dis;
+			// skip stuck elevts
+			if (elevtStates[i] != null) {
+				int dis = findDistance(floor, dir, elevtStates[i]);
+				distances[i] = dis;
+			}
 		}
 
 		// get the elevt# of which has the smallest distance to the floor
@@ -206,7 +238,14 @@ public class Scheduler implements Runnable {
 		// receive from ElevtSub
 		this.inState = -1;
 		byte[] msgReceive = rpcElevt.receivePacket();
-		if (Common.findType(msgReceive) != Common.TYPE.CONFIRMATION){
+
+		if (Common.findType(msgReceive) == Common.TYPE.ELEV_ERROR){
+			//if it is an ELEV_ERROR message
+			elevtSubAddErrorMsg(msgReceive);
+			System.out.println("Scheduler received ERROR message from ElevtSub: " + Arrays.toString(msgReceive)  + " @ time = " + LocalTime.now());
+
+		} else if (Common.findType(msgReceive) != Common.TYPE.CONFIRMATION) {
+			// if it is an normal ELEV message
 			elevtSubAddMsg(msgReceive);
 			System.out.println("Scheduler received message from ElevtSub: " + Arrays.toString(msgReceive)  + " @ time = " + LocalTime.now());
 
@@ -214,7 +253,6 @@ public class Scheduler implements Runnable {
 		this.inState = 0;
 
 	}
-
 
 
 	@Override
