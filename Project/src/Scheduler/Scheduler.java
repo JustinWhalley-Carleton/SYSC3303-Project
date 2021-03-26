@@ -95,10 +95,10 @@ public class Scheduler implements Runnable {
 	 */
 	private void elevtSubAddErrorMsg (byte[] msg) {
 		int[] message = Common.decode(msg);
-		int elevNum   = message[2];
-		int curFloor  = message[3];
-		int destFloor = message[4];
-		int dirFloor  = message[5];
+		int elevNum   = message[0];
+		int curFloor  = message[1];
+		int destFloor = message[2];
+		int dirFloor  = message[3];
 
 
 		// remove the stuck elev from scheduling list
