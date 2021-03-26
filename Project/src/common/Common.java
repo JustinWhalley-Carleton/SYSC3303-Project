@@ -68,16 +68,18 @@ public class Common {
 		private byte elevNum;
 		private byte curFloor;
 		private byte destFloor;
+		private byte dirFloor;
 
 		private ELEV_ERROR(byte b){ this.value = b; }
 
 		private byte[] encode(){
-			byte[] msg = new byte[5];
+			byte[] msg = new byte[6];
 			msg[0] = TYPE.ELEV_ERROR.value;
 			msg[1] = value;
 			msg[2] = elevNum;
 			msg[3] = curFloor;
 			msg[4] = destFloor;
+			msg[5] = dirFloor;
 			return msg;
 		}
 
@@ -95,10 +97,12 @@ public class Common {
 			elevError.elevNum 				= msg[2];
 			elevError.curFloor 				= msg[3];
 			elevError.destFloor 			= msg[4];
+			elevError.dirFloor				= msg[5];
 			return elevError;
 		}
 
 		// Decode the elev error msg to int[]
+		// {elevNum, curFloor, destFloor}
 		private static int[] decodeToInt(byte[] msg){
 			int[] result = new int[3];
 			result[0] 		= msg[2];
