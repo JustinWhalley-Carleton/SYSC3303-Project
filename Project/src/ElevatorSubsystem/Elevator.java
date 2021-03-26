@@ -96,7 +96,17 @@ public class Elevator implements Runnable {
 					}
 				}**/
 				closeDoor();
+				if(map.get(floor)) {
+					removeFloor(floor);
+					/**
+					int nextFloor = fileLoader.popDestination();
+					buttons[nextfloor-1].register();
+					addDest(nextFloor, false);
+					**/
+					return;
+				}
 				removeFloor(floor);
+				buttons[floor-1].reached();
 				return;
 			}
 			timer.start();
@@ -175,6 +185,7 @@ public class Elevator implements Runnable {
 		case 0:
 			stuck = true;
 			timer.stop();
+			System.out.println("Elevator "+elevNum+" stuck between floors "+curFloor+" and "+(state==up?curFloor+1:curFloor-1)+ " @ time = " + LocalTime.now());
 			while(getFloor() != -1) {
 				msg = Common.encodeElevError(Common.ELEV_ERROR.STUCK, elevNum,curFloor,map.get(getFloor()) ? -1 : getFloor(), !buttons[getFloor()-1].isOn());
 				transmitter.sendPacket(msg);
@@ -185,6 +196,7 @@ public class Elevator implements Runnable {
 		case 1:
 			stuck = true;
 			timer.stop();
+			System.out.println("Elevator "+elevNum+" stuck with doors open at floor "+curFloor+" @ time = " + LocalTime.now());
 			while(getFloor() != -1) {
 				msg = Common.encodeElevError(Common.ELEV_ERROR.DOOR_OPEN, elevNum,curFloor,map.get(getFloor()) ? -1 : getFloor(), !buttons[getFloor()-1].isOn());
 				transmitter.sendPacket(msg);
@@ -195,6 +207,7 @@ public class Elevator implements Runnable {
 		case 2:
 			stuck = true;
 			timer.stop();
+			System.out.println("Elevator "+elevNum+" stuck with doors closed at floor "+curFloor+" @ time = " + LocalTime.now());
 			while(getFloor() != -1) {
 				msg = Common.encodeElevError(Common.ELEV_ERROR.DOOR_CLOSE, elevNum,curFloor,map.get(getFloor()) ? -1 : getFloor(), !buttons[getFloor()-1].isOn());
 				transmitter.sendPacket(msg);
