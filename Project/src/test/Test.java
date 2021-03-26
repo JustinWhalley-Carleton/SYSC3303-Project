@@ -50,7 +50,7 @@ public class Test {
 		carButton = new int[ROWS];
 		lines = new String[ROWS];
 		createFile();
-		scheduler = new Thread(new Scheduler(ELEVATORS,9));
+		scheduler = new Thread(new Scheduler(ELEVATORS,FLOORS));
 		floorSubsystem = new Thread(new FloorSubSystem(FLOORS), "Producer");
 		elevatorSubsystem = new Thread(new ElevatorSubsystem(ELEVATORS), "Consumer");
 		floorSubsystem.start();
@@ -94,35 +94,50 @@ public class Test {
 			e.printStackTrace();
 		}
 	}
-	
+
+	/**
+	 * Generate pathname
+	 * @param filename
+	 * @return a File
+	 */
+	private File path(String filename) throws IOException {
+		String path = System.getProperty("user.dir") +
+				System.getProperty("file.separator") + "src" +
+				System.getProperty("file.separator") + "test" +
+				System.getProperty("file.separator") + filename;
+
+		// create a new file. if file is already made, delete it and make a new one
+		File file = new File(path);
+		if(file.exists()) {
+			file.delete();
+			file = new File(filename);
+		}
+
+		file.createNewFile();
+
+		return file;
+	}
+
 	/**
 	 * create the file and write to it
 	 */
-	public void createFile() {
-		try {
-			//get the path to file
-			String path = System.getProperty("user.dir")+System.getProperty("file.separator")+"src"+System.getProperty("file.separator")+"test"+System.getProperty("file.separator")+"testFile.txt";
-			// create a new file. if file is already made, delete it and make a new one
-			File file = new File(path);
-			if(file.exists()) {
-				file.delete();
-				file = new File(path);
-			}
-			file.createNewFile();
-			
-			generateData();
-			
-			//write data to the file
-			FileWriter writer = new FileWriter(file.getAbsoluteFile());
-			for(int i = 0; i < ROWS; i++) {
-				lines[i] = time[i] + " " + Integer.toString(floor[i]) + " " + dir[i] + " " + Integer.toString(carButton[i]);
-				writer.write(time[i] + " " + Integer.toString(floor[i]) + " " + dir[i] + " " + Integer.toString(carButton[i])+"\n");
-			}
-			writer.close();
-		} catch (IOException e) {
-			e.printStackTrace();
+	public void createFile() throws IOException {
+
+		// Test File
+		File file = path("testFile.txt");
+		generateData();
+		//write data to the file
+		FileWriter writer = new FileWriter(file.getAbsoluteFile());
+		for(int i = 0; i < ROWS; i++) {
+			lines[i] = time[i] + " " + Integer.toString(floor[i]) + " " + dir[i] + " " + Integer.toString(carButton[i]);
+			writer.write(time[i] + " " + Integer.toString(floor[i]) + " " + dir[i] + " " + Integer.toString(carButton[i])+"\n");
 		}
-		
+		writer.close();
+
+		// Error File
+		file = path("errorFile.txt");
+
+
 	}
 	
 	/**
@@ -141,10 +156,10 @@ public class Test {
 		for(int i = 0; i < ROWS; i++) {
 			String temp = (referenceTime.plus(10*i/SPEED,ChronoUnit.SECONDS)).toString();
 			time[i] = temp;
-			floor[i] = rand.nextInt(9)+1;
-			carButton[i] = rand.nextInt(9)+1;
+			floor[i] = rand.nextInt(FLOORS - 1)+1;
+			carButton[i] = rand.nextInt(FLOORS - 1)+1;
 			while(floor[i] == carButton[i]) {
-				carButton[i] = rand.nextInt(9)+1;
+				carButton[i] = rand.nextInt(FLOORS - 1)+1;
 			}
 			if(floor[i] > carButton[i]) {
 				dir[i] = DOWN;

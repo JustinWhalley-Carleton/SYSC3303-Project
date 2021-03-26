@@ -68,16 +68,18 @@ public class Common {
 		private byte elevNum;
 		private byte curFloor;
 		private byte destFloor;
+		private byte dirFloor;
 
 		private ELEV_ERROR(byte b){ this.value = b; }
 
 		private byte[] encode(){
-			byte[] msg = new byte[5];
+			byte[] msg = new byte[6];
 			msg[0] = TYPE.ELEV_ERROR.value;
 			msg[1] = value;
 			msg[2] = elevNum;
 			msg[3] = curFloor;
 			msg[4] = destFloor;
+			msg[5] = dirFloor;
 			return msg;
 		}
 
@@ -95,15 +97,18 @@ public class Common {
 			elevError.elevNum 				= msg[2];
 			elevError.curFloor 				= msg[3];
 			elevError.destFloor 			= msg[4];
+			elevError.dirFloor				= msg[5];
 			return elevError;
 		}
 
 		// Decode the elev error msg to int[]
+		// {elevNum, curFloor, destFloor, dirFloor}
 		private static int[] decodeToInt(byte[] msg){
 			int[] result = new int[3];
 			result[0] 		= msg[2];
 			result[1] 		= msg[3];
 			result[2] 		= msg[4];
+			result[3]		= msg[5];
 			return result;
 		}
 	}
@@ -190,11 +195,13 @@ public class Common {
 	public static byte[] encodeElevError(ELEV_ERROR err,
 										 int elevNum,
 										 int curFloor,
-										 int destFloor) {
+										 int destFloor,
+										 boolean dirFloor) {
 		ELEV_ERROR elevError 	= err;
 		elevError.elevNum 		= (byte) elevNum;
 		elevError.curFloor 		= (byte) curFloor;
 		elevError.destFloor 	= (byte) destFloor;
+		elevError.dirFloor		= (byte) (dirFloor ? 1 : 0);
 		return err.encode();
 	}
 
@@ -308,6 +315,7 @@ public class Common {
 		errorMsg_1.elevNum 		= 1;
 		errorMsg_1.curFloor 	= 2;
 		errorMsg_1.destFloor 	= 3;
+		errorMsg_1.dirFloor		= 0;
 		// Encode to byte array
 		byte[] errorMsg_1_byte = errorMsg_1.encode();
 
@@ -317,7 +325,8 @@ public class Common {
 		byte[] errorMsg_2_byte = encodeElevError(ELEV_ERROR.DOOR_OPEN,
 												4,
 												5,
-												6);
+												6,
+												true);
 
 
 		/**
@@ -326,7 +335,7 @@ public class Common {
 
 
 		// Change this to test the other encoding method:
-		byte[] errorMsg_byte = errorMsg_2_byte;
+		byte[] errorMsg_byte = errorMsg_1_byte;
 
 		// Decode the message:
 
@@ -351,10 +360,12 @@ public class Common {
 			int elevNum 	= errorMsg_receive.elevNum;
 			int curFloor 	= errorMsg_receive.curFloor;
 			int destFloor	= errorMsg_receive.destFloor;
+			int dirFloor	= errorMsg_receive.dirFloor;
 
 			System.out.println("elevNum: " + elevNum +
 								", curFloor: " + curFloor +
-								", destFloor: " + destFloor);
+								", destFloor: " + destFloor +
+								", dirFloor: " + dirFloor);
 
 		}
 	}
