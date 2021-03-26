@@ -5,6 +5,8 @@ package common;
 
 import ElevatorSubsystem.*;
 
+import java.util.Random;
+
 /**
  * @author jcwha
  *
@@ -57,20 +59,24 @@ public class Common {
 
 	/* Elevator error reporting messages types */
 	public enum ELEV_ERROR{
-		INVALID			((byte) -1),
-		UNKNOWN			((byte) 0),
-		STUCK			((byte) 1),
-		DOOR_OPEN		((byte) 2),
-		DOOR_CLOSE		((byte) 3);
+		INVALID			((byte) -1, "Invalid"),
+		UNKNOWN			((byte) 0, "Unknown"),
+		STUCK			((byte) 1, "StuckBetween"),
+		DOOR_OPEN		((byte) 2, "StuckOpen"),
+		DOOR_CLOSE		((byte) 3, "StuckClose");
 
 		// Enum initializer
 		private final byte value;
+		private final String name;
 		private byte elevNum;
 		private byte curFloor;
 		private byte destFloor;
 		private byte dirFloor;
 
-		private ELEV_ERROR(byte b){ this.value = b; }
+		private ELEV_ERROR(byte b, String n){
+			this.value = b;
+			this.name = n;
+		}
 
 		private byte[] encode(){
 			byte[] msg = new byte[6];
@@ -110,6 +116,13 @@ public class Common {
 			result[2] 		= msg[4];
 			result[3]		= msg[5];
 			return result;
+		}
+
+		public static String randomError(){
+			Random random = new Random();
+			ELEV_ERROR possibleErrors[] = new ELEV_ERROR[]{STUCK, DOOR_OPEN, DOOR_CLOSE};
+			int randomIndex = random.nextInt(possibleErrors.length);
+			return possibleErrors[randomIndex].name;
 		}
 	}
 

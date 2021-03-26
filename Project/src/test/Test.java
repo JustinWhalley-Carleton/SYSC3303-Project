@@ -9,12 +9,12 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
-import java.util.Random;
-import java.util.Scanner;
+import java.util.*;
 
 import ElevatorSubsystem.ElevatorSubsystem;
 import Scheduler.Scheduler;
 import FloorSubsystem.FloorSubSystem;
+import common.Common;
 //import ElevatorSubsystem.ElevatorSubsystem;
 /**
  * Create a file of commands to test the system
@@ -23,14 +23,18 @@ import FloorSubsystem.FloorSubSystem;
  *
  */
 public class Test {
-
+	// Setting
 	private File instructionFile = new File("src/test/settings.txt");
-	private int ROWS;
-	private int ELEVATORS;
+	// Constants
+	private static int ROWS;
+	private static int ELEVATORS;
+	private static int ELEV_ERR;
 	public static int FLOORS;
 	public static int SPEED;
+	// Strings
 	static final String UP = "Up";
 	static final String DOWN = "Down";
+	// Class vars
 	private Random rand = new Random();
 	private String[] time;
 	private String[] dir;
@@ -57,6 +61,7 @@ public class Test {
 		elevatorSubsystem.start();
 		scheduler.start();
 	}
+
 	/**
 	 * @param args
 	 */
@@ -75,17 +80,20 @@ public class Test {
 	public void readSettings() {
 		try {
 			Scanner scanner = new Scanner(instructionFile);
-			for (int i = 0; i < 4; i++) {
+			while(scanner.hasNextLine()) {
 				String line = scanner.nextLine();
 				String[] splitStr = line.trim().split("\\s+");
-				if(splitStr[0].trim().equals("ELEVATORS:")) {
-					this.ELEVATORS = Integer.parseInt(splitStr[1]);
-				} else if (splitStr[0].trim().equals("ROWS:")) {
-					this.ROWS = Integer.parseInt(splitStr[1]);
-				} else if (splitStr[0].trim().equals("FLOORS:")) {
-					this.FLOORS = Integer.parseInt(splitStr[1]);
-				} else if (splitStr[0].trim().equals("SPEED:")) {
-					SPEED = Integer.parseInt(splitStr[1]);
+
+				// Get value
+				int value = Integer.parseInt(splitStr[1]);
+				// Assign value to its according variable
+				switch(splitStr[0].trim()){
+					case "ELEVATORS:" 	-> ELEVATORS 	= value;
+					case "ROWS:"		-> ROWS 		= value;
+					case "FLOORS:"		-> FLOORS 		= value;
+					case "SPEED:"		-> SPEED 		= value;
+					case "ELEV_ERR:"	-> ELEV_ERR		= value;
+					default -> System.out.println("Unexpected item in settings file.");
 				}
 			}
 			scanner.close();
@@ -100,7 +108,7 @@ public class Test {
 	 * @param filename
 	 * @return a File
 	 */
-	private File path(String filename) throws IOException {
+	private File newFile(String filename) throws IOException {
 		String path = System.getProperty("user.dir") +
 				System.getProperty("file.separator") + "src" +
 				System.getProperty("file.separator") + "test" +
@@ -110,7 +118,7 @@ public class Test {
 		File file = new File(path);
 		if(file.exists()) {
 			file.delete();
-			file = new File(filename);
+			file = new File(path);
 		}
 
 		file.createNewFile();
@@ -122,22 +130,40 @@ public class Test {
 	 * create the file and write to it
 	 */
 	public void createFile() throws IOException {
+		// Local vars
+		File file;
+		FileWriter writer;
 
 		// Test File
-		File file = path("testFile.txt");
+		file = newFile("testFile.txt");
 		generateData();
 		//write data to the file
-		FileWriter writer = new FileWriter(file.getAbsoluteFile());
+		writer = new FileWriter(file.getAbsoluteFile());
 		for(int i = 0; i < ROWS; i++) {
-			lines[i] = time[i] + " " + Integer.toString(floor[i]) + " " + dir[i] + " " + Integer.toString(carButton[i]);
-			writer.write(time[i] + " " + Integer.toString(floor[i]) + " " + dir[i] + " " + Integer.toString(carButton[i])+"\n");
+			String curLine = time[i] + " " + Integer.toString(floor[i]) + " " +
+							  dir[i] + " " + Integer.toString(carButton[i]);
+			lines[i] = curLine;
+			writer.write(curLine + "\n");
 		}
 		writer.close();
 
 		// Error File
-		file = path("errorFile.txt");
+		file = newFile("errorFile.txt");
+		writer = new FileWriter(file.getAbsoluteFile());
 
+		Integer errorIterations[] = generateError(ELEV_ERR, ROWS);
+		Integer brokenElevators[] = generateError(ELEV_ERR, ELEVATORS);
 
+		for(int i = 0; i < ELEV_ERR; ++i ){
+			// Elev number = elevator that's gonna break (min = 1).
+			Integer elevNum = brokenElevators[i] + 1;
+			String errorType = Common.ELEV_ERROR.randomError();
+
+			String curLine = time[errorIterations[i]] + " " + elevNum + " " + errorType;
+
+			writer.write(curLine + "\n");
+		}
+		writer.close();
 	}
 	
 	/**
@@ -156,10 +182,10 @@ public class Test {
 		for(int i = 0; i < ROWS; i++) {
 			String temp = (referenceTime.plus(10*i/SPEED,ChronoUnit.SECONDS)).toString();
 			time[i] = temp;
-			floor[i] = rand.nextInt(FLOORS - 1)+1;
-			carButton[i] = rand.nextInt(FLOORS - 1)+1;
+			floor[i] = rand.nextInt(FLOORS)+1;
+			carButton[i] = rand.nextInt(FLOORS)+1;
 			while(floor[i] == carButton[i]) {
-				carButton[i] = rand.nextInt(FLOORS - 1)+1;
+				carButton[i] = rand.nextInt(FLOORS)+1;
 			}
 			if(floor[i] > carButton[i]) {
 				dir[i] = DOWN;
@@ -167,5 +193,28 @@ public class Test {
 				dir[i] = UP;
 			}
 		}
+	}
+
+	/**
+	 * Generate a sorted non-repeating Integer[]
+	 * length = the length of the output array.
+	 * range  = max value of random numbers in the output array (min = 0).
+	 * Since generated values are non-repeating, length <= range.
+	 * @return Integer[]
+	 */
+	private Integer[] generateError(int length, int range){
+		ArrayList<Integer> possibilities = new ArrayList<Integer>();
+		// All possibilities
+		for(int i = 0; i < range; ++i){
+			possibilities.add(i);
+		}
+		// Shuffle possibilities
+		Collections.shuffle(possibilities);
+		// Reduce amount of error as required
+		List<Integer> reduced = possibilities.subList(0, length);
+		Collections.sort(reduced);
+
+		Integer[] errors = new Integer[length];
+		return reduced.toArray(errors);
 	}
 }
