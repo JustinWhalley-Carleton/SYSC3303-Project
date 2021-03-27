@@ -143,6 +143,7 @@ public class Elevator implements Runnable {
 			if(stuckMsg != null) {
 				if(stuckMsg.equals("StuckClose")) {
 					makeStuck(2);
+					return;
 				}
 			}
 			openDoor();
@@ -222,7 +223,7 @@ public class Elevator implements Runnable {
 		}
 
 		System.out.println("\n\n*******");
-
+		Thread.currentThread().interrupt();
 	}
 	
 	private void pollStop() throws FileNotFoundException {
@@ -233,7 +234,7 @@ public class Elevator implements Runnable {
 				makeStuck(0);
 			}
 		}
-
+		
 
 	}
 
@@ -309,18 +310,19 @@ public class Elevator implements Runnable {
 
 
 		while (!stuck) {
-			move();
-
 			try {
-				receive();
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-			}
+				move();
+	
+				try {
+					receive();
+				} catch (FileNotFoundException e) {
+					e.printStackTrace();
+				}
 
-			try {
+			
 				Thread.sleep(200);
 			} catch (InterruptedException e) {
-				e.printStackTrace();
+				//e.printStackTrace();
 			}
 			
 		}

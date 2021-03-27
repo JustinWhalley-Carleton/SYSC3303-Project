@@ -1,4 +1,4 @@
-22:53:01.723941 1 StuckClose
-22:53:06.723941 2 StuckClose
-22:53:11.723941 3 StuckClose
-22:53:16.723941 4 StuckClose
+23:11:21.887707800 1 StuckBetween
+23:11:26.887707800 3 StuckClose
+23:11:51.887707800 4 StuckClose
+23:11:56.887707800 5 StuckBetween
