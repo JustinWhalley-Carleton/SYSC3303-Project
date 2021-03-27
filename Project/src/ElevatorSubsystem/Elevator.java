@@ -174,7 +174,9 @@ public class Elevator implements Runnable {
 			}
 			closeDoor();
 		}
-
+		byte[] msg = Common.encodeElevator(elevNum, curFloor, state, getFloor() == null ? curFloor : getFloor());
+		transmitter.sendPacket(msg);
+		transmitter.receivePacket();
 	}
 
 	//Method removeFloor takes chosen floor and removes it from the Arraylist of destination floors

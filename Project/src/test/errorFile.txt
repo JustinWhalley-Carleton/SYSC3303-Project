@@ -1,2 +1,4 @@
-22:37:19.697384 1 StuckOpen
-22:37:49.697384 2 StuckClose
+22:53:01.723941 1 StuckClose
+22:53:06.723941 2 StuckClose
+22:53:11.723941 3 StuckClose
+22:53:16.723941 4 StuckClose

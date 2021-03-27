@@ -162,6 +162,12 @@ public class Scheduler implements Runnable {
 				index = i;
 			}
 		}
+
+		if (min >= 99999){
+			System.out.println("No elevator available!");
+			System.exit(1);
+		}
+
 		result = index + 1;
 		return result;
 	}

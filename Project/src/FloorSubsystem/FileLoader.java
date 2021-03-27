@@ -191,6 +191,7 @@ public class FileLoader {
     		}
     		
     	}
+		scanner.close();
     	return output;  // return possible error code
     }
 
