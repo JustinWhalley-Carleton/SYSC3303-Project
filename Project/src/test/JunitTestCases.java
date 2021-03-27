@@ -139,7 +139,7 @@ class JunitTestCases {
 	void testFileReader() {
 		String[] lines = createFile();
 		try {
-			FileLoader fileLoader = new FileLoader("JunitTestFile.txt");
+			FileLoader fileLoader = new FileLoader("JunitTestFile.txt", true);
 			int i = 0;
 			while(fileLoader.hasNextInstruction()) {
 				String text = fileLoader.getTime() + " " + fileLoader.departFloor() + " " + (fileLoader.requestUp() ? "Up" : "Down") + " " + fileLoader.destFloor();
