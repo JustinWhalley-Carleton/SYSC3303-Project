@@ -36,7 +36,7 @@ public class FileLoader {
         this.nextLine();
     }
     
-    public FileLoader(String fileName) throws Exception{
+    public FileLoader(String fileName, boolean isInstruction) throws Exception{
     	instructionFile = new File("src/test/"+fileName);
         try {
             scanner = new Scanner(instructionFile);
@@ -48,7 +48,7 @@ public class FileLoader {
 
         destinations = new HashMap<Integer, ArrayList<Integer>>();
         // Call nextLine() to load the first instruction
-        this.nextLine();
+        if (isInstruction) this.nextLine();
     }
 
     public boolean hasNextInstruction(){
@@ -111,6 +111,21 @@ public class FileLoader {
                 }
                 // Update destinations
                 pushDestinations();
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean nextLineErr() throws Exception {
+        if (hasNextInstruction()){
+            curLine = readLine();
+            if(! curLine.equals("")){
+                // Split line into 4 segments: Time, Departure floor, Direction, Destination floor
+                lineSplit = curLine.split(" ");
+                if (lineSplit.length != 3){
+                    throw new Exception("Error File format unsupported!");
+                }
                 return true;
             }
         }

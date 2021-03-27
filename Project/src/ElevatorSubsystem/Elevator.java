@@ -1,5 +1,6 @@
 package ElevatorSubsystem;
 
+import java.io.FileNotFoundException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.time.LocalTime;
@@ -39,6 +40,7 @@ public class Elevator implements Runnable {
 	private boolean stuck=false;
 	private FileLoader fileLoader;
 	private String stuckMsg;
+	private boolean goingUp;
 	
 
 	/**
@@ -47,7 +49,7 @@ public class Elevator implements Runnable {
 	public Elevator() {testing=true;}
 	
 	// Constructor
-	public Elevator(int elevNum, int curFloor, boolean doorStatus, int destPort, int recPort/**,FileLoader fileLoader**/) throws UnknownHostException {   
+	public Elevator(int elevNum, int curFloor, boolean doorStatus, int destPort, int recPort, FileLoader fileLoader) throws UnknownHostException {
 		this.curFloor = curFloor;     
 		this.doorStatus = doorStatus;            //Initializing variables
 		state = idle;   // setting motor state to idle
@@ -60,7 +62,7 @@ public class Elevator implements Runnable {
 		timer = new TimerController(1000/Test.SPEED,this);
 		
 		map = new HashMap<Integer,Boolean>();
-		//this.filLoader = fileLoader;
+		this.fileLoader = fileLoader;
 	}
 
 	//Method addDest sets the new target floor to move towards
@@ -82,27 +84,30 @@ public class Elevator implements Runnable {
 				state = up;
 			} else {
 				System.out.println("Same floor. No state change\n");  //No movement if same floor
-				/**
+
 				if(stuckMsg != null) {
-					if(stuckMsg.equals("StuckClosed")) {
+					if(stuckMsg.equals("StuckClose")) {
 						makeStuck(2);
 					}
-				}**/
+				}
 				openDoor();
-				/**
+
 				if(stuckMsg != null) {
 					if(stuckMsg.equals("StuckOpen")) {
 						makeStuck(1);
 					}
-				}**/
+				}
 				closeDoor();
-				if(map.get(floor)) {
+				if(map.get(curFloor) == null ? false : map.get(curFloor)) {
 					removeFloor(floor);
-					/**
-					int nextFloor = fileLoader.popDestination();
-					buttons[nextfloor-1].register();
-					addDest(nextFloor, false);
-					**/
+
+					Integer[] nextFloors = fileLoader.popDestinations(curFloor, goingUp);
+
+					for (Integer floorNum: nextFloors){
+						buttons[floorNum-1].register();
+						addDest(floorNum, false);
+					}
+
 					return;
 				}
 				removeFloor(floor);
@@ -110,12 +115,12 @@ public class Elevator implements Runnable {
 				return;
 			}
 			timer.start();
-			/**
+
 			if(stuckMsg != null) {
 				if(stuckMsg.equals("StuckBetween")) {
 					makeStuck(0);
 				}
-			}**/
+			}
 		}
 	}
 	
@@ -134,44 +139,42 @@ public class Elevator implements Runnable {
 				timer.start();
 			}
 		} else {
-			// arrived at floor 
-			/**
+			// arrived at floor
 			if(stuckMsg != null) {
-				if(stuckMsg.equals("StuckClosed")) {
+				if(stuckMsg.equals("StuckClose")) {
 					makeStuck(2);
 				}
-			}**/
+			}
 			openDoor();
 			System.out.println("Elevator " + elevNum + " State Change: IN IDLE @ time = " + LocalTime.now() + "\n");  //Printing time stamps
 			state = idle;    // set state to idle
 			byte[] msg = Common.encodeElevator(elevNum, curFloor, state,curFloor);
 			transmitter.sendPacket(msg);
 			msg = transmitter.receivePacket();
-			if(map.get(curFloor)) {
+			if(map.get(curFloor) == null ? false : map.get(curFloor)) {
 				removeFloor(curFloor);  //calls method remove floor to remove it from the arraylist
-				/**
-				int nextFloor = fileLoader.popDestination();
-				buttons[nextfloor-1].register();
-				addDest(nextFloor, false);
-				**/
+
+				Integer[] nextFloors = fileLoader.popDestinations(curFloor, goingUp);
+
+				for (Integer floorNum: nextFloors){
+					buttons[floorNum-1].register();
+					addDest(floorNum, false);
+				}
 				
 			} else {
 				removeFloor(curFloor);  //calls method remove floor to remove it from the arraylist
 				buttons[curFloor-1].reached();
 				
 			}
-			/**
+
 			if(stuckMsg != null) {
 				if(stuckMsg.equals("StuckOpen")) {
 					makeStuck(1);
 				}
-			}**/
+			}
 			closeDoor();
 		}
-		
-		
-		
-		
+
 	}
 
 	//Method removeFloor takes chosen floor and removes it from the Arraylist of destination floors
@@ -180,53 +183,56 @@ public class Elevator implements Runnable {
 	}
 	
 	private void makeStuck(int reason) {
+		System.out.println("*******\n\n");
 		byte[] msg;
+		stuck = true;
+		Common.ELEV_ERROR errorType = ELEV_ERROR.STUCK;
+
 		switch(reason) {
 		case 0:
-			stuck = true;
-			timer.stop();
-			System.out.println("Elevator "+elevNum+" stuck between floors "+curFloor+" and "+(state==up?curFloor+1:curFloor-1)+ " @ time = " + LocalTime.now());
-			while(getFloor() != -1) {
-				msg = Common.encodeElevError(Common.ELEV_ERROR.STUCK, elevNum,curFloor,map.get(getFloor()) ? -1 : getFloor(), !buttons[getFloor()-1].isOn());
-				transmitter.sendPacket(msg);
-				transmitter.receivePacket();
-				removeFloor(getFloor());
-			}
+			System.out.println("Elevator "+elevNum+" stuck between floors "+
+					curFloor+" and "+(state==up?curFloor+1:curFloor-1)+
+					" @ time = " + LocalTime.now());
+			errorType = ELEV_ERROR.STUCK;
 			break;
 		case 1:
-			stuck = true;
-			timer.stop();
-			System.out.println("Elevator "+elevNum+" stuck with doors open at floor "+curFloor+" @ time = " + LocalTime.now());
-			while(getFloor() != -1) {
-				msg = Common.encodeElevError(Common.ELEV_ERROR.DOOR_OPEN, elevNum,curFloor,map.get(getFloor()) ? -1 : getFloor(), !buttons[getFloor()-1].isOn());
-				transmitter.sendPacket(msg);
-				transmitter.receivePacket();
-				removeFloor(getFloor());
-			}
+			System.out.println("Elevator "+elevNum+" stuck door open on floor "+curFloor+" @ time = " + LocalTime.now());
+			errorType = ELEV_ERROR.DOOR_OPEN;
 			break;
 		case 2:
-			stuck = true;
-			timer.stop();
-			System.out.println("Elevator "+elevNum+" stuck with doors closed at floor "+curFloor+" @ time = " + LocalTime.now());
-			while(getFloor() != -1) {
-				msg = Common.encodeElevError(Common.ELEV_ERROR.DOOR_CLOSE, elevNum,curFloor,map.get(getFloor()) ? -1 : getFloor(), !buttons[getFloor()-1].isOn());
-				transmitter.sendPacket(msg);
-				transmitter.receivePacket();
-				removeFloor(getFloor());
-			}
+			System.out.println("Elevator "+elevNum+" stuck door close on floor "+curFloor+" @ time = " + LocalTime.now());
+			errorType = ELEV_ERROR.DOOR_CLOSE;
 			break;
 		}
+
+		timer.stop();
+		if (getFloor() == -1){
+			System.out.println("Removing floors..");
+			msg = Common.encodeElevError(errorType, elevNum,curFloor, -1, goingUp);
+			transmitter.sendPacket(msg);
+			removeFloor(getFloor());
+		}
+		while(getFloor() != -1) {
+			System.out.println("Removing floors..");
+			msg = Common.encodeElevError(errorType, elevNum, curFloor, map.get(getFloor()) ? -1 : getFloor(), goingUp);
+			transmitter.sendPacket(msg);
+			removeFloor(getFloor());
+		}
+
+		System.out.println("\n\n*******");
+
 	}
 	
-	private void pollStop() {
-		/**
-		stuckMsg = fileLoader.getStop(elevNum);
+	private void pollStop() throws FileNotFoundException {
+
+		stuckMsg = fileLoader.errorFileReader(elevNum);
 		if(stuckMsg != null) {
 			if(stuckMsg.equals("StuckBetween") && state != idle) {
 				makeStuck(0);
 			}
 		}
-		**/
+
+
 	}
 
 	public Integer getFloor() {
@@ -270,7 +276,7 @@ public class Elevator implements Runnable {
 	
 	// receive method that first sends a check request to elevatorSubsystem
 	// and then receives instructions for a specific elevator
-	public void receive() {
+	public void receive() throws FileNotFoundException {
 		pollStop();
 		byte[] checkMsg;  //byte array variables for the msgs
 		byte[] receiveMsg;
@@ -290,7 +296,7 @@ public class Elevator implements Runnable {
 		} else{
 			int received[] = Common.decode(receiveMsg);  //decode the received msg that stores the info in an integer array
 			addDest(received[1],true);   //Common.java identifies msg[1] as destination floor
-
+			goingUp = received[2] == 1 ? true : false;
 		}
 		pollStop();
 	}
@@ -300,9 +306,15 @@ public class Elevator implements Runnable {
 		// TODO Auto-generated method stub
 
 
-		while (true) {
+		while (!stuck) {
 			move();
-			receive();
+
+			try {
+				receive();
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			}
+
 			try {
 				Thread.sleep(200);
 			} catch (InterruptedException e) {
