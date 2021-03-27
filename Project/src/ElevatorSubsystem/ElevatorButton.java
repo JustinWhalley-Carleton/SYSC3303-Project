@@ -35,5 +35,9 @@ public class ElevatorButton {
 	private void turnOff() {
 		light = false;
 	}
+	
+	public boolean isOn() {
+		return light;
+	}
 
 }
