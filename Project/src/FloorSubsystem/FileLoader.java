@@ -148,6 +148,36 @@ public class FileLoader {
         }
         return result;
     }
+    
+    // Method to read the generated errors for elevators
+    public static String errorFileReader (int elevNum) throws FileNotFoundException {
+    	String output = null;
+    	File errorFile = new File ("src/test/errorFile.txt");   //file location and name
+    	Boolean errorFound = false;  //boolean status of file search
+    	
+		Scanner scanner = new Scanner (errorFile);
+
+		while (scanner.hasNextLine() && errorFound == false) {  //while elevator has not been found
+        	//output = null;
+    		String line = scanner.nextLine();
+    		String[] currentLine = line.split(" ");   //stores each column in separate index of this string[]
+    		
+    		int num = Integer.parseInt(currentLine[1]);  //store the file's elevator number
+    		
+    		if (num == elevNum) {  //if the current line contains the same elevNum as requested
+    			errorFound = true;    // possible error has been found
+    			
+    			if (LocalTime.now().isAfter(LocalTime.parse(currentLine[0]))) {   // if error time has past
+    				output = currentLine[2];    // set up output to be the error code
+    			}
+    			else {
+    				output = null;
+    			}
+    		}
+    		
+    	}
+    	return output;  // return possible error code
+    }
 
     // toString() override
     public String toString(){
