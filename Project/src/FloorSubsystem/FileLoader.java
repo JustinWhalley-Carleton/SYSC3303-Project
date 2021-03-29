@@ -78,9 +78,12 @@ public class FileLoader {
                   (!goingUp && destination < departFloor)){
                     // Add destination to output
                     output.add(destination);
-                    // Remove destination from destinationFloors
-                    destinationFloors.remove(destination);
                 }
+            }
+
+            for (int destination: output){
+                // Remove destination from destinationFloors
+                destinationFloors.remove(Integer.valueOf(destination));
             }
 
             // if destinationFloors is empty, cleanup
@@ -201,6 +204,19 @@ public class FileLoader {
         return "User at floor " + departFloor() + " requested to move " +
                 (requestUp() ? " UP " : "DOWN") + " to floor " +
                 destFloor() + " @ " + getTime();
+    }
+
+
+    public static void main(String[] args) throws Exception {
+        FileLoader fileLoader = new FileLoader();
+
+        fileLoader.nextLine();
+
+        Integer[] destinations = fileLoader.popDestinations(19, false);
+
+        for (int destination: destinations) {
+            System.out.println(destination);
+        }
     }
 
 }
