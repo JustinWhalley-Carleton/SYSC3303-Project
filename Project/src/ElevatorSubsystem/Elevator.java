@@ -207,14 +207,31 @@ public class Elevator implements Runnable {
 					curFloor+" and "+(state==up?curFloor+1:curFloor-1)+
 					" @ time = " + LocalTime.now());
 			errorType = ELEV_ERROR.STUCK;
+			Thread.currentThread().interrupt();
 			break;
 		case 1:
 			System.out.println("Elevator "+elevNum+" stuck door open on floor "+curFloor+" @ time = " + LocalTime.now());
 			errorType = ELEV_ERROR.DOOR_OPEN;
+			try {
+				Thread.sleep(5000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			stuck = false;
+			stuckMsg = null;
 			break;
 		case 2:
 			System.out.println("Elevator "+elevNum+" stuck door close on floor "+curFloor+" @ time = " + LocalTime.now());
 			errorType = ELEV_ERROR.DOOR_CLOSE;
+			try {
+				Thread.sleep(5000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			stuck = false;
+			stuckMsg = null;
 			break;
 		}
 
@@ -233,7 +250,7 @@ public class Elevator implements Runnable {
 		}
 
 		System.out.println("\n\n*******");
-		Thread.currentThread().interrupt();
+		
 	}
 	
 	private void pollStop() throws FileNotFoundException {
