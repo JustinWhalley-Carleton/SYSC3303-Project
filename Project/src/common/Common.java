@@ -63,7 +63,8 @@ public class Common {
 		UNKNOWN			((byte) 0, "Unknown"),
 		STUCK			((byte) 1, "StuckBetween"),
 		DOOR_OPEN		((byte) 2, "StuckOpen"),
-		DOOR_CLOSE		((byte) 3, "StuckClose");
+		DOOR_CLOSE		((byte) 3, "StuckClose"),
+		RECOVER			((byte) 4, "Recover");
 
 		// Enum initializer
 		private final byte value;
