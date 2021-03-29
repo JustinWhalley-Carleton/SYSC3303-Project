@@ -79,7 +79,7 @@ public class FileLoader {
                     // Add destination to output
                     output.add(destination);
                     // Remove destination from destinationFloors
-                    destinationFloors.remove(destination);
+                    //destinationFloors.remove(destination);
                 }
             }
 

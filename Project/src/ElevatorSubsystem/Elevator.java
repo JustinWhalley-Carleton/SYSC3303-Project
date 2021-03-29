@@ -41,6 +41,7 @@ public class Elevator implements Runnable {
 	private FileLoader fileLoader;
 	private String stuckMsg;
 	private boolean goingUp;
+	private FileLoader file;
 	
 
 	/**
@@ -63,6 +64,16 @@ public class Elevator implements Runnable {
 		
 		map = new HashMap<Integer,Boolean>();
 		this.fileLoader = fileLoader;
+		try {
+			file = new FileLoader();
+			while(file.hasNextInstruction()) {
+				file.nextLine();
+			}
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 	}
 
 	//Method addDest sets the new target floor to move towards
@@ -98,10 +109,10 @@ public class Elevator implements Runnable {
 					}
 				}
 				closeDoor();
-				if(map.get(curFloor) == null ? false : map.get(curFloor)) {
+				if(map.get(curFloor) == null ? false : (boolean)map.get(curFloor)) {
 					removeFloor(floor);
 
-					Integer[] nextFloors = fileLoader.popDestinations(curFloor, goingUp);
+					Integer[] nextFloors = file.popDestinations(curFloor, goingUp);
 
 					for (Integer floorNum: nextFloors){
 						buttons[floorNum-1].register();
@@ -129,7 +140,7 @@ public class Elevator implements Runnable {
 		if(stuck) {
 			//if stuck do nothing
 			return;
-		} else if(curFloor != getFloor() && getFloor() != -1) {
+		} else if((state == up && curFloor < getFloor())||(state == down && curFloor > getFloor())){
 			// continue going in current direction
 			if(state == up) {
 				curFloor++;
@@ -152,11 +163,10 @@ public class Elevator implements Runnable {
 			byte[] msg = Common.encodeElevator(elevNum, curFloor, state,curFloor);
 			transmitter.sendPacket(msg);
 			msg = transmitter.receivePacket();
-			if(map.get(curFloor) == null ? false : map.get(curFloor)) {
+			if(map.get(curFloor) == null ? false : (boolean)map.get(curFloor)) {
 				removeFloor(curFloor);  //calls method remove floor to remove it from the arraylist
-
-				Integer[] nextFloors = fileLoader.popDestinations(curFloor, goingUp);
-
+				Integer[] nextFloors = file.popDestinations(curFloor, goingUp);
+				
 				for (Integer floorNum: nextFloors){
 					buttons[floorNum-1].register();
 					addDest(floorNum, false);
@@ -217,7 +227,7 @@ public class Elevator implements Runnable {
 		}
 		while(getFloor() != -1) {
 			System.out.println("Removing floors..");
-			msg = Common.encodeElevError(errorType, elevNum, curFloor, map.get(getFloor()) ? -1 : getFloor(), goingUp);
+			msg = Common.encodeElevError(errorType, elevNum, curFloor, ((boolean)map.get(getFloor())) ? -1 : getFloor(), goingUp);
 			transmitter.sendPacket(msg);
 			removeFloor(getFloor());
 		}
@@ -322,7 +332,7 @@ public class Elevator implements Runnable {
 			
 				Thread.sleep(200);
 			} catch (InterruptedException e) {
-				//e.printStackTrace();
+				return;
 			}
 			
 		}

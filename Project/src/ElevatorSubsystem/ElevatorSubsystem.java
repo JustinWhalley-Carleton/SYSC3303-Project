@@ -60,7 +60,7 @@ public class ElevatorSubsystem implements Runnable{
 		this.NUM_ELEV = numElev;
 		elevators = new Thread[NUM_ELEV];
 		FileLoader fileLoader = new FileLoader("errorFile.txt", false);
-
+		
 		for (int i = 0; i < NUM_ELEV; ++i){
 			int serialNum = i + 1;
 			elevators[i] = new Thread (new
