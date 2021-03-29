@@ -61,10 +61,14 @@ public class Scheduler implements Runnable {
 		int dest = message[3];
 
 		// update elevt States
-		if(elevtStates[elevt-1] == null) return;
-		elevtStates[elevt-1].setFloor(floor);
-		elevtStates[elevt-1].setDir(dir);
-		elevtStates[elevt-1].setDest(dest);
+		if(elevtStates[elevt-1] == null && dir == -1) return;
+
+		ElevtState ES = new ElevtState(elevt);
+		ES.setFloor(floor);
+		ES.setDir(dir);
+		ES.setDest(dest);
+
+		elevtStates[elevt-1] = ES ;
 
 		//if the the elevator stops on a floor, dismiss floor buttons
 		if (dir == 0){
