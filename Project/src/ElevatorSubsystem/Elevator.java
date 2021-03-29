@@ -220,6 +220,7 @@ public class Elevator implements Runnable {
 			}
 			stuck = false;
 			stuckMsg = null;
+			System.out.println("\n\nRECOVERED\n\n");
 			break;
 		case 2:
 			System.out.println("Elevator "+elevNum+" stuck door close on floor "+curFloor+" @ time = " + LocalTime.now());
@@ -232,6 +233,7 @@ public class Elevator implements Runnable {
 			}
 			stuck = false;
 			stuckMsg = null;
+			System.out.println("\n\nRECOVERED\n\n");
 			break;
 		}
 
