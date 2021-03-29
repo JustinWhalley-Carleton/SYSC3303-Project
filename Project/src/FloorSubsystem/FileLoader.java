@@ -36,7 +36,7 @@ public class FileLoader {
         this.nextLine();
     }
     
-    public FileLoader(String fileName) throws Exception{
+    public FileLoader(String fileName, boolean isInstruction) throws Exception{
     	instructionFile = new File("src/test/"+fileName);
         try {
             scanner = new Scanner(instructionFile);
@@ -48,7 +48,7 @@ public class FileLoader {
 
         destinations = new HashMap<Integer, ArrayList<Integer>>();
         // Call nextLine() to load the first instruction
-        this.nextLine();
+        if (isInstruction) this.nextLine();
     }
 
     public boolean hasNextInstruction(){
@@ -78,9 +78,12 @@ public class FileLoader {
                   (!goingUp && destination < departFloor)){
                     // Add destination to output
                     output.add(destination);
-                    // Remove destination from destinationFloors
-                    destinationFloors.remove(destination);
                 }
+            }
+
+            for (int destination: output){
+                // Remove destination from destinationFloors
+                destinationFloors.remove(Integer.valueOf(destination));
             }
 
             // if destinationFloors is empty, cleanup
@@ -111,6 +114,21 @@ public class FileLoader {
                 }
                 // Update destinations
                 pushDestinations();
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean nextLineErr() throws Exception {
+        if (hasNextInstruction()){
+            curLine = readLine();
+            if(! curLine.equals("")){
+                // Split line into 4 segments: Time, Departure floor, Direction, Destination floor
+                lineSplit = curLine.split(" ");
+                if (lineSplit.length != 3){
+                    throw new Exception("Error File format unsupported!");
+                }
                 return true;
             }
         }
@@ -148,6 +166,37 @@ public class FileLoader {
         }
         return result;
     }
+    
+    // Method to read the generated errors for elevators
+    public static String errorFileReader (int elevNum) throws FileNotFoundException {
+    	String output = null;
+    	File errorFile = new File ("src/test/errorFile.txt");   //file location and name
+    	Boolean errorFound = false;  //boolean status of file search
+    	
+		Scanner scanner = new Scanner (errorFile);
+
+		while (scanner.hasNextLine() && errorFound == false) {  //while elevator has not been found
+        	//output = null;
+    		String line = scanner.nextLine();
+    		String[] currentLine = line.split(" ");   //stores each column in separate index of this string[]
+    		
+    		int num = Integer.parseInt(currentLine[1]);  //store the file's elevator number
+    		
+    		if (num == elevNum) {  //if the current line contains the same elevNum as requested
+    			errorFound = true;    // possible error has been found
+    			
+    			if (LocalTime.now().isAfter(LocalTime.parse(currentLine[0]))) {   // if error time has past
+    				output = currentLine[2];    // set up output to be the error code
+    			}
+    			else {
+    				output = null;
+    			}
+    		}
+    		
+    	}
+		scanner.close();
+    	return output;  // return possible error code
+    }
 
     // toString() override
     public String toString(){
@@ -155,6 +204,19 @@ public class FileLoader {
         return "User at floor " + departFloor() + " requested to move " +
                 (requestUp() ? " UP " : "DOWN") + " to floor " +
                 destFloor() + " @ " + getTime();
+    }
+
+
+    public static void main(String[] args) throws Exception {
+        FileLoader fileLoader = new FileLoader();
+
+        fileLoader.nextLine();
+
+        Integer[] destinations = fileLoader.popDestinations(19, false);
+
+        for (int destination: destinations) {
+            System.out.println(destination);
+        }
     }
 
 }

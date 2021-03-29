@@ -61,9 +61,14 @@ public class Scheduler implements Runnable {
 		int dest = message[3];
 
 		// update elevt States
-		elevtStates[elevt-1].setFloor(floor);
-		elevtStates[elevt-1].setDir(dir);
-		elevtStates[elevt-1].setDest(dest);
+		if(elevtStates[elevt-1] == null && dir == -1) return;
+
+		ElevtState ES = new ElevtState(elevt);
+		ES.setFloor(floor);
+		ES.setDir(dir);
+		ES.setDest(dest);
+
+		elevtStates[elevt-1] = ES ;
 
 		//if the the elevator stops on a floor, dismiss floor buttons
 		if (dir == 0){
@@ -95,23 +100,19 @@ public class Scheduler implements Runnable {
 	 */
 	private void elevtSubAddErrorMsg (byte[] msg) {
 		int[] message = Common.decode(msg);
-		int elevNum   = message[2];
-		int curFloor  = message[3];
-		int destFloor = message[4];
-		int dirFloor  = message[5];
+		int elevNum   = message[0];
+		int curFloor  = message[1];
+		int destFloor = message[2];
+		int dirFloor  = message[3];
 
 
 		// remove the stuck elev from scheduling list
-		for (int i = 0; i < totalElevts; i++) {
-			if (i ==  elevNum-1){
-				elevtStates[i] = null;
-			}
-		}
+		elevtStates[elevNum-1] = null;
+		if(destFloor == -1) return;
 
 		int closestElevt = findClosestElevt(destFloor,dirFloor);
 		byte[] oneMsgToElevtSub = Common.encodeScheduler(closestElevt, destFloor, dirFloor);
 		msgToElevtSub.offer(oneMsgToElevtSub);
-
 		return;
 	}
 
@@ -126,6 +127,8 @@ public class Scheduler implements Runnable {
 		int dir = message[1];
 
 		int closestElevt = findClosestElevt(floor,dir);
+		if (closestElevt < 0 ) return;
+
 		byte[] oneMsgToElevtSub = Common.encodeScheduler(closestElevt, floor,dir);
 		msgToElevtSub.offer(oneMsgToElevtSub);
 		return;
@@ -150,17 +153,26 @@ public class Scheduler implements Runnable {
 				int dis = findDistance(floor, dir, elevtStates[i]);
 				distances[i] = dis;
 			}
+			else{
+				distances[i] = 99999;
+			}
 		}
 
 		// get the elevt# of which has the smallest distance to the floor
 		int index = 0;
-		int min = distances[result];
+		int min = distances[0];
 		for (int i = 1; i < distances.length; i++){
 			if (distances[i] <= min){
 				min = distances[i];
 				index = i;
 			}
 		}
+
+		if (min >= 99999){
+			System.out.println("No elevator available!");
+			System.exit(1);
+		}
+
 		result = index + 1;
 		return result;
 	}
@@ -239,15 +251,16 @@ public class Scheduler implements Runnable {
 		this.inState = -1;
 		byte[] msgReceive = rpcElevt.receivePacket();
 
+
 		if (Common.findType(msgReceive) == Common.TYPE.ELEV_ERROR){
+			System.out.println("Scheduler received ERROR message from ElevtSub: " + Arrays.toString(msgReceive)  + " @ time = " + LocalTime.now());
 			//if it is an ELEV_ERROR message
 			elevtSubAddErrorMsg(msgReceive);
-			System.out.println("Scheduler received ERROR message from ElevtSub: " + Arrays.toString(msgReceive)  + " @ time = " + LocalTime.now());
 
 		} else if (Common.findType(msgReceive) != Common.TYPE.CONFIRMATION) {
+			System.out.println("Scheduler received message from ElevtSub: " + Arrays.toString(msgReceive)  + " @ time = " + LocalTime.now());
 			// if it is an normal ELEV message
 			elevtSubAddMsg(msgReceive);
-			System.out.println("Scheduler received message from ElevtSub: " + Arrays.toString(msgReceive)  + " @ time = " + LocalTime.now());
 
 		}
 		this.inState = 0;

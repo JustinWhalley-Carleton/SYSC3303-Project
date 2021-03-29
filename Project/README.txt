@@ -2,10 +2,10 @@ Group Number: 5
 
 Breakdown of responsibilities:
 
-Justin Whalley #101117127:   Test, JunitTestCases, Common, Timer, TimerController, FloorSubSystem UDP
+Justin Whalley #101117127:   Test, JunitTestCases, Common, Timer, TimerController, FloorSubSystem UDP, Elevator faults
 Yisheng Li     #101028686:   Scheduler
-Yixiang Huang  #101071528:   ElevatorSubSystem, Common, RPC
-Gurjit Gill    #101110071:   Elevator
+Yixiang Huang  #101071528:   ElevatorSubSystem, Common, RPC, Test faults,Floor subsystem
+Gurjit Gill    #101110071:   Elevator, Fileloader errorfile
 Everyone: 	   UML
 
 
@@ -23,6 +23,7 @@ Running Junit Instruction:
 FloorSubsystem:
 	- FileLoader.java
 		*reads data file
+		* reads error file
 	- Floor.java
 		*represents each floor
 	- FloorButton.java
@@ -41,16 +42,19 @@ ElevatorSubsystem:
 		*communicates with scheduler
 	- Elevator.java
 		*responds to messages for elevator
+		* handles faults 
 	
 Scheduler:
 	-Scheduler.java
 		*send/receive messages to/from elevator and floor subsystems
 		*store states
 		*scheduling for elevators
+		*handles stuck elevators
 	-ElevtState.java
 		*store a state of an elevator
 	-FloorState.java
 		*store a state of a Floor
+	
 
 Timer:
     - TimerController.java
@@ -62,6 +66,7 @@ test:
 	- Test.java
 		*create data file
 		*initialize FloorSubsystem, Elevator and scheduler
+		* creates error file
 	- testFile.txt
 		*hold the data
 	- settings.txt

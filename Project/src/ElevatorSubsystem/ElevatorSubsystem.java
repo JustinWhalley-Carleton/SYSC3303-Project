@@ -2,6 +2,7 @@
  * 
  */
 package ElevatorSubsystem;
+import FloorSubsystem.FileLoader;
 import Scheduler.Scheduler;
 import common.Common;
 import common.RPC;
@@ -25,7 +26,7 @@ public class ElevatorSubsystem implements Runnable{
 	*  2nd elevator = 10012
 	*  3rd elevator = 10013
 	*  etc... */
-	private static final int ELEV_SUB_ELEV_RECV_PORT = 10005;
+	private static final int ELEV_SUB_ELEV_RECV_PORT = 500;
 
 	/* The Initial port number used for receiving by elevator
 	 *  (max 100 elevators)
@@ -58,12 +59,15 @@ public class ElevatorSubsystem implements Runnable{
 		// Init elevators
 		this.NUM_ELEV = numElev;
 		elevators = new Thread[NUM_ELEV];
+		FileLoader fileLoader = new FileLoader("errorFile.txt", false);
+		
 		for (int i = 0; i < NUM_ELEV; ++i){
 			int serialNum = i + 1;
 			elevators[i] = new Thread (new
 									Elevator(serialNum, 1, true,
 									ELEV_SUB_ELEV_RECV_PORT + serialNum,
-									ELEV_RECV_PORT + serialNum));
+									ELEV_RECV_PORT + serialNum,
+									fileLoader));
 		}
 
 		// Init Buffer

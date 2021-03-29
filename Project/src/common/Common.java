@@ -110,7 +110,7 @@ public class Common {
 		// Decode the elev error msg to int[]
 		// {elevNum, curFloor, destFloor, dirFloor}
 		private static int[] decodeToInt(byte[] msg){
-			int[] result = new int[3];
+			int[] result = new int[4];
 			result[0] 		= msg[2];
 			result[1] 		= msg[3];
 			result[2] 		= msg[4];
