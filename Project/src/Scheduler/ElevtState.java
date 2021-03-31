@@ -10,6 +10,7 @@ public class ElevtState {
 	private int floor;
 	private int dir; // 1(Up) or -1(Down) or 0(Idle)
 	private int dest;
+	public boolean isStuck;
 	
 	
 	/**
@@ -23,6 +24,7 @@ public class ElevtState {
 		this.floor = 1;
 		this.dir = 0;
 		this.dest = 1;
+		this.isStuck = false;
 
 	}
 	
