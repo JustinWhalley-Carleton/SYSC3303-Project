@@ -245,6 +245,7 @@ public class Elevator implements Runnable {
 			stuckMsg = null;
 			System.out.println("\n\nRECOVERED\n\n");
 			msg = Common.encodeElevError(ELEV_ERROR.RECOVER, elevNum, curFloor, -1, goingUp);
+			transmitter.sendPacket(msg);
 		}
 		
 	}
