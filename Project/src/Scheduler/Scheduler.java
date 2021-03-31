@@ -54,24 +54,22 @@ public class Scheduler implements Runnable {
      * @param msg The message sent by the elevator subsystem.
      */
 	private void elevtSubAddMsg (byte[] msg) {
+
 		int[] message = Common.decode(msg);
 		int elevt = message[0];
 		int floor = message[1];
 		int dir = message[2];
 		int dest = message[3];
 
+		if(elevtStates[elevt-1].isStuck) return;
+
 		// update elevt States
-		if(elevtStates[elevt-1] == null && dir == -1) return;
-
-		ElevtState ES = new ElevtState(elevt);
-		ES.setFloor(floor);
-		ES.setDir(dir);
-		ES.setDest(dest);
-
-		elevtStates[elevt-1] = ES ;
+		elevtStates[elevt-1].setFloor(floor);
+		elevtStates[elevt-1].setDir(dir);
+		elevtStates[elevt-1].setDest(dest);
 
 		//if the the elevator stops on a floor, dismiss floor buttons
-		if (dir == 0){
+		if (dir == 0 ){
 
 			if (dest < floor){
 				byte[] oneMsgToFloorSub = Common.encodeScheduler(1, floor,0);
@@ -105,14 +103,25 @@ public class Scheduler implements Runnable {
 		int destFloor = message[2];
 		int dirFloor  = message[3];
 
+		Common.ELEV_ERROR errorMsg_receive = Common.ELEV_ERROR.decode(msg);
 
-		// remove the stuck elev from scheduling list
-		elevtStates[elevNum-1] = null;
-		if(destFloor == -1) return;
+		System.out.println(errorMsg_receive);
+		if (errorMsg_receive == Common.ELEV_ERROR.RECOVER){
+			System.out.println("Scheduler received RECOVER message from ElevtSub: " + Arrays.toString(msg)  + " @ time = " + LocalTime.now());
+			//recover elevt
+			elevtStates[elevNum-1].isStuck = false;
+		}
+		else {
+			System.out.println("Scheduler received ERROR message from ElevtSub: " + Arrays.toString(msg)  + " @ time = " + LocalTime.now());
+			//if it is an ELEV_ERROR message
+			//set elevt stuck state
+			elevtStates[elevNum-1].isStuck = true;
+			if (destFloor == -1) return;
 
-		int closestElevt = findClosestElevt(destFloor,dirFloor);
-		byte[] oneMsgToElevtSub = Common.encodeScheduler(closestElevt, destFloor, dirFloor);
-		msgToElevtSub.offer(oneMsgToElevtSub);
+			//re schedule for destFloor
+			doSchedule(destFloor, dirFloor);
+		}
+
 		return;
 	}
 
@@ -126,13 +135,27 @@ public class Scheduler implements Runnable {
 		int floor = message[0];
 		int dir = message[1];
 
+		doSchedule(floor, dir);
+		return;
+	}
+
+
+	/**
+	 *
+	 * @param floor floor# of a pressed floor button
+	 * @param dir direction of a pressed floor button
+	 *
+	 */
+
+	private void doSchedule(int floor, int dir) {
+
 		int closestElevt = findClosestElevt(floor,dir);
 		if (closestElevt < 0 ) return;
-
 		byte[] oneMsgToElevtSub = Common.encodeScheduler(closestElevt, floor,dir);
 		msgToElevtSub.offer(oneMsgToElevtSub);
 		return;
 	}
+
 
 
 	/**
@@ -149,12 +172,12 @@ public class Scheduler implements Runnable {
 		// find distance for all elevators
 		for (int i = 0; i < totalElevts; i++) {
 			// skip stuck elevts
-			if (elevtStates[i] != null) {
+			if (elevtStates[i].isStuck) {
+				distances[i] = Integer.MAX_VALUE;
+			}
+			else {
 				int dis = findDistance(floor, dir, elevtStates[i]);
 				distances[i] = dis;
-			}
-			else{
-				distances[i] = 99999;
 			}
 		}
 
@@ -253,12 +276,13 @@ public class Scheduler implements Runnable {
 
 
 		if (Common.findType(msgReceive) == Common.TYPE.ELEV_ERROR){
-			System.out.println("Scheduler received ERROR message from ElevtSub: " + Arrays.toString(msgReceive)  + " @ time = " + LocalTime.now());
-			//if it is an ELEV_ERROR message
+			// sendToGUI()
 			elevtSubAddErrorMsg(msgReceive);
 
 		} else if (Common.findType(msgReceive) != Common.TYPE.CONFIRMATION) {
 			System.out.println("Scheduler received message from ElevtSub: " + Arrays.toString(msgReceive)  + " @ time = " + LocalTime.now());
+			// sendToGUI()
+
 			// if it is an normal ELEV message
 			elevtSubAddMsg(msgReceive);
 
