@@ -6,6 +6,12 @@ import java.awt.Insets;
 
 import javax.swing.border.Border;
 
+/**
+ * create a rounded border for a button
+ * @author Lalchand from https://stackoverflow.com/questions/423950/rounded-swing-jbutton-using-java
+ *
+ */
+
 public class RoundedBorder implements Border {
 
     private int radius;
