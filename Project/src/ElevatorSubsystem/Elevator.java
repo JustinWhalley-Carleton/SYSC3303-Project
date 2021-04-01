@@ -266,9 +266,21 @@ public class Elevator implements Runnable {
 		int target = -1;
 		try {
 			if(state==up) {
-				target = Collections.min(map.keySet());
+				Integer min = Integer.MAX_VALUE;
+				for(Integer key : map.keySet()) {
+					if(key > curFloor && key < min) {
+						target = key;
+					}
+				}
+			} else if(state == down) {
+				Integer min = Integer.MAX_VALUE;
+				for(Integer key : map.keySet()) {
+					if(key < curFloor && key > min) {
+						target = key;
+					}
+				}
 			} else {
-				target = Collections.max(map.keySet());
+				target = Collections.min(map.keySet());
 			}
 			return target;
 		} catch (NoSuchElementException e) {

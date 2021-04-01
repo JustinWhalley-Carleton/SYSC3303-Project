@@ -94,6 +94,7 @@ public class ElevatorPanel extends JPanel {
 		GridLayout layout = new GridLayout((int)Math.ceil(GUI.FLOORS/6),GUI.FLOORS >= 6 ? 6 : GUI.FLOORS);
 		layout.setHgap(20);
 		layout.setVgap(20);
+		buttons = new JButton[GUI.FLOORS];
 		buttonPanel.setLayout(layout);
 		for(int i = 0; i < GUI.FLOORS; i++) {
 			JButton button = new JButton(Integer.toString(i+1));
@@ -101,8 +102,10 @@ public class ElevatorPanel extends JPanel {
 			button.setBorder(new RoundedBorder(5));
 			button.setForeground(Color.BLACK);
 			button.addActionListener(new ElevatorButtonListener(i+1,elevNum));
+			buttons[i] = button;
 			buttonPanel.add(button);
 		}
+		Helper.turnAllButtonsOff(buttons);
 		add(buttonPanel);
 	}
 	
@@ -119,18 +122,13 @@ public class ElevatorPanel extends JPanel {
 		stateLabel = new JLabel("State: " + state);
 		// disable all elevator buttons when in fault state
 		if(state.split(" ")[0].equals("Fault") && !faultState) {
-			for(JButton button : buttons) {
-				button.setEnabled(false);
-				button.setBackground(Color.BLUE);
-			}
+			Helper.turnAllButtonsOff(buttons);
 		}
 		// reenable fault button and all elevator buttons when in non fault state
 		if(!state.split(" ")[0].equals("Fault") && faultState) {
 			faultButton.setEnabled(true);
 			faultButton.setBackground(Color.RED);
-			for(JButton button : buttons) {
-				button.setEnabled(true);
-			}
+			Helper.turnAllButtonsOn(buttons);
 		}
 		// reenable elevator button and reset color if floor reached
 		if(!buttons[cur-1].isEnabled()) {
