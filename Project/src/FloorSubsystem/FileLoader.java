@@ -52,7 +52,11 @@ public class FileLoader {
     }
 
     public boolean hasNextInstruction(){
-        return !endOfFile && scanner.hasNextLine();
+        // When EOF reached, no more instructions to read.
+        if(endOfFile) return false;
+
+        endOfFile = !scanner.hasNextLine();
+        return !endOfFile;
     }
 
     // Add curLine instruction into destinations,

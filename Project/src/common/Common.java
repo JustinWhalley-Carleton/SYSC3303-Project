@@ -43,7 +43,8 @@ public class Common {
 		INVALID			((byte) -1, "INVALID"),
 		CHECK			((byte) 0, "Check request"),
 		RECEIVED		((byte) 1, "Received"),
-		NO_MSG			((byte) 2, "No new message");
+		NO_MSG			((byte) 2, "No new message"),
+		END				((byte) 3, "End of file");
 
 		// Enum initializer
 		private final byte value;
