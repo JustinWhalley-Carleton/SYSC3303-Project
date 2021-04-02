@@ -351,7 +351,7 @@ public class Common {
 					"from elevator #" + results[0] + ": " +
 					"currently at floor " + results[1] +
 					", going " + (results[2] == 1 ? "up" : "down") +
-					", to destination floor" + results[3];
+					", destination floor " + results[3];
 
 			case FLOOR -> text +=
 					"from floor #" + results[0] + ": " +
@@ -373,10 +373,11 @@ public class Common {
 					" to floor " + results[2];
 
 			default ->
-					text += "unknow source.";
+					text += "unknown source.";
 		}
 
 		System.out.println(text);
+		System.out.println();
 	}
 
 
