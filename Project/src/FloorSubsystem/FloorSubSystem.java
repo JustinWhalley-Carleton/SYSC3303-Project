@@ -103,7 +103,7 @@ public class FloorSubSystem implements Runnable{
     		return;
     	}
     	int departureFloor = Integer.parseInt(line[1]);
-    	boolean goingUp = line[2].equals("UP")?true:false;
+    	boolean goingUp = line[2].equals("UP");
     	System.out.println(departureFloor +" "+goingUp);
     	 if(MIN_FLOOR <= departureFloor && departureFloor <= MAX_FLOOR){
              // Register corresponding button
