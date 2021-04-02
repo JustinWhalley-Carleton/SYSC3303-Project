@@ -146,11 +146,6 @@ public class ElevatorPanel extends JPanel {
 		destLabel.setText("Destination Floor: " + (dest == -1 ? cur : dest));
 		stateLabel.setText("State: " + state);
 		
-		if(state.equals("Idle") && !GUIFileLoader.elevHasCommand(elevNum)) {
-			buttonsActive = false;
-			Helper.turnAllButtonsOff(buttons);
-		}
-		
 		
 		// reenable elevator button and reset color if floor reached
 		if(!buttons[cur-1].isEnabled() && buttonsActive) {
