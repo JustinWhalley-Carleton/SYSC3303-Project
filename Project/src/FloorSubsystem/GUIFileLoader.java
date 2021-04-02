@@ -12,7 +12,7 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-public class GUIFileLoader {
+public  class GUIFileLoader {
 
 	
 	/**
@@ -52,7 +52,6 @@ public class GUIFileLoader {
 			return null;
 		} catch (FileNotFoundException e) {
 			// return null if exception thrown
-			e.printStackTrace();
 			return null;
 		}
 	}
@@ -89,7 +88,6 @@ public class GUIFileLoader {
 			return false;
 		}catch(FileNotFoundException e) {
 			//error so no command found
-			e.printStackTrace();
 			return false;
 		}
 	}
@@ -139,7 +137,6 @@ public class GUIFileLoader {
 			return result;
 		}catch(FileNotFoundException e) {
 			// no command found return null
-			e.printStackTrace();
 			return null;
 		}
 	}
@@ -173,23 +170,6 @@ public class GUIFileLoader {
 			if(!tempFile.renameTo(instructionFile)) {
 				System.out.println("Error renaming file");
 			}
-			
-			/*
-			BufferedWriter writer = new BufferedWriter(new FileWriter(tempFile));
-			
-			// iterate over all lines in the command file and copy every line that does not equal msg
-			String curLine;
-			while((curLine = reader.readLine())!=null) {
-				String trimmed = curLine.trim();
-				if(trimmed.equals(msg)) continue;
-				writer.write(curLine+"\n");
-			}
-			writer.close();
-			reader.close();
-			// rename temparary file to the command file
-			instructionFile.delete();
-			tempFile.renameTo(instructionFile);
-			*/
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -221,7 +201,6 @@ public class GUIFileLoader {
 			return false;
 		}catch(FileNotFoundException e) {
 			// no command found return null
-			e.printStackTrace();
 			return false;
 		}
 	}

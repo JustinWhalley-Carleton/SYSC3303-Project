@@ -194,7 +194,7 @@ public class Elevator implements Runnable {
 			}
 			closeDoor();
 		}
-		byte[] msg = Common.encodeElevator(elevNum, curFloor, state, getFloor() == null ? curFloor : getFloor());
+		byte[] msg = Common.encodeElevator(elevNum, curFloor, state, getFloor() == -1 ? curFloor : getFloor());
 		transmitter.sendPacket(msg);
 		transmitter.receivePacket();
 	}

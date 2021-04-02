@@ -181,7 +181,7 @@ public class Scheduler implements Runnable {
 						+"dest" + elevtStates[i].getDest() );
 
 				System.out.println("elevator:" + i+1 + "to floor:" + floor + "dir: " + dir);
-
+				System.out.println(dis);
 			}
 		}
 

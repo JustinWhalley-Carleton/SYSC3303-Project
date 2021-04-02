@@ -57,6 +57,9 @@ public class FloorSubSystem implements Runnable{
                 instructionSent = !instructionFile.hasNextInstruction();
                 // read instruction
                 nextInstruction();
+                if(instructionSent) {
+                	//send end of file to scheduler
+                }
             } else if(!GUIFlag){
                 // compare time stamp
                 if (LocalTime.now().isAfter(instructionFile.getTime())) {
