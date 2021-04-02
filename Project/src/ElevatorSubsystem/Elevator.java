@@ -231,13 +231,15 @@ public class Elevator implements Runnable {
 		timer.stop();
 		if (getFloor() == -1){
 			System.out.println("Removing floors..");
+			System.out.println("Nothing");
 			msg = Common.encodeElevError(errorType, elevNum,curFloor, -1, goingUp);
 			transmitter.sendPacket(msg);
 			removeFloor(getFloor());
 		}
 		while(getFloor() != -1) {
 			System.out.println("Removing floors..");
-			msg = Common.encodeElevError(errorType, elevNum, curFloor, ((boolean)map.get(getFloor())) ? -1 : getFloor(), goingUp);
+			System.out.println("Removing floor: "+getFloor()+" | " +map.get(getFloor()));
+			msg = Common.encodeElevError(errorType, elevNum, curFloor, ((boolean)map.get(getFloor())) ? getFloor(): -1, goingUp);
 			transmitter.sendPacket(msg);
 			removeFloor(getFloor());
 		}
@@ -312,6 +314,14 @@ public class Elevator implements Runnable {
 						target = key;
 					}
 				}
+				if(target == -1) {
+					min = -1;
+					for(Integer key : map.keySet()) {
+						if(key <= curFloor && key > min) {
+							target = key;
+						}
+					}
+				}
 			} else if(state == down) {
 				Integer min = -1;
 				for(Integer key : map.keySet()) {
@@ -319,8 +329,19 @@ public class Elevator implements Runnable {
 						target = key;
 					}
 				}
+				if(target == -1) {
+					min = Integer.MAX_VALUE;
+					for(Integer key : map.keySet()) {
+						if(key > curFloor && key < min) {
+							target = key;
+						}
+					}
+				}
 			} else {
 				target = Collections.min(map.keySet());
+			}
+			if(target == -1) {
+				return Collections.min(map.keySet());
 			}
 			return target;
 		} catch (NoSuchElementException e) {
