@@ -22,7 +22,7 @@ public class Scheduler implements Runnable {
 	private FloorState[] floorStates;
 	private Queue<byte[]> msgToElevtSub, msgToFloorSub;
 
-	private RPC rpcFloor, rpcElevt;
+	private RPC rpcFloor, rpcElevt,rpcGUI;
 
 	/**
 	 * Constructor
@@ -44,7 +44,9 @@ public class Scheduler implements Runnable {
 
 		rpcElevt = new RPC(InetAddress.getLocalHost(),10003, 10004);
 		rpcFloor = new RPC(InetAddress.getLocalHost(),10001,10002);
-
+		rpcGUI = new RPC(InetAddress.getLocalHost(),6,5);
+		rpcElevt.setTimeout(2000);
+		rpcFloor.setTimeout(2000);
 	}
 
 
@@ -239,7 +241,7 @@ public class Scheduler implements Runnable {
 		if (msgSend != null) {
 			rpcFloor.sendPacket(msgSend);
 			System.out.println("Scheduler sent message to FloorSub: " +  Arrays.toString(Common.decode(msgSend)) + " @ time = " + LocalTime.now());
-
+			rpcGUI.sendPacket(msgSend);
 		} else {
 			rpcFloor.sendPacket(CheckMSG);
 		}
@@ -248,6 +250,10 @@ public class Scheduler implements Runnable {
 		// receive from FloorSub
 		this.inState = -1;
 		byte[] msgReceive = rpcFloor.receivePacket();
+		if(msgReceive == null) {
+			this.inState = 0;
+			return;
+		}
 		if (Common.findType(msgReceive) != Common.TYPE.CONFIRMATION) {
 			floorSubAddMsg(msgReceive);
 			System.out.println("Scheduler received message from FloorSub: " + Arrays.toString(msgReceive)  + " @ time = " + LocalTime.now());
@@ -274,10 +280,14 @@ public class Scheduler implements Runnable {
 		this.inState = -1;
 		byte[] msgReceive = rpcElevt.receivePacket();
 
-
+		if(msgReceive ==null) {
+			this.inState = 0;
+			return;
+		}
 		if (Common.findType(msgReceive) == Common.TYPE.ELEV_ERROR){
 			// sendToGUI()
 			elevtSubAddErrorMsg(msgReceive);
+			rpcGUI.sendPacket(msgReceive);
 
 		} else if (Common.findType(msgReceive) != Common.TYPE.CONFIRMATION) {
 			System.out.println("Scheduler received message from ElevtSub: " + Arrays.toString(msgReceive)  + " @ time = " + LocalTime.now());
@@ -285,7 +295,8 @@ public class Scheduler implements Runnable {
 
 			// if it is an normal ELEV message
 			elevtSubAddMsg(msgReceive);
-
+			System.out.println("Sending");
+			rpcGUI.sendPacket(msgReceive);
 		}
 		this.inState = 0;
 

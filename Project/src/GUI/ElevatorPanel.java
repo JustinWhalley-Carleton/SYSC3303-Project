@@ -25,6 +25,7 @@ public class ElevatorPanel extends JPanel {
 	private JButton faultButton;
 	private JButton[] buttons;
 	private boolean faultState = false;
+	private boolean buttonsActive = false;
 	
 	/**
 	 * constructor for an elevator panel
@@ -84,7 +85,7 @@ public class ElevatorPanel extends JPanel {
 		// create a panel with the current state label
 		JPanel statePanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		statePanel.setMaximumSize(new Dimension(Integer.MAX_VALUE,30));
-		stateLabel = new JLabel("State: " + "Up");
+		stateLabel = new JLabel("State: " + "Idle");
 		stateLabel.setBorder(new EmptyBorder(10,10,10,10));
 		statePanel.add(stateLabel);
 		add(statePanel);
@@ -116,24 +117,47 @@ public class ElevatorPanel extends JPanel {
 	 * @param state
 	 */
 	public void update(int cur,int dest, String state) {
-		// update labels
-		curFloorLabel = new JLabel("Current Floor: " + cur);
-		destLabel = new JLabel("Destination Floor: " + dest);
-		stateLabel = new JLabel("State: " + state);
 		// disable all elevator buttons when in fault state
-		if(state.split(" ")[0].equals("Fault") && !faultState) {
+		if(state.equals("FAULT")) {
 			Helper.turnAllButtonsOff(buttons);
+			buttonsActive = false;
+			faultState = true;
+			stateLabel.setText("State: " + state);
+			return;
 		}
 		// reenable fault button and all elevator buttons when in non fault state
-		if(!state.split(" ")[0].equals("Fault") && faultState) {
+		if(state.equals("Recovered")) {
+			buttonsActive = true;
+			System.out.println("RECOVERING");
 			faultButton.setEnabled(true);
 			faultButton.setBackground(Color.RED);
 			Helper.turnAllButtonsOn(buttons);
+			stateLabel.setText("State: " + "Idle");
+			return;
 		}
+		// update labels
+		curFloorLabel.setText("Current Floor: " + cur);
+		destLabel.setText("Destination Floor: " + (dest == -1 ? cur : dest));
+		stateLabel.setText("State: " + state);
+		
+		if(state.equals("Idle") && !GUIFileLoader.elevHasCommand(elevNum)) {
+			buttonsActive = false;
+			Helper.turnAllButtonsOff(buttons);
+		}
+		
+		
 		// reenable elevator button and reset color if floor reached
-		if(!buttons[cur-1].isEnabled()) {
+		if(!buttons[cur-1].isEnabled() && buttonsActive) {
 			buttons[cur-1].setEnabled(true);
-			buttons[cur-1].setBackground(Color.BLUE);
+			buttons[cur-1].setBackground(null);
 		}
+	}
+	
+	/**
+	 * turn on all buttons for floor reached
+	 */
+	public void personIn() {
+		buttonsActive = true;
+		Helper.turnAllButtonsOn(buttons);
 	}
 }

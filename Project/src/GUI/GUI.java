@@ -10,8 +10,14 @@ import javax.swing.*;
 import javax.swing.border.CompoundBorder;
 import javax.swing.plaf.basic.BasicArrowButton;
 
+import ElevatorSubsystem.Elevator;
+import ElevatorSubsystem.ElevatorSubsystem;
+import FloorSubsystem.FloorSubSystem;
+import FloorSubsystem.GUIFileLoader;
+import Scheduler.Scheduler;
 import common.Common;
 import common.RPC;
+import test.Test;
 
 public class GUI extends JFrame{
 
@@ -33,6 +39,13 @@ public class GUI extends JFrame{
 	public GUI() {
 		//read the settings file 
 		getSettings();
+		GUIFileLoader.deleteFile();
+		try {
+			new Test(true).readSettings();
+		} catch (Exception e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		try {
 			// initialize communication between scheduler and GUI
 			transmitter = new RPC(InetAddress.getLocalHost(), 5, 6);
@@ -84,18 +97,33 @@ public class GUI extends JFrame{
         		while(true) {
 	       			byte[] msg = transmitter.receivePacket();
 	       			int[] decodedMsg = Common.decode(msg);
-	       			if(Common.findType(msg) == Common.TYPE.ELEV_ERROR) {
-	       				elevatorPanels[decodedMsg[0]].update(decodedMsg[1],decodedMsg[3],"FAULT");
+	       			if(decodedMsg.length == 3) {
+	       				elevatorPanels[decodedMsg[0]-1].personIn();
+	       				System.out.println(decodedMsg[2]);
+	       				if(decodedMsg[2]==1) {
+	       					upButtons[decodedMsg[1]-1].setEnabled(true);
+	       				} else {
+	       					downButtons[decodedMsg[1]-1].setEnabled(true);
+	       				}
+	       			} else if(Common.findType(msg) == Common.TYPE.ELEV_ERROR) {
+	       				if(Common.ELEV_ERROR.decode(msg)== Common.ELEV_ERROR.RECOVER) {
+	       					System.out.println("Trying to recover");
+	       					elevatorPanels[decodedMsg[0]-1].update(decodedMsg[1],decodedMsg[3],"Recovered");
+	       					TextManager.print("Elevator "+decodedMsg[0]+" recovered from fault");
+	       				} else {
+	       					elevatorPanels[decodedMsg[0]-1].update(decodedMsg[1],decodedMsg[3],"FAULT");
+	       				}
 	       			} else if (Common.findType(msg) != Common.TYPE.CONFIRMATION) {
 		       			String state;
-		       			if(decodedMsg[1] == 1) {
+		       			System.out.println("DECODED: "+ decodedMsg[0] + " " + decodedMsg[1] + " " + decodedMsg[2] + " " + decodedMsg[3]);
+		       			if(decodedMsg[2] == 1) {
 		       				state = "Up";
-		       			} else if (decodedMsg[1]==0) {
+		       			} else if (decodedMsg[2]==0) {
 		       				state = "Idle";
 		        		} else {
 		        			state = "Down";
 		        		}
-		        		elevatorPanels[decodedMsg[0]].update(decodedMsg[1],decodedMsg[3],state);
+		        		elevatorPanels[decodedMsg[0]-1].update(decodedMsg[1],decodedMsg[3],state);
 	        		}
 	        	
         		}
@@ -103,7 +131,17 @@ public class GUI extends JFrame{
         };
         thread.start();
         
-        TextManager.print("Program now ready\n\n");
+        try {
+			new Thread(new Scheduler(ELEVATORS,FLOORS)).start();
+			new Thread(new ElevatorSubsystem(ELEVATORS,true)).start();
+			new Thread(new FloorSubSystem(FLOORS,true)).start();
+			TextManager.print("Program now ready\n\n");
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        
+        
 	}
 	
 	/**

@@ -48,7 +48,7 @@ public class ElevatorSubsystem implements Runnable{
 
 	/* Common code */
 
-	public ElevatorSubsystem(int numElev) throws Exception {
+	public ElevatorSubsystem(int numElev,boolean GUI) throws Exception {
 		if (numElev <= 0){
 			throw new Exception("incompatible setting: numElev should be at least 1.");
 		}
@@ -67,7 +67,7 @@ public class ElevatorSubsystem implements Runnable{
 									Elevator(serialNum, 1, true,
 									ELEV_SUB_ELEV_RECV_PORT + serialNum,
 									ELEV_RECV_PORT + serialNum,
-									fileLoader));
+									fileLoader,GUI));
 		}
 
 		// Init Buffer
@@ -244,7 +244,7 @@ public class ElevatorSubsystem implements Runnable{
 	// For testing use ONLY!
 	// Spawn elevator subsystem
 	public static void main(String[] args) throws Exception{
-		ElevatorSubsystem elevatorSubsystem = new ElevatorSubsystem(3);
+		ElevatorSubsystem elevatorSubsystem = new ElevatorSubsystem(3,false);
 		elevatorSubsystem.run();
 	}
 

@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.NoSuchElementException;
 
 import FloorSubsystem.FileLoader;
+import FloorSubsystem.GUIFileLoader;
 import Timer.TimerController;
 import common.RPC;
 import common.Common.ELEV_ERROR;
@@ -39,10 +40,10 @@ public class Elevator implements Runnable {
 	private ElevatorButton[] buttons;
 	private boolean stuck=false;
 	private FileLoader fileLoader;
-	private String stuckMsg;
+	private String stuckMsg = null;
 	private boolean goingUp;
 	private FileLoader file;
-	
+	private boolean GUIFlag;
 
 	/**
 	 * no port elevator for junit testing
@@ -50,8 +51,9 @@ public class Elevator implements Runnable {
 	public Elevator() {testing=true;}
 	
 	// Constructor
-	public Elevator(int elevNum, int curFloor, boolean doorStatus, int destPort, int recPort, FileLoader fileLoader) throws UnknownHostException {
-		this.curFloor = curFloor;     
+	public Elevator(int elevNum, int curFloor, boolean doorStatus, int destPort, int recPort, FileLoader fileLoader, boolean GUI) throws UnknownHostException {
+		this.curFloor = curFloor;  
+		GUIFlag = GUI;
 		this.doorStatus = doorStatus;            //Initializing variables
 		state = idle;   // setting motor state to idle
 		transmitter = new RPC(InetAddress.getLocalHost(), destPort, recPort);
@@ -96,15 +98,17 @@ public class Elevator implements Runnable {
 			} else {
 				System.out.println("Same floor. No state change\n");  //No movement if same floor
 
-				if(stuckMsg != null) {
+				if(stuckMsg != null && !GUIFlag) {
 					if(stuckMsg.equals("StuckClose")) {
+						System.out.println("1");
 						makeStuck(2);
 					}
 				}
 				openDoor();
 
-				if(stuckMsg != null) {
+				if(stuckMsg != null && !GUIFlag) {
 					if(stuckMsg.equals("StuckOpen")) {
+						System.out.println("2");
 						makeStuck(1);
 					}
 				}
@@ -112,12 +116,7 @@ public class Elevator implements Runnable {
 				if(map.get(curFloor) == null ? false : (boolean)map.get(curFloor)) {
 					removeFloor(floor);
 
-					Integer[] nextFloors = file.popDestinations(curFloor, goingUp);
-
-					for (Integer floorNum: nextFloors){
-						buttons[floorNum-1].register();
-						addDest(floorNum, false);
-					}
+					pollCommand();
 
 					return;
 				}
@@ -127,8 +126,9 @@ public class Elevator implements Runnable {
 			}
 			timer.start();
 
-			if(stuckMsg != null) {
+			if(stuckMsg != null && !GUIFlag) {
 				if(stuckMsg.equals("StuckBetween")) {
+					System.out.println("3");
 					makeStuck(0);
 				}
 			}
@@ -151,8 +151,9 @@ public class Elevator implements Runnable {
 			}
 		} else {
 			// arrived at floor
-			if(stuckMsg != null) {
+			if(stuckMsg != null && !GUIFlag) {
 				if(stuckMsg.equals("StuckClose")) {
+					System.out.println("4");
 					makeStuck(2);
 					return;
 				}
@@ -160,16 +161,23 @@ public class Elevator implements Runnable {
 			openDoor();
 			System.out.println("Elevator " + elevNum + " State Change: IN IDLE @ time = " + LocalTime.now() + "\n");  //Printing time stamps
 			state = idle;    // set state to idle
+			/*
 			byte[] msg = Common.encodeElevator(elevNum, curFloor, state,curFloor);
 			transmitter.sendPacket(msg);
-			msg = transmitter.receivePacket();
+			msg = transmitter.receivePacket();*/
 			if(map.get(curFloor) == null ? false : (boolean)map.get(curFloor)) {
 				removeFloor(curFloor);  //calls method remove floor to remove it from the arraylist
-				Integer[] nextFloors = file.popDestinations(curFloor, goingUp);
-				
-				for (Integer floorNum: nextFloors){
-					buttons[floorNum-1].register();
-					addDest(floorNum, false);
+				Integer[] nextFloors;
+				if(GUIFlag) {
+					nextFloors = GUIFileLoader.getElevButton(elevNum);
+				} else {
+					nextFloors = file.popDestinations(curFloor, goingUp);
+				}
+				if(nextFloors != null) {
+					for (Integer floorNum: nextFloors){
+						buttons[floorNum-1].register();
+						addDest(floorNum, false);
+					}
 				}
 				
 			} else {
@@ -178,8 +186,9 @@ public class Elevator implements Runnable {
 				
 			}
 
-			if(stuckMsg != null) {
+			if(stuckMsg != null && !GUIFlag) {
 				if(stuckMsg.equals("StuckOpen")) {
+					System.out.println("5");
 					makeStuck(1);
 				}
 			}
@@ -251,10 +260,21 @@ public class Elevator implements Runnable {
 	}
 	
 	private void pollStop() throws FileNotFoundException {
-
+		if(GUIFlag) {
+			if(GUIFileLoader.getFault(elevNum)) {
+				int reason = 2;
+				if(state == up || state == down) {
+					reason = 0;
+				}
+				System.out.println("6");
+				makeStuck(reason);
+			}
+		}
+		
 		stuckMsg = fileLoader.errorFileReader(elevNum);
-		if(stuckMsg != null) {
+		if(stuckMsg != null && !GUIFlag) {
 			if(stuckMsg.equals("StuckBetween") && state != idle) {
+				System.out.println("7");
 				makeStuck(0);
 			}
 		}
@@ -262,6 +282,26 @@ public class Elevator implements Runnable {
 
 	}
 
+	public void pollCommand() {
+		if(GUIFlag) {
+			Integer[] command = GUIFileLoader.getElevButton(elevNum);
+			if(command != null) {
+				for (Integer floorNum: command){
+					buttons[floorNum-1].register();
+					addDest(floorNum, false);
+				}
+			}
+		} else {
+			Integer[] command =  file.popDestinations(curFloor, goingUp);
+			if(command != null) {
+				for (Integer floorNum: command) {
+					buttons[floorNum-1].register();
+					addDest(floorNum, false);
+				}
+			}
+		}
+	}
+	
 	public Integer getFloor() {
 		int target = -1;
 		try {
@@ -273,9 +313,9 @@ public class Elevator implements Runnable {
 					}
 				}
 			} else if(state == down) {
-				Integer min = Integer.MAX_VALUE;
+				Integer min = -1;
 				for(Integer key : map.keySet()) {
-					if(key < curFloor && key > min) {
+					if(key <= curFloor && key > min) {
 						target = key;
 					}
 				}
@@ -317,6 +357,7 @@ public class Elevator implements Runnable {
 	// and then receives instructions for a specific elevator
 	public void receive() throws FileNotFoundException {
 		pollStop();
+		pollCommand();
 		byte[] checkMsg;  //byte array variables for the msgs
 		byte[] receiveMsg;
 		checkMsg = Common.encodeConfirmation(Common.CONFIRMATION.CHECK); //using the Common.java to encode check msg
@@ -338,6 +379,7 @@ public class Elevator implements Runnable {
 			goingUp = received[2] == 1 ? true : false;
 		}
 		pollStop();
+		pollCommand();
 	}
 
 	@Override

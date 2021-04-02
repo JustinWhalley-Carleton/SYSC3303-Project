@@ -7,7 +7,9 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 public class GUIFileLoader {
@@ -76,6 +78,7 @@ public class GUIFileLoader {
 				// if fault for elevator is found return true
 				String line = scanner.nextLine();
 				if(line.split(" ")[0].equals("0") && line.split(" ")[2].equals(Integer.toString(elevNum))) {
+					System.out.println("\n\n\n"+line+"\n\n\n");
 					scanner.close();
 					removeLine(line);
 					return true;
@@ -94,36 +97,50 @@ public class GUIFileLoader {
 	/**
 	 * get elevator button command 
 	 * @param elevNum
-	 * @return int floor clicked, -1 if no command found
+	 * @return int floor clicked, null if no command found
 	 */
-	public static int getElevButton(int elevNum)  {
+	public static Integer[] getElevButton(int elevNum)  {
 		//open command file
 		File instructionFile = new File("src/test/GUICommands.txt");
 		try {
+			ArrayList<String> list = new ArrayList<String>();
 			//create scanner for command file
 			Scanner scanner = new Scanner(instructionFile);
 			//if file is empty return -1
 			if(!scanner.hasNextLine()) {
 				scanner.close();
-				return -1;
+				return null;
 			}
 			// iterate over the file
 			while(scanner.hasNextLine()) {
 				// if command found return destination floor
 				String line = scanner.nextLine();
 				if(line.split(" ")[0].equals("2") && line.split(" ")[2].equals(Integer.toString(elevNum))) {
-					scanner.close();
 					removeLine(line);
-					return Integer.parseInt(line.split(" ")[3]);
+					list.add(line);
 				}
 			}
-			//no command found return -1
+			if(list.size() == 0) {
+				//no command found return -1
+				scanner.close();
+				return null;
+			} 
 			scanner.close();
-			return -1;
+			Integer[] result = new Integer[list.size()];
+			int i = 0;
+			while(list.size()!=0) {
+				removeLine(list.get(0));
+				String line = list.get(0);
+				list.remove(0);
+				result[i] = (Integer)Integer.parseInt(line.split(" ")[3]);
+				i++;
+			}
+			
+			return result;
 		}catch(FileNotFoundException e) {
-			// no command found return -1
+			// no command found return null
 			e.printStackTrace();
-			return -1;
+			return null;
 		}
 	}
 	
@@ -140,6 +157,24 @@ public class GUIFileLoader {
 			// create a buffered reader for the command file
 			BufferedReader reader = new BufferedReader(new FileReader(instructionFile));
 			// create a buffered writer for the temperary file
+			PrintWriter pw = new PrintWriter(new FileWriter(tempFile));
+			String line;
+			while((line = reader.readLine()) != null) {
+				if(!line.trim().equals(msg)) {
+					pw.println(line);
+					pw.flush();
+				}
+			}
+			pw.close();
+			reader.close();
+			if(!instructionFile.delete() ) {
+				System.out.println("Error deleting file");
+			}
+			if(!tempFile.renameTo(instructionFile)) {
+				System.out.println("Error renaming file");
+			}
+			
+			/*
 			BufferedWriter writer = new BufferedWriter(new FileWriter(tempFile));
 			
 			// iterate over all lines in the command file and copy every line that does not equal msg
@@ -152,13 +187,54 @@ public class GUIFileLoader {
 			writer.close();
 			reader.close();
 			// rename temparary file to the command file
+			instructionFile.delete();
 			tempFile.renameTo(instructionFile);
-			
+			*/
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
+	}
+	
+	public static boolean elevHasCommand(int elevNum) {
+		//open command file
+		File instructionFile = new File("src/test/GUICommands.txt");
+		try {
+			ArrayList<String> list = new ArrayList<String>();
+			//create scanner for command file
+			Scanner scanner = new Scanner(instructionFile);
+			//if file is empty return -1
+			if(!scanner.hasNextLine()) {
+				scanner.close();
+				return false;
+			}
+			// iterate over the file
+			while(scanner.hasNextLine()) {
+				// if command found return destination floor
+				String line = scanner.nextLine();
+				if(line.split(" ")[0].equals("2") && line.split(" ")[2].equals(Integer.toString(elevNum))) {
+					return true;
+				}
+			}
+			scanner.close();
+			return false;
+		}catch(FileNotFoundException e) {
+			// no command found return null
+			e.printStackTrace();
+			return false;
+		}
+	}
+	
+	public static void deleteFile() {
+		File instructionFile = new File("src/test/GUICommands.txt");
+		instructionFile.delete();
+		try {
+			instructionFile.createNewFile();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	/**
