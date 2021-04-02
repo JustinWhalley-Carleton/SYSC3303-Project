@@ -24,6 +24,9 @@ public class Scheduler implements Runnable {
 
 	private RPC rpcFloor, rpcElevt,rpcGUI;
 
+	//private RPC rpcGUI;
+
+
 	/**
 	 * Constructor
 	 *
@@ -287,13 +290,14 @@ public class Scheduler implements Runnable {
 			return;
 		}
 		if (Common.findType(msgReceive) == Common.TYPE.ELEV_ERROR){
-			// sendToGUI()
+			//rpcGUI.sendPacket(msgReceive);
 			elevtSubAddErrorMsg(msgReceive);
 			rpcGUI.sendPacket(msgReceive);
 
 		} else if (Common.findType(msgReceive) != Common.TYPE.CONFIRMATION) {
 			System.out.println("Scheduler received message from ElevtSub: " + Arrays.toString(msgReceive)  + " @ time = " + LocalTime.now());
-			// sendToGUI()
+			//rpcGUI.sendPacket(msgReceive);
+
 
 			// if it is an normal ELEV message
 			elevtSubAddMsg(msgReceive);
