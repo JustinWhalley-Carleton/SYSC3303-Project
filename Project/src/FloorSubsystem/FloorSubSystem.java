@@ -44,6 +44,7 @@ public class FloorSubSystem implements Runnable{
 
     public void run() {
         boolean instructionSent = false;
+        boolean endMsgSent = false;
 
         // init current time based on time set on first instruction
 //        curTime = instructionFile.getTime();
@@ -57,8 +58,14 @@ public class FloorSubSystem implements Runnable{
                 instructionSent = !instructionFile.hasNextInstruction();
                 // read instruction
                 nextInstruction();
-                if(instructionSent) {
+                if(instructionSent && !endMsgSent) {
                 	//send end of file to scheduler
+                    byte[] msg = Common.encodeConfirmation(Common.CONFIRMATION.END);
+                    rpc.sendPacket(msg);
+                    rpc.receivePacket();
+                    // set flag, read file finish.
+                    System.out.println("Instruction file: EOF.");
+                    endMsgSent = true;
                 }
             } else if(!GUIFlag){
                 // compare time stamp
