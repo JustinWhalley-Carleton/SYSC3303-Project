@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.net.*;
 import java.util.*;
 import common.*;
+import test.Test;
 
 /**
  * @author Yisheng Li
@@ -45,8 +46,8 @@ public class Scheduler implements Runnable {
 		for (int i=0;i<elevtStates.length;i++) { elevtStates[i]= new ElevtState(i+1); }
 		for (int i=0;i<floorStates.length;i++) { floorStates[i]= new FloorState(i+1); }
 
-		rpcElevt = new RPC(InetAddress.getLocalHost(),10003, 10004);
-		rpcFloor = new RPC(InetAddress.getLocalHost(),10001,10002);
+		rpcElevt = new RPC(InetAddress.getLocalHost(), Test.ELEV_SUB_RECV_PORT, Test.SCHEDULER_RECV_ELEV_PORT);
+		rpcFloor = new RPC(InetAddress.getLocalHost(),Test.FLOOR_SUB_RECV_PORT,Test.SCHEDULER_RECV_FLOOR_PORT);
 		rpcGUI = new RPC(InetAddress.getLocalHost(),6,5);
 		rpcElevt.setTimeout(2000);
 		rpcFloor.setTimeout(2000);

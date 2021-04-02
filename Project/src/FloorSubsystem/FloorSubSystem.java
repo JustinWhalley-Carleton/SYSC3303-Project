@@ -1,6 +1,7 @@
 package FloorSubsystem;
 import common.Common;
 import common.RPC;
+import test.Test;
 
 import java.net.InetAddress;
 import java.time.LocalTime;
@@ -37,7 +38,7 @@ public class FloorSubSystem implements Runnable{
         // Init instruction reader
         instructionFile = new FileLoader();
         
-        rpc = new RPC(InetAddress.getLocalHost(),10002,10001);
+        rpc = new RPC(InetAddress.getLocalHost(), Test.SCHEDULER_RECV_FLOOR_PORT, Test.FLOOR_SUB_RECV_PORT);
         rpc.setTimeout(2000);
         messageQueue = new LinkedList<byte[]>();
     }
