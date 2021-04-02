@@ -26,6 +26,7 @@ public class ElevatorPanel extends JPanel {
 	private JButton[] buttons;
 	private boolean faultState = false;
 	private boolean buttonsActive = false;
+	private int fontSize = 20;
 	
 	/**
 	 * constructor for an elevator panel
@@ -108,6 +109,11 @@ public class ElevatorPanel extends JPanel {
 		}
 		Helper.turnAllButtonsOff(buttons);
 		add(buttonPanel);
+		
+		curFloorLabel.setFont(new Font("Serif",Font.PLAIN,fontSize));
+		destLabel.setFont(new Font("Serif",Font.PLAIN,fontSize));
+		stateLabel.setFont(new Font("Serif",Font.PLAIN,fontSize));
+		elevatorLabel.setFont(new Font("Serif",Font.PLAIN,fontSize));
 	}
 	
 	/**
