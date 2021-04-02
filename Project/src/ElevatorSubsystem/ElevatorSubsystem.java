@@ -6,6 +6,7 @@ import FloorSubsystem.FileLoader;
 import Scheduler.Scheduler;
 import common.Common;
 import common.RPC;
+import test.Test;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -17,8 +18,8 @@ public class ElevatorSubsystem implements Runnable{
 	// Ports (maybe move this to Common class?)
 	private final InetAddress SCHEDULER_ADDR;
 	private final InetAddress ELEVATOR_ADDR;
-	private static final int SCHEDULER_RECV_PORT = 10004;
-	private static final int ELEV_SUB_RECV_PORT  = 10003;
+	private static final int SCHEDULER_RECV_PORT = Test.SCHEDULER_RECV_ELEV_PORT;
+	private static final int ELEV_SUB_RECV_PORT  = Test.ELEV_SUB_RECV_PORT;
 
 	/* The Initial port number used for receiving from elevator
 	*  (max 100 elevators)
@@ -26,7 +27,7 @@ public class ElevatorSubsystem implements Runnable{
 	*  2nd elevator = 10012
 	*  3rd elevator = 10013
 	*  etc... */
-	private static final int ELEV_SUB_ELEV_RECV_PORT = 500;
+	private static final int ELEV_SUB_ELEV_RECV_PORT = Test.ELEV_SUB_ELEV_RECV_PORT;
 
 	/* The Initial port number used for receiving by elevator
 	 *  (max 100 elevators)
@@ -34,7 +35,7 @@ public class ElevatorSubsystem implements Runnable{
 	 *  2nd elevator = 10202
 	 *  3rd elevator = 10203
 	 *  etc... */
-	private static final int ELEV_RECV_PORT = 10200;
+	private static final int ELEV_RECV_PORT = Test.ELEV_RECV_PORT;
 
 	// Class vars
 	private final int NUM_ELEV;

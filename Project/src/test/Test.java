@@ -31,6 +31,13 @@ public class Test {
 	private static int ELEV_ERR;
 	public static int FLOORS;
 	public static int SPEED;
+	// Port numbers
+	public static int ELEV_RECV_PORT;
+	public static int ELEV_SUB_ELEV_RECV_PORT;
+	public static int FLOOR_SUB_RECV_PORT;
+	public static int SCHEDULER_RECV_FLOOR_PORT;
+	public static int ELEV_SUB_RECV_PORT;
+	public static int SCHEDULER_RECV_ELEV_PORT;
 	// Strings
 	static final String UP = "Up";
 	static final String DOWN = "Down";
@@ -95,6 +102,13 @@ public class Test {
 					case "FLOORS:"		-> FLOORS 		= value;
 					case "SPEED:"		-> SPEED 		= value;
 					case "ELEV_ERR:"	-> ELEV_ERR		= value;
+					// Ports
+					case "ELEV_RECV_PORT:" 				-> ELEV_RECV_PORT 				= value;
+					case "ELEV_SUB_ELEV_RECV_PORT:" 	-> ELEV_SUB_ELEV_RECV_PORT 		= value;
+					case "FLOOR_SUB_RECV_PORT:" 		-> FLOOR_SUB_RECV_PORT 			= value;
+					case "SCHEDULER_RECV_FLOOR_PORT:" 	-> SCHEDULER_RECV_FLOOR_PORT 	= value;
+					case "ELEV_SUB_RECV_PORT:" 			-> ELEV_SUB_RECV_PORT 			= value;
+					case "SCHEDULER_RECV_ELEV_PORT:" 	-> SCHEDULER_RECV_ELEV_PORT 	= value;
 					default -> System.out.println("Unexpected item in settings file.");
 				}
 			}
