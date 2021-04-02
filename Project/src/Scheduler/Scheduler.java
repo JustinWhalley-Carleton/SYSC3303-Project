@@ -73,17 +73,12 @@ public class Scheduler implements Runnable {
 		//if the the elevator stops on a floor, dismiss floor buttons
 		if (dir == 0 ){
 
-			if (dest < floor){
-				byte[] oneMsgToFloorSub = Common.encodeScheduler(1, floor,0);
-				msgToFloorSub.offer(oneMsgToFloorSub);
-			}
-
 			if (floor != 1 && (dest < floor || dest == floor)) {
-				byte[] oneMsgToFloorSub = Common.encodeScheduler(1, floor,0);
+				byte[] oneMsgToFloorSub = Common.encodeScheduler(elevt, floor,0);
 				msgToFloorSub.offer(oneMsgToFloorSub);
 			}
 			if (floor != floorStates.length && (dest > floor || dest == floor)) {
-				byte[] oneMsgToFloorSub = Common.encodeScheduler(1, floor,1);
+				byte[] oneMsgToFloorSub = Common.encodeScheduler(elevt, floor,1);
 				msgToFloorSub.offer(oneMsgToFloorSub);
 			}
 
@@ -180,6 +175,13 @@ public class Scheduler implements Runnable {
 			else {
 				int dis = findDistance(floor, dir, elevtStates[i]);
 				distances[i] = dis;
+				System.out.println("elevator:" + i+1 + "is"
+						+ "floor" + elevtStates[i].getFloor()
+						+"state" + elevtStates[i].getDir()
+						+"dest" + elevtStates[i].getDest() );
+
+				System.out.println("elevator:" + i+1 + "to floor:" + floor + "dir: " + dir);
+
 			}
 		}
 
