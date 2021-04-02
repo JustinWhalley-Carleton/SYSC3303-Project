@@ -46,20 +46,22 @@ public class Test {
 	/**
 	 * constructor to create the file
 	 */
-	public Test() throws Exception {
-		readSettings();
-		time = new String[ROWS];
-		dir = new String[ROWS];
-		floor = new int[ROWS];
-		carButton = new int[ROWS];
-		lines = new String[ROWS];
-		createFile();
-		scheduler = new Thread(new Scheduler(ELEVATORS,FLOORS));
-		floorSubsystem = new Thread(new FloorSubSystem(FLOORS), "Producer");
-		elevatorSubsystem = new Thread(new ElevatorSubsystem(ELEVATORS), "Consumer");
-		floorSubsystem.start();
-		elevatorSubsystem.start();
-		scheduler.start();
+	public Test(boolean GUI) throws Exception {
+		if(!GUI) {
+			readSettings();
+			time = new String[ROWS];
+			dir = new String[ROWS];
+			floor = new int[ROWS];
+			carButton = new int[ROWS];
+			lines = new String[ROWS];
+			createFile();
+			scheduler = new Thread(new Scheduler(ELEVATORS,FLOORS));
+			floorSubsystem = new Thread(new FloorSubSystem(FLOORS,false), "Producer");
+			elevatorSubsystem = new Thread(new ElevatorSubsystem(ELEVATORS,false), "Consumer");
+			floorSubsystem.start();
+			elevatorSubsystem.start();
+			scheduler.start();
+		} 
 	}
 
 	/**
@@ -68,7 +70,7 @@ public class Test {
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		try {
-			Test test = new Test();
+			Test test = new Test(false);
 		} catch (Exception e){
 			e.printStackTrace();
 		}

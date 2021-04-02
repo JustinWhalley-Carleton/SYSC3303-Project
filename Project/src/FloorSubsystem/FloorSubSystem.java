@@ -15,9 +15,11 @@ public class FloorSubSystem implements Runnable{
     public FileLoader instructionFile;
     
     public RPC rpc;
+    private boolean GUIFlag;
 
     private LinkedList<byte[]> messageQueue;
-    public FloorSubSystem(int maxFloor) throws Exception{
+    public FloorSubSystem(int maxFloor, boolean GUI) throws Exception{
+    	GUIFlag = GUI;
         // Error checking
         if (maxFloor <= 1) {
             throw new Exception("incompatible setting: maxFloor should be at least 2.");
@@ -47,12 +49,18 @@ public class FloorSubSystem implements Runnable{
 //        curTime = instructionFile.getTime();
 
         while (true) {
+        	if(GUIFlag) {
+        		getInstruction();
+        	}
             // send instruction if needed
-            if (instructionSent) {
+            if (instructionSent && !GUIFlag) {
                 instructionSent = !instructionFile.hasNextInstruction();
                 // read instruction
                 nextInstruction();
-            } else {
+                if(instructionSent) {
+                	//send end of file to scheduler
+                }
+            } else if(!GUIFlag){
                 // compare time stamp
                 if (LocalTime.now().isAfter(instructionFile.getTime())) {
                     // read instruction now
@@ -89,7 +97,27 @@ public class FloorSubSystem implements Runnable{
         return null;
     }
 
-
+    public void getInstruction() {
+    	String[] line = GUIFileLoader.readLineFloor();
+    	if(line == null) {
+    		return;
+    	}
+    	int departureFloor = Integer.parseInt(line[1]);
+    	boolean goingUp = line[2].equals("UP");
+    	System.out.println(departureFloor +" "+goingUp);
+    	 if(MIN_FLOOR <= departureFloor && departureFloor <= MAX_FLOOR){
+             // Register corresponding button
+             floors[departureFloor - 1].register(instructionFile.requestUp());
+         }else{
+             // Unexpected floor in instruction, ignore.
+             System.out.println("WARNING! Departure floor " + departureFloor + " out of range!");
+             return;
+         }
+    	
+    	byte[] msg = Common.encodeFloor(departureFloor,goingUp);
+    	addToQueue(msg);
+    }
+    
     // send method: send data to scheduler.
     public void readInstruction() {
         // turn on up/ down button correspondingly
@@ -126,7 +154,6 @@ public class FloorSubSystem implements Runnable{
     public void receive() {
         // process message from scheduler
         byte[] message = rpc.receivePacket();
-
         // terminate if no message
         if (message == null){
             return;
@@ -139,7 +166,6 @@ public class FloorSubSystem implements Runnable{
         	}
         } else {
         
-
 	        int[] decodeMsg = Common.decode(message);
 	
 	        int arrivalFloor = decodeMsg[1];
