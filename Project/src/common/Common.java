@@ -5,6 +5,7 @@ package common;
 
 import ElevatorSubsystem.*;
 
+import java.time.LocalTime;
 import java.util.Random;
 
 /**
@@ -39,14 +40,18 @@ public class Common {
 
 	/* Confirmation messages types */
 	public enum CONFIRMATION{
-		INVALID			((byte) -1),
-		CHECK			((byte) 0),
-		RECEIVED		((byte) 1),
-		NO_MSG			((byte) 2);
+		INVALID			((byte) -1, "INVALID"),
+		CHECK			((byte) 0, "Check request"),
+		RECEIVED		((byte) 1, "Received"),
+		NO_MSG			((byte) 2, "No new message");
 
 		// Enum initializer
 		private final byte value;
-		private CONFIRMATION(byte b){ this.value = b; }
+		private final String name;
+		private CONFIRMATION(byte b, String n){
+			this.value = b;
+			this.name = n;
+		}
 
 		// Determine which type the byte corresponds to
 		public static CONFIRMATION findConfirmation(byte b){
@@ -128,7 +133,11 @@ public class Common {
 	}
 
 	/**
-	 * encode the data in the form 0(for elevator), 127(seperator), elevator number, 127(seperator), current floor, 127(seperator), 1(Up) or -1(Down) or 0(Idle), 127(seperator), destination floor, 127(end file)
+	 * encode the data in the form 0(for elevator), 127(seperator),
+	 * elevator number, 127(seperator),
+	 * current floor, 127(seperator),
+	 * 1(Up) or -1(Down) or 0(Idle), 127(seperator),
+	 * destination floor, 127(end file)
 	 * 
 	 * @param curr
 	 * @param state
@@ -157,7 +166,9 @@ public class Common {
 	}
 	
 	/**
-	 * encode the data in the form: 1(floor message),127(seperator),floor clicked, 127(seperator), 0(down) or 1(up)
+	 * encode the data in the form: 1(floor message),127(seperator),
+	 * floor clicked, 127(seperator),
+	 * 0(down) or 1(up)
 	 * 
 	 * @param floor clicked
 	 * @param dir true for up, false for down
@@ -175,7 +186,10 @@ public class Common {
 	}
 	
 	/**
-	 * encode the data in the form: 2(for scheduler), 127(seperator), elevt#, 127(seperator), floor# (shared by floor and elevt), 127(seperator), floor button to dismiss 0(down) or 1(up), 127(seperator)
+	 * encode the data in the form: 2(for scheduler), 127(seperator),
+	 * elevt#, 127(seperator),
+	 * floor# (shared by floor and elevt), 127(seperator),
+	 * floor button to dismiss 0(down) or 1(up), 127(seperator)
 	 * 
 	 * @param elevt, floor, dir
 	 * @return message to send
@@ -254,7 +268,10 @@ public class Common {
 	}
 	
 	/**
-	 * decode an elevator message. return in form of index 0: current floor, index 1: direction (1 = up,0=Idle,-1=down),index 2: destination floor
+	 * decode an elevator message. return in form of
+	 * index 0: current floor,
+	 * index 1: direction (1 = up,0=Idle,-1=down),
+	 * index 2: destination floor
 	 * 
 	 * @param msg
 	 * @return int[] containing the decoded data
@@ -269,7 +286,9 @@ public class Common {
 	}
 	
 	/**
-	 * decode floor message. return in the form index 0: floor number, index 1: direction 0(down) or 1(up)
+	 * decode floor message. return in the form
+	 * index 0: floor number,
+	 * index 1: direction 0(down) or 1(up)
 	 * 
 	 * @param msg
 	 * @return int[] containing decoded data
@@ -282,7 +301,10 @@ public class Common {
 	}
 	
 	/**
-	 * decode scheduler message. return in the form index 0: elevator number, index 1: floor, index 2: direction
+	 * decode scheduler message. return in the form
+	 * index 0: elevator number,
+	 * index 1: floor,
+	 * index 2: direction
 	 * 
 	 * @param msg
 	 * @return int[] containing decoded data
@@ -312,6 +334,50 @@ public class Common {
 	 */
 	public static ELEV_ERROR findElevError(byte[] msg){
 		return ELEV_ERROR.decode(msg);
+	}
+
+
+	/**
+	 * Print out the message to console from original byte[]
+	 * @param msg
+	 */
+	public static void print(byte[] msg){
+
+		int[] results = decode(msg);
+		String text = "[" + LocalTime.now() + "] MSG ";
+
+		switch (findType(msg)){
+			case ELEVATOR -> text +=
+					"from elevator #" + results[0] + ": " +
+					"currently at floor " + results[1] +
+					", going " + (results[2] == 1 ? "up" : "down") +
+					", destination floor " + results[3];
+
+			case FLOOR -> text +=
+					"from floor #" + results[0] + ": " +
+					(results[1] == 1 ? "up" : "down") + " button pressed";
+
+			case SCHEDULER -> text +=
+					"from scheduler: " +
+					"elevator #" + results[0] +
+					", floor #" + results[1] +
+					", dismiss " + (results[2] == 1 ? "up" : "down");
+
+			case CONFIRMATION -> text +=
+					"confirmation: " + findConfirmation(msg).name;
+
+			case ELEV_ERROR -> text +=
+					"elevator #" + results[0] + " error " + findElevError(msg).name +
+					"currently at floor " + results[1] +
+					", going " + (results[3] == 1 ? "up" : "down") +
+					" to floor " + results[2];
+
+			default ->
+					text += "unknown source.";
+		}
+
+		System.out.println(text);
+		System.out.println();
 	}
 
 

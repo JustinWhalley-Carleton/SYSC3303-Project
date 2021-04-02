@@ -107,12 +107,14 @@ public class Scheduler implements Runnable {
 
 		System.out.println(errorMsg_receive);
 		if (errorMsg_receive == Common.ELEV_ERROR.RECOVER){
-			System.out.println("Scheduler received RECOVER message from ElevtSub: " + Arrays.toString(msg)  + " @ time = " + LocalTime.now());
+			System.out.println("Scheduler received RECOVER message from ElevtSub: ");
+			Common.print(msg);
 			//recover elevt
 			elevtStates[elevNum-1].isStuck = false;
 		}
 		else {
-			System.out.println("Scheduler received ERROR message from ElevtSub: " + Arrays.toString(msg)  + " @ time = " + LocalTime.now());
+			System.out.println("Scheduler received ERROR message from ElevtSub: ");
+			Common.print(msg);
 			//if it is an ELEV_ERROR message
 			//set elevt stuck state
 			elevtStates[elevNum-1].isStuck = true;
@@ -245,7 +247,8 @@ public class Scheduler implements Runnable {
 		byte[] msgSend = msgToFloorSub.poll();
 		if (msgSend != null) {
 			rpcFloor.sendPacket(msgSend);
-			System.out.println("Scheduler sent message to FloorSub: " +  Arrays.toString(Common.decode(msgSend)) + " @ time = " + LocalTime.now());
+			System.out.println("Scheduler sending message to FloorSub: ");
+			Common.print(msgSend);
 			rpcGUI.sendPacket(msgSend);
 		} else {
 			rpcFloor.sendPacket(CheckMSG);
@@ -261,7 +264,8 @@ public class Scheduler implements Runnable {
 		}
 		if (Common.findType(msgReceive) != Common.TYPE.CONFIRMATION) {
 			floorSubAddMsg(msgReceive);
-			System.out.println("Scheduler received message from FloorSub: " + Arrays.toString(msgReceive)  + " @ time = " + LocalTime.now());
+			System.out.println("Scheduler received message from FloorSub: ");
+			Common.print(msgReceive);
 
 		}
 		this.inState = 0;
@@ -274,7 +278,8 @@ public class Scheduler implements Runnable {
 		byte[] msgSend = msgToElevtSub.poll();
 		if ( msgSend != null) {
 			rpcElevt.sendPacket(msgSend);
-			System.out.println("Scheduler sent message to ElevtSub: " +  Arrays.toString(Common.decode(msgSend)) + " @ time = " + LocalTime.now());
+			System.out.println("Scheduler sent message to ElevtSub: ");
+			Common.print(msgSend);
 
 		} else{
 			rpcElevt.sendPacket(CheckMSG);
@@ -295,7 +300,8 @@ public class Scheduler implements Runnable {
 			rpcGUI.sendPacket(msgReceive);
 
 		} else if (Common.findType(msgReceive) != Common.TYPE.CONFIRMATION) {
-			System.out.println("Scheduler received message from ElevtSub: " + Arrays.toString(msgReceive)  + " @ time = " + LocalTime.now());
+			System.out.println("Scheduler received message from ElevtSub: ");
+			Common.print(msgReceive);
 			//rpcGUI.sendPacket(msgReceive);
 
 
