@@ -93,6 +93,11 @@ public class Test {
 				String line = scanner.nextLine();
 				String[] splitStr = line.trim().split("\\s+");
 
+				if (splitStr.length == 1 || splitStr[0].trim().equals("//")){
+					// Empty line or Comment in setting file.
+					continue;
+				}
+
 				// Get value
 				int value = Integer.parseInt(splitStr[1]);
 				// Assign value to its according variable
@@ -109,6 +114,7 @@ public class Test {
 					case "SCHEDULER_RECV_FLOOR_PORT:" 	-> SCHEDULER_RECV_FLOOR_PORT 	= value;
 					case "ELEV_SUB_RECV_PORT:" 			-> ELEV_SUB_RECV_PORT 			= value;
 					case "SCHEDULER_RECV_ELEV_PORT:" 	-> SCHEDULER_RECV_ELEV_PORT 	= value;
+					// Unsupported settings
 					default -> System.out.println("Unexpected item in settings file.");
 				}
 			}
