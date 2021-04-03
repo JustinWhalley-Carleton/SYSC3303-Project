@@ -4,6 +4,8 @@ import java.time.LocalTime;
 import java.io.*;
 import java.net.*;
 import java.util.*;
+
+import FloorSubsystem.FileLoader;
 import common.*;
 import test.Test;
 
@@ -185,13 +187,13 @@ public class Scheduler implements Runnable {
 
 //				 print out distance calculation result
 
-				System.out.println("elevator: " + i+1 + "is"
-						+ "floor " + elevtStates[i].getFloor()
-						+"state " + elevtStates[i].getDir()
-						+"dest " + elevtStates[i].getDest() );
-
-				System.out.println("elevator: " + i+1 + "to floor: " + floor + "dir: " + dir);
-				System.out.println(dis);
+//				System.out.println("elevator: " + (i+1) + " is"
+//						+ " floor " + elevtStates[i].getFloor()
+//						+" state " + elevtStates[i].getDir()
+//						+" dest " + elevtStates[i].getDest() );
+//
+//				System.out.println("elevator: " + (i+1) + " to floor: " + floor + " dir: " + dir);
+//				System.out.println(dis);
 			}
 		}
 
@@ -377,26 +379,14 @@ public class Scheduler implements Runnable {
 
 		//Scheduler exection time
 		long execTime =  endMS - startMS;
-		String exec = "Scheduler exec time in ms: " + execTime;
+		String exec = "Scheduler execution time in ms: " + execTime;
 		System.out.println(exec);
 
 		// log Scheduler timing into the file
-		PrintWriter pw = null;
-		try {
-			File file = new File("src/test/log.txt");
-			file.createNewFile();
-			FileWriter fw = new FileWriter(file, true);
-			pw = new PrintWriter(fw);
-			pw.println(start);
-			pw.println(end);
-			pw.println(exec);
-		} catch (IOException e) {
-			e.printStackTrace();
-		} finally {
-			if (pw != null) {
-				pw.close();
-			}
-		}
-
+		FileLoader.logToFile("\n");
+		FileLoader.logToFile(start);
+		FileLoader.logToFile(end);
+		FileLoader.logToFile(exec);
+		FileLoader.logToFile("\n\n\n");
 	}
 }

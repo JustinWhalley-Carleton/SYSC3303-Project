@@ -1,7 +1,6 @@
 package FloorSubsystem;
 
-import java.io.File;
-import java.io.FileNotFoundException;
+import java.io.*;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -209,6 +208,25 @@ public class FileLoader {
 		}
 		scanner.close();
 		return output;  // return possible error code
+	}
+
+
+	// Write a line in log.txt
+	public static void logToFile(String s) {
+		PrintWriter pw = null;
+		try {
+			File file = new File("src/test/log.txt");
+			file.createNewFile();
+			FileWriter fw = new FileWriter(file, true);
+			pw = new PrintWriter(fw);
+			pw.println(s);
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			if (pw != null) {
+				pw.close();
+			}
+		}
 	}
 
 	// toString() override
