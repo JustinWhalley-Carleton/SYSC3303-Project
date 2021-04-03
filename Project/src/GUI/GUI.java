@@ -1,6 +1,7 @@
 package GUI;
 
 import java.awt.*;
+import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.net.InetAddress;
@@ -27,16 +28,19 @@ public class GUI extends JFrame{
 	private static int ELEV_ERR;
 	public static int FLOORS;
 	public static int SPEED;
-	private ElevatorPanel[] elevatorPanels;
+	public static ElevatorPanel[] elevatorPanels;
 	private RPC transmitter;
 	public static JTextArea textPanel;
 	public static BasicArrowButton[] upButtons;
 	public static BasicArrowButton[] downButtons;
+	private Thread floorThread;
+	private Thread elevatorThread;
+	private Thread schedulerThread;
 	
 	/**
 	 * constructor for GUI 
 	 */
-	public GUI() {
+	public GUI(boolean show) {
 		//read the settings file 
 		getSettings();
 		GUIFileLoader.deleteFile();
@@ -89,7 +93,7 @@ public class GUI extends JFrame{
         
         // dont allow resizing of the frame and show frame on screen
         setResizable(false);
-        setVisible(true);
+        if(show) setVisible(true);
         
         // create and run a thread to continously wait on a message from scheduler and update GUI based on message
         Thread thread = new Thread() {
@@ -132,9 +136,12 @@ public class GUI extends JFrame{
         thread.start();
         
         try {
-			new Thread(new Scheduler(ELEVATORS,FLOORS)).start();
-			new Thread(new ElevatorSubsystem(ELEVATORS,true)).start();
-			new Thread(new FloorSubSystem(FLOORS,true)).start();
+        	schedulerThread = new Thread(new Scheduler(ELEVATORS,FLOORS));
+        	elevatorThread = new Thread(new ElevatorSubsystem(ELEVATORS,true));
+        	floorThread = new Thread(new FloorSubSystem(FLOORS,true));
+			schedulerThread.start();
+			elevatorThread.start();
+			floorThread.start();
 			TextManager.print("Program now ready\n\n");
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -239,9 +246,13 @@ public class GUI extends JFrame{
 		return panel;
 	}
 	
+	public void stop() {
+		elevatorThread.interrupt();
+		schedulerThread.interrupt();
+		floorThread.interrupt();
+	}
 	public static void main(String[] args) {
-		new GUI();
-       
+		new GUI(true);
 	}
 
 }

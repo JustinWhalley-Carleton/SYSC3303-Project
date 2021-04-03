@@ -325,7 +325,7 @@ public class Scheduler implements Runnable {
 				sendReceiveElevtSub();
 				Thread.sleep(200);
 			} catch (InterruptedException e) {
-				e.printStackTrace();
+				System.exit(1);
 			}
 		}
 	}

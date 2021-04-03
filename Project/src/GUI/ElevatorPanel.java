@@ -19,11 +19,11 @@ import FloorSubsystem.GUIFileLoader;
 public class ElevatorPanel extends JPanel {
 
 	private int elevNum;
-	private JLabel curFloorLabel;
-	private JLabel stateLabel;
-	private JLabel destLabel;
-	private JButton faultButton;
-	private JButton[] buttons;
+	public JLabel curFloorLabel;
+	public JLabel stateLabel;
+	public JLabel destLabel;
+	public JButton faultButton;
+	public JButton[] buttons;
 	private boolean faultState = false;
 	private boolean buttonsActive = false;
 	private int fontSize = 20;

@@ -32,6 +32,7 @@ public class ElevatorButtonListener implements ActionListener{
 			GUIFileLoader.writeToFile(2, elevNum, floorNum);
 			((JButton)e.getSource()).setBackground(Color.YELLOW);
 			((JButton)e.getSource()).setEnabled(false);
+			
 		}
 	}
 }
