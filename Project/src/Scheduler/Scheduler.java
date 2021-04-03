@@ -27,7 +27,7 @@ public class Scheduler implements Runnable {
 
 	private long startMS, endMS;
 	private LocalTime endTime;
-	private boolean floorSubEnded, bothSubEnded;
+	private boolean floorSubEnded, allSubEnded;
 
 	private RPC rpcFloor, rpcElevt, rpcGUI;
 
@@ -47,7 +47,7 @@ public class Scheduler implements Runnable {
 		this.msgToElevtSub = new LinkedList<byte[]>();
 		this.msgToFloorSub = new LinkedList<byte[]>();
 		this.floorSubEnded = false;
-		this.bothSubEnded = false;
+		this.allSubEnded = false;
 
 		for (int i=0;i<elevtStates.length;i++) { elevtStates[i]= new ElevtState(i+1); }
 		for (int i=0;i<floorStates.length;i++) { floorStates[i]= new FloorState(i+1); }
@@ -367,28 +367,26 @@ public class Scheduler implements Runnable {
 				Thread.sleep(200);
 
 				if(floorSubEnded && checkElevtSubEnded() && msgToFloorSub.isEmpty() && msgToElevtSub.isEmpty()){
-					if(!bothSubEnded) { // bothSubEnded from false -> ture, updated timing result
-						bothSubEnded = true;
+					if(!allSubEnded) { // bothSubEnded from false -> ture, updated timing result
+						allSubEnded = true;
 						endMS = System.currentTimeMillis();
 						endTime = LocalTime.now();
 					}
 				} else {
-					bothSubEnded = false;
+					allSubEnded = false;
 				}
 
 				// if no elevt goes back to moving in 2.5s, finish and log timing into the file
-				if (bothSubEnded) {
+				if (allSubEnded) {
 					if ((System.currentTimeMillis() - endMS) > 2500){
 						break;
 					}
 				}
 
-
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
 		}
-
 		//Scheduler finish
 		System.out.println("\n*******\n");
 		String end = "Scheduler finished at: " + endTime;
