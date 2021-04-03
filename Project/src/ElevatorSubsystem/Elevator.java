@@ -1,6 +1,9 @@
 package ElevatorSubsystem;
 
+import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.time.LocalTime;
@@ -8,6 +11,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.NoSuchElementException;
+import java.util.logging.FileHandler;
+import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 
 import FloorSubsystem.FileLoader;
 import FloorSubsystem.GUIFileLoader;
@@ -104,6 +110,7 @@ public class Elevator implements Runnable {
 						makeStuck(2);
 					}
 				}
+				long doorStart = System.currentTimeMillis();
 				openDoor();
 
 				if(stuckMsg != null && !GUIFlag) {
@@ -113,6 +120,10 @@ public class Elevator implements Runnable {
 					}
 				}
 				closeDoor();
+				long doorEnd = System.currentTimeMillis();
+				String elapsedDoorTime = String.valueOf(doorEnd - doorStart);
+				logFileWriter ("Elevator Load/Unload", elapsedDoorTime);
+				
 				if(map.get(curFloor) == null ? false : (boolean)map.get(curFloor)) {
 					removeFloor(floor);
 
@@ -124,7 +135,11 @@ public class Elevator implements Runnable {
 				buttons[floor-1].reached();
 				return;
 			}
+			long moveStart = System.currentTimeMillis();
 			timer.start();
+			long moveEnd = System.currentTimeMillis();
+			String elapsedDoorTime = String.valueOf(moveEnd - moveStart);
+			logFileWriter ("Elevator " + elevNum + " moving from floor " + curFloor + "to floor " + floor, elapsedDoorTime);
 
 			if(stuckMsg != null && !GUIFlag) {
 				if(stuckMsg.equals("StuckBetween")) {
@@ -372,6 +387,25 @@ public class Elevator implements Runnable {
 	//getter to return door status
 	public boolean getDoorStatus() {
 		return doorStatus;
+	}
+	
+	public static void logFileWriter (String function, String duration) {
+		Logger logger = Logger.getLogger("Elevator Log");  
+	    FileHandler fh;  
+
+	    try {  
+
+	        fh = new FileHandler("src/test/logFile.txt");
+	        logger.addHandler(fh);
+	        SimpleFormatter formatter = new SimpleFormatter();  
+	        fh.setFormatter(formatter);  
+
+	        logger.info(function + ": " + duration);  
+
+	    } catch (IOException e) {  
+	        e.printStackTrace();  
+	    }
+		
 	}
 	
 	// receive method that first sends a check request to elevatorSubsystem
