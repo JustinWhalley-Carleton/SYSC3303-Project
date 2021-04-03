@@ -1,6 +1,0 @@
-Apr. 02, 2021 9:44:19 P.M. ElevatorSubsystem.Elevator logFileWriter
-INFO: Elevator Load/Unload: 1617414259001
-Apr. 02, 2021 9:44:24 P.M. ElevatorSubsystem.Elevator logFileWriter
-INFO: Elevator Load/Unload: 1617414264988
-Apr. 02, 2021 9:44:51 P.M. ElevatorSubsystem.Elevator logFileWriter
-INFO: Elevator Load/Unload: 1617414291533
