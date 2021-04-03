@@ -168,9 +168,7 @@ public class Test {
 			writer.write(curLine + "\n");
 		}
 //		writer.close();
-
-		writer.write("\n");
-
+		
 		// Error File
 		file = newFile("errorFile.txt");
 //		writer = new FileWriter(file.getAbsoluteFile());

@@ -26,7 +26,7 @@ public class GUI extends JFrame{
 	private static int ELEVATORS;
 	private static int ELEV_ERR;
 	public static int FLOORS;
-	public static int SPEED;
+	public static double SPEED;
 	private ElevatorPanel[] elevatorPanels;
 	private RPC transmitter;
 	public static JTextArea textPanel;
@@ -154,15 +154,22 @@ public class GUI extends JFrame{
 				String line = scanner.nextLine();
 				String[] splitStr = line.trim().split("\\s+");
 
+				if (splitStr.length == 1 || splitStr[0].trim().equals("//")){
+					// Empty line or Comment in setting file.
+					continue;
+				}
+
 				// Get value
-				int value = Integer.parseInt(splitStr[1]);
+				int value = splitStr[1].contains(".") ? 0 : Integer.parseInt(splitStr[1]);
 				// Assign value to its according variable
 				switch(splitStr[0].trim()){
 					case "ELEVATORS:" 	-> ELEVATORS 	= value;
 					case "ROWS:"		-> ROWS 		= value;
 					case "FLOORS:"		-> FLOORS 		= value;
-					case "SPEED:"		-> SPEED 		= value;
+					case "SPEED:"		-> SPEED 		= Double.parseDouble(splitStr[1]);
 					case "ELEV_ERR:"	-> ELEV_ERR		= value;
+
+					// Unsupported settings
 					default -> System.out.println("Unexpected item in settings file.");
 				}
 			}

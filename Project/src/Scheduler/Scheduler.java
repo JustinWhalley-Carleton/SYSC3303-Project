@@ -383,12 +383,13 @@ public class Scheduler implements Runnable {
 		// log Scheduler timing into the file
 		PrintWriter pw = null;
 		try {
-			File file = new File("log.txt");
+			File file = new File("src/test/log.txt");
+			file.createNewFile();
 			FileWriter fw = new FileWriter(file, true);
 			pw = new PrintWriter(fw);
 			pw.println(start);
 			pw.println(end);
-			pw.println(execTime);
+			pw.println(exec);
 		} catch (IOException e) {
 			e.printStackTrace();
 		} finally {

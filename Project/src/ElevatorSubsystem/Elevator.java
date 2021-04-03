@@ -51,6 +51,8 @@ public class Elevator implements Runnable {
 	private FileLoader file;
 	private boolean GUIFlag;
 
+	private long moveStart;
+
 	/**
 	 * no port elevator for junit testing
 	 */
@@ -135,11 +137,8 @@ public class Elevator implements Runnable {
 				buttons[floor-1].reached();
 				return;
 			}
-			long moveStart = System.currentTimeMillis();
+			moveStart = System.currentTimeMillis();
 			timer.start();
-			long moveEnd = System.currentTimeMillis();
-			String elapsedDoorTime = String.valueOf(moveEnd - moveStart);
-			logFileWriter ("Elevator " + elevNum + " moving from floor " + curFloor + "to floor " + floor, elapsedDoorTime);
 
 			if(stuckMsg != null && !GUIFlag) {
 				if(stuckMsg.equals("StuckBetween")) {
@@ -208,6 +207,9 @@ public class Elevator implements Runnable {
 				}
 			}
 			closeDoor();
+			long moveEnd = System.currentTimeMillis();
+			String elapsedDoorTime = String.valueOf(moveEnd - moveStart);
+			logFileWriter ("Elevator " + elevNum + " arrived floor " + curFloor, elapsedDoorTime);
 		}
 		byte[] msg = Common.encodeElevator(elevNum, curFloor, state, getFloor() == -1 ? curFloor : getFloor());
 		transmitter.sendPacket(msg);
@@ -391,7 +393,7 @@ public class Elevator implements Runnable {
 	
 	public static void logFileWriter (String function, String duration) {
 		Logger logger = Logger.getLogger("Elevator Log");  
-	    FileHandler fh;  
+		FileHandler fh;
 
 	    try {  
 

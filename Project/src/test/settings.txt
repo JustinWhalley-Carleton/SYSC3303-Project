@@ -1,7 +1,7 @@
 FLOORS: 22
 ROWS: 10
 ELEVATORS: 4
-SPEED: 0.5
+SPEED: 2
 ELEV_ERR: 3
 
 // These are ports

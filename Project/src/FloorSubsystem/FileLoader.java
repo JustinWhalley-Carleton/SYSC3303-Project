@@ -113,7 +113,7 @@ public class FileLoader {
 			if(! curLine.equals("")){
 				// Split line into 4 segments: Time, Departure floor, Direction, Destination floor
 				lineSplit = curLine.split(" ");
-				if (lineSplit.length != 3 || lineSplit.length != 4){
+				if (lineSplit.length != 3 && lineSplit.length != 4){
 					throw new Exception("Instruction File format unsupported!");
 				}
 				else if (lineSplit.length == 4) {
