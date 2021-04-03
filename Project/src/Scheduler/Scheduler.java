@@ -54,7 +54,7 @@ public class Scheduler implements Runnable {
 
 		rpcElevt = new RPC(InetAddress.getLocalHost(), Test.ELEV_SUB_RECV_PORT, Test.SCHEDULER_RECV_ELEV_PORT);
 		rpcFloor = new RPC(InetAddress.getLocalHost(),Test.FLOOR_SUB_RECV_PORT,Test.SCHEDULER_RECV_FLOOR_PORT);
-		rpcGUI = new RPC(InetAddress.getLocalHost(),6,5);
+		rpcGUI = new RPC(InetAddress.getLocalHost(),Test.GUI_RECV_SCHEDULER_PORT,Test.SCHEDULER_RECV_GUI_PORT);
 		rpcElevt.setTimeout(2000);
 		rpcFloor.setTimeout(2000);
 	}
