@@ -26,7 +26,8 @@ public class Scheduler implements Runnable {
 	private Queue<byte[]> msgToElevtSub, msgToFloorSub;
 
 	private long startMS, endMS;
-	private boolean floorSubEnded, elevtSubEnded;
+	private LocalTime endTime;
+	private boolean floorSubEnded, bothSubEnded;
 
 	private RPC rpcFloor, rpcElevt, rpcGUI;
 
@@ -46,8 +47,8 @@ public class Scheduler implements Runnable {
 		this.msgToElevtSub = new LinkedList<byte[]>();
 		this.msgToFloorSub = new LinkedList<byte[]>();
 		this.floorSubEnded = false;
-		this.elevtSubEnded = false;
-		
+		this.bothSubEnded = false;
+
 		for (int i=0;i<elevtStates.length;i++) { elevtStates[i]= new ElevtState(i+1); }
 		for (int i=0;i<floorStates.length;i++) { floorStates[i]= new FloorState(i+1); }
 
@@ -364,17 +365,33 @@ public class Scheduler implements Runnable {
 				Thread.sleep(200);
 				sendReceiveElevtSub();
 				Thread.sleep(200);
-				elevtSubEnded = checkElevtSubEnded();
-				if(floorSubEnded && elevtSubEnded){ break; }
+
+				if(floorSubEnded && checkElevtSubEnded() && msgToFloorSub.isEmpty() && msgToElevtSub.isEmpty()){
+					if(!bothSubEnded) { // bothSubEnded from false -> ture, updated timing result
+						bothSubEnded = true;
+						endMS = System.currentTimeMillis();
+						endTime = LocalTime.now();
+					}
+				} else {
+					bothSubEnded = false;
+				}
+
+				// if no elevt goes back to moving in 2.5s, finish and log timing into the file
+				if (bothSubEnded) {
+					if ((System.currentTimeMillis() - endMS) > 2500){
+						break;
+					}
+				}
 
 
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
 		}
+
 		//Scheduler finish
-		endMS = System.currentTimeMillis();
-		String end = "Scheduler finished at: " + LocalTime.now();
+		System.out.println("\n*******\n");
+		String end = "Scheduler finished at: " + endTime;
 		System.out.println(end);
 
 		//Scheduler exection time
@@ -383,10 +400,9 @@ public class Scheduler implements Runnable {
 		System.out.println(exec);
 
 		// log Scheduler timing into the file
-		FileLoader.logToFile("\n");
 		FileLoader.logToFile(start);
 		FileLoader.logToFile(end);
 		FileLoader.logToFile(exec);
-		FileLoader.logToFile("\n\n\n");
+		FileLoader.logToFile("\n\n");
 	}
 }
