@@ -62,7 +62,7 @@ public class Elevator implements Runnable {
 		for(int i = 0; i < NUM_FLOORS; i++) {
 			buttons[i] = new ElevatorButton(i+1,false);
 		}
-		timer = new TimerController(1000/Test.SPEED,this);
+		timer = new TimerController((int)(1000/Test.SPEED),this);
 		
 		map = new HashMap<Integer,Boolean>();
 		this.fileLoader = fileLoader;

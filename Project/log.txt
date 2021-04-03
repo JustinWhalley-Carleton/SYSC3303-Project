@@ -1,0 +1,6 @@
+Scheduler started at: 20:08:53.377768
+Scheduler finished at: 20:09:57.432480
+64055
+Scheduler started at: 20:17:10.752752
+Scheduler finished at: 20:18:30.696093
+79944
