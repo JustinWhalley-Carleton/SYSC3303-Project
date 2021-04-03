@@ -185,13 +185,13 @@ public class Scheduler implements Runnable {
 
 //				 print out distance calculation result
 
-//				System.out.println("elevator: " + i+1 + "is"
-//						+ "floor " + elevtStates[i].getFloor()
-//						+"state " + elevtStates[i].getDir()
-//						+"dest " + elevtStates[i].getDest() );
-//
-//				System.out.println("elevator: " + i+1 + "to floor: " + floor + "dir: " + dir);
-//				System.out.println(dis);
+				System.out.println("elevator: " + i+1 + "is"
+						+ "floor " + elevtStates[i].getFloor()
+						+"state " + elevtStates[i].getDir()
+						+"dest " + elevtStates[i].getDest() );
+
+				System.out.println("elevator: " + i+1 + "to floor: " + floor + "dir: " + dir);
+				System.out.println(dis);
 			}
 		}
 
@@ -232,7 +232,7 @@ public class Scheduler implements Runnable {
 		if (elevtFloor == elevtDest){
 			distance = Math.abs(floorDiff);
 		}
-		else if ((floorDiff < 0 && dir == -1 && elevtDir == -1) || (floorDiff > 0 && dir == 1 && elevtDir == 1)) { // on elevt's way
+		else if ((floorDiff > 0 && dir == -1 && elevtDir == -1) || (floorDiff < 0 && dir == 1 && elevtDir == 1)) { // on elevt's way
 			distance = Math.min(Math.abs(elevtFloor - floor),Math.abs(elevtDest - floor));
 		}
 		else { // elevt needs turn around
