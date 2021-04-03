@@ -1,0 +1,4 @@
+Apr. 02, 2021 9:02:40 P.M. ElevatorSubsystem.Elevator logFileWriter
+INFO: Elevator 4 arrived floor 8: 4006
+Apr. 02, 2021 9:02:47 P.M. ElevatorSubsystem.Elevator logFileWriter
+INFO: Elevator 4 arrived floor 13: 3008
