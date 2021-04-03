@@ -40,7 +40,7 @@ public class Elevator implements Runnable {
 	private Down down = new Down();    // The 3 states as per the motor interface
 	private Idle idle = new Idle();
 	private RPC transmitter;
-	private TimerController timer;
+	private TimerController timer, timer2;
 	private boolean testing = false;
 	private int NUM_FLOORS = Test.FLOORS;
 	private ElevatorButton[] buttons;
@@ -52,7 +52,8 @@ public class Elevator implements Runnable {
 	private boolean GUIFlag;
 
 	private long moveStart;
-
+	private boolean doorOpen = false;
+	private long doorStart;
 	/**
 	 * no port elevator for junit testing
 	 */
@@ -71,7 +72,7 @@ public class Elevator implements Runnable {
 			buttons[i] = new ElevatorButton(i+1,false);
 		}
 		timer = new TimerController((int)(1000/Test.SPEED),this);
-		
+		timer2 = new TimerController(1000,this);
 		map = new HashMap<Integer,Boolean>();
 		this.fileLoader = fileLoader;
 		try {
@@ -94,7 +95,7 @@ public class Elevator implements Runnable {
 
 	public void move() {
 		int floor = getFloor();
-		if(floor!=-1 && state == idle && !stuck) {
+		if(floor!=-1 && state == idle && !stuck && !doorOpen) {
 			System.out.println("\nElevator " + elevNum + " going from floor " + curFloor + " to floor " + floor);
 			//If statements to checks the location of the destination floor relative to the current floor
 			if(curFloor > floor) {
@@ -112,7 +113,7 @@ public class Elevator implements Runnable {
 						makeStuck(2);
 					}
 				}
-				long doorStart = System.currentTimeMillis();
+				doorStart = System.currentTimeMillis();
 				openDoor();
 
 				if(stuckMsg != null && !GUIFlag) {
@@ -121,20 +122,13 @@ public class Elevator implements Runnable {
 						makeStuck(1);
 					}
 				}
+				timer2.start();
+				doorOpen = true;
+				
 				closeDoor();
 				long doorEnd = System.currentTimeMillis();
 				String elapsedDoorTime = String.valueOf(doorEnd - doorStart);
 				logFileWriter ("Elevator Load/Unload", elapsedDoorTime);
-				
-				if(map.get(curFloor) == null ? false : (boolean)map.get(curFloor)) {
-					removeFloor(floor);
-
-					pollCommand();
-
-					return;
-				}
-				removeFloor(floor);
-				buttons[floor-1].reached();
 				return;
 			}
 			moveStart = System.currentTimeMillis();
@@ -154,7 +148,22 @@ public class Elevator implements Runnable {
 		if(stuck) {
 			//if stuck do nothing
 			return;
-		} else if((state == up && curFloor < getFloor())||(state == down && curFloor > getFloor())){
+		} else if(doorOpen) { 
+			doorOpen = false;
+			closeDoor();
+			if(map.get(curFloor) == null ? false : (boolean)map.get(curFloor)) {
+				removeFloor(curFloor);
+
+				pollCommand();
+
+				return;
+			}
+			removeFloor(curFloor);
+			buttons[curFloor-1].reached();
+			long doorEnd = System.currentTimeMillis();
+			String elapsedDoorTime = String.valueOf(doorEnd - doorStart);
+			logFileWriter ("Elevator Load/Unload", elapsedDoorTime);
+		}else if((state == up && curFloor < getFloor())||(state == down && curFloor > getFloor())){
 			// continue going in current direction
 			if(state == up) {
 				curFloor++;
@@ -206,10 +215,8 @@ public class Elevator implements Runnable {
 					makeStuck(1);
 				}
 			}
-			closeDoor();
-			long moveEnd = System.currentTimeMillis();
-			String elapsedDoorTime = String.valueOf(moveEnd - moveStart);
-			logFileWriter ("Elevator " + elevNum + " arrived floor " + curFloor, elapsedDoorTime);
+			timer2.start();
+			doorOpen= true;
 		}
 		byte[] msg = Common.encodeElevator(elevNum, curFloor, state, getFloor() == -1 ? curFloor : getFloor());
 		transmitter.sendPacket(msg);
