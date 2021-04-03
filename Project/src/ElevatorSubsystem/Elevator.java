@@ -1,6 +1,9 @@
 package ElevatorSubsystem;
 
+import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.time.LocalTime;
@@ -8,6 +11,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.NoSuchElementException;
+import java.util.logging.FileHandler;
+import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 
 import FloorSubsystem.FileLoader;
 import FloorSubsystem.GUIFileLoader;
@@ -45,6 +51,8 @@ public class Elevator implements Runnable {
 	private FileLoader file;
 	private boolean GUIFlag;
 
+	private long moveStart;
+
 	/**
 	 * no port elevator for junit testing
 	 */
@@ -62,7 +70,7 @@ public class Elevator implements Runnable {
 		for(int i = 0; i < NUM_FLOORS; i++) {
 			buttons[i] = new ElevatorButton(i+1,false);
 		}
-		timer = new TimerController(1000/Test.SPEED,this);
+		timer = new TimerController((int)(1000/Test.SPEED),this);
 		
 		map = new HashMap<Integer,Boolean>();
 		this.fileLoader = fileLoader;
@@ -104,6 +112,7 @@ public class Elevator implements Runnable {
 						makeStuck(2);
 					}
 				}
+				long doorStart = System.currentTimeMillis();
 				openDoor();
 
 				if(stuckMsg != null && !GUIFlag) {
@@ -113,6 +122,10 @@ public class Elevator implements Runnable {
 					}
 				}
 				closeDoor();
+				long doorEnd = System.currentTimeMillis();
+				String elapsedDoorTime = String.valueOf(doorEnd - doorStart);
+				logFileWriter ("Elevator Load/Unload", elapsedDoorTime);
+				
 				if(map.get(curFloor) == null ? false : (boolean)map.get(curFloor)) {
 					removeFloor(floor);
 
@@ -124,6 +137,7 @@ public class Elevator implements Runnable {
 				buttons[floor-1].reached();
 				return;
 			}
+			moveStart = System.currentTimeMillis();
 			timer.start();
 
 			if(stuckMsg != null && !GUIFlag) {
@@ -193,6 +207,9 @@ public class Elevator implements Runnable {
 				}
 			}
 			closeDoor();
+			long moveEnd = System.currentTimeMillis();
+			String elapsedDoorTime = String.valueOf(moveEnd - moveStart);
+			logFileWriter ("Elevator " + elevNum + " arrived floor " + curFloor, elapsedDoorTime);
 		}
 		byte[] msg = Common.encodeElevator(elevNum, curFloor, state, getFloor() == -1 ? curFloor : getFloor());
 		transmitter.sendPacket(msg);
@@ -372,6 +389,25 @@ public class Elevator implements Runnable {
 	//getter to return door status
 	public boolean getDoorStatus() {
 		return doorStatus;
+	}
+	
+	public static void logFileWriter (String function, String duration) {
+		Logger logger = Logger.getLogger("Elevator Log");  
+		FileHandler fh;
+
+	    try {  
+
+	        fh = new FileHandler("src/test/logFile.txt");
+	        logger.addHandler(fh);
+	        SimpleFormatter formatter = new SimpleFormatter();  
+	        fh.setFormatter(formatter);  
+
+	        logger.info(function + ": " + duration);  
+
+	    } catch (IOException e) {  
+	        e.printStackTrace();  
+	    }
+		
 	}
 	
 	// receive method that first sends a check request to elevatorSubsystem

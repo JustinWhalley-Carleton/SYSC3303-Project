@@ -1,7 +1,7 @@
 package Scheduler;
 
 import java.time.LocalTime;
-import java.io.IOException;
+import java.io.*;
 import java.net.*;
 import java.util.*;
 import common.*;
@@ -23,9 +23,10 @@ public class Scheduler implements Runnable {
 	private FloorState[] floorStates;
 	private Queue<byte[]> msgToElevtSub, msgToFloorSub;
 
-	private RPC rpcFloor, rpcElevt,rpcGUI;
+	private long startMS, endMS;
+	private boolean floorSubEnded, elevtSubEnded;
 
-	//private RPC rpcGUI;
+	private RPC rpcFloor, rpcElevt, rpcGUI;
 
 
 	/**
@@ -42,6 +43,8 @@ public class Scheduler implements Runnable {
 		this.floorStates = new FloorState[totalFloors];
 		this.msgToElevtSub = new LinkedList<byte[]>();
 		this.msgToFloorSub = new LinkedList<byte[]>();
+		this.floorSubEnded = false;
+		this.elevtSubEnded = false;
 		
 		for (int i=0;i<elevtStates.length;i++) { elevtStates[i]= new ElevtState(i+1); }
 		for (int i=0;i<floorStates.length;i++) { floorStates[i]= new FloorState(i+1); }
@@ -106,7 +109,6 @@ public class Scheduler implements Runnable {
 
 		Common.ELEV_ERROR errorMsg_receive = Common.ELEV_ERROR.decode(msg);
 
-		System.out.println(errorMsg_receive);
 		if (errorMsg_receive == Common.ELEV_ERROR.RECOVER){
 			System.out.println("Scheduler received RECOVER message from ElevtSub: ");
 			Common.print(msg);
@@ -151,7 +153,6 @@ public class Scheduler implements Runnable {
 	 */
 
 	private void doSchedule(int floor, int dir) {
-
 		int closestElevt = findClosestElevt(floor,dir);
 		if (closestElevt < 0 ) return;
 		byte[] oneMsgToElevtSub = Common.encodeScheduler(closestElevt, floor,dir);
@@ -181,13 +182,16 @@ public class Scheduler implements Runnable {
 			else {
 				int dis = findDistance(floor, dir, elevtStates[i]);
 				distances[i] = dis;
-				System.out.println("elevator:" + i+1 + "is"
-						+ "floor" + elevtStates[i].getFloor()
-						+"state" + elevtStates[i].getDir()
-						+"dest" + elevtStates[i].getDest() );
 
-				System.out.println("elevator:" + i+1 + "to floor:" + floor + "dir: " + dir);
-				System.out.println(dis);
+//				 print out distance calculation result
+
+//				System.out.println("elevator: " + i+1 + "is"
+//						+ "floor " + elevtStates[i].getFloor()
+//						+"state " + elevtStates[i].getDir()
+//						+"dest " + elevtStates[i].getDest() );
+//
+//				System.out.println("elevator: " + i+1 + "to floor: " + floor + "dir: " + dir);
+//				System.out.println(dis);
 			}
 		}
 
@@ -200,7 +204,6 @@ public class Scheduler implements Runnable {
 				index = i;
 			}
 		}
-
 		if (min >= 99999){
 			System.out.println("No elevator available!");
 			System.exit(1);
@@ -228,9 +231,11 @@ public class Scheduler implements Runnable {
 		int floorDiff = elevtFloor - floor; // positive means floor is below the elevt; negative means above ;
 		if (elevtFloor == elevtDest){
 			distance = Math.abs(floorDiff);
-		} else if ((floorDiff < 0 && dir == -1 && elevtDir == -1) || (floorDiff > 0 && dir == 1 && elevtDir == 1)) { // on elevt's way
+		}
+		else if ((floorDiff < 0 && dir == -1 && elevtDir == -1) || (floorDiff > 0 && dir == 1 && elevtDir == 1)) { // on elevt's way
 			distance = Math.min(Math.abs(elevtFloor - floor),Math.abs(elevtDest - floor));
-		} else { // elevt needs turn around
+		}
+		else { // elevt needs turn around
 			if (elevtDir == -1) { // elevt is going down
 				distance = elevtFloor + floor;
 			} else{ // elevt is going up
@@ -239,6 +244,22 @@ public class Scheduler implements Runnable {
 		}
 		return distance;
 	}
+
+	/**
+	 *
+	 * @return whether all elevators are idle
+	 */
+	private boolean checkElevtSubEnded() {
+		boolean result = true;
+		for (int i = 0; i < totalElevts; i++) {
+			if (elevtStates[i].getDest() != elevtStates[i].getFloor()) {
+				result = false;
+			}
+		}
+		return result;
+	}
+
+
 
 
 	// communicate with FloorSub
@@ -251,7 +272,8 @@ public class Scheduler implements Runnable {
 			System.out.println("Scheduler sending message to FloorSub: ");
 			Common.print(msgSend);
 			rpcGUI.sendPacket(msgSend);
-		} else {
+		}
+		else {
 			rpcFloor.sendPacket(CheckMSG);
 		}
 		this.inState = 0;
@@ -263,7 +285,18 @@ public class Scheduler implements Runnable {
 			this.inState = 0;
 			return;
 		}
-		if (Common.findType(msgReceive) != Common.TYPE.CONFIRMATION) {
+
+		if (Common.findType(msgReceive) == Common.TYPE.CONFIRMATION) {
+
+			Common.CONFIRMATION comfirmMsg_receive = Common.CONFIRMATION.findConfirmation(msgReceive[1]);
+
+			if (comfirmMsg_receive == Common.CONFIRMATION.END) {
+				System.out.println("FloorSub ended");
+				floorSubEnded = true;
+			}
+
+		}
+		else {
 			floorSubAddMsg(msgReceive);
 			System.out.println("Scheduler received message from FloorSub: ");
 			Common.print(msgReceive);
@@ -318,15 +351,52 @@ public class Scheduler implements Runnable {
 
 	@Override
 	public void run() {
+		//Scheduler start
+		startMS = System.currentTimeMillis();
+		String start = "Scheduler started at: " + LocalTime.now();
+		System.out.println(start);
+
 		while (true) {
 			try {
 				sendReceiveFloorSub();
 				Thread.sleep(200);
 				sendReceiveElevtSub();
 				Thread.sleep(200);
+				elevtSubEnded = checkElevtSubEnded();
+				if(floorSubEnded && elevtSubEnded){ break; }
+
+
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
 		}
+		//Scheduler finish
+		endMS = System.currentTimeMillis();
+		String end = "Scheduler finished at: " + LocalTime.now();
+		System.out.println(end);
+
+		//Scheduler exection time
+		long execTime =  endMS - startMS;
+		String exec = "Scheduler exec time in ms: " + execTime;
+		System.out.println(exec);
+
+		// log Scheduler timing into the file
+		PrintWriter pw = null;
+		try {
+			File file = new File("src/test/log.txt");
+			file.createNewFile();
+			FileWriter fw = new FileWriter(file, true);
+			pw = new PrintWriter(fw);
+			pw.println(start);
+			pw.println(end);
+			pw.println(exec);
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			if (pw != null) {
+				pw.close();
+			}
+		}
+
 	}
 }

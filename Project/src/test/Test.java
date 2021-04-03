@@ -30,7 +30,7 @@ public class Test {
 	private static int ELEVATORS;
 	private static int ELEV_ERR;
 	public static int FLOORS;
-	public static int SPEED;
+	public static double SPEED;
 	// Port numbers
 	public static int ELEV_RECV_PORT;
 	public static int ELEV_SUB_ELEV_RECV_PORT;
@@ -99,13 +99,13 @@ public class Test {
 				}
 
 				// Get value
-				int value = Integer.parseInt(splitStr[1]);
+				int value = splitStr[1].contains(".") ? 0 : Integer.parseInt(splitStr[1]);
 				// Assign value to its according variable
 				switch(splitStr[0].trim()){
 					case "ELEVATORS:" 	-> ELEVATORS 	= value;
 					case "ROWS:"		-> ROWS 		= value;
 					case "FLOORS:"		-> FLOORS 		= value;
-					case "SPEED:"		-> SPEED 		= value;
+					case "SPEED:"		-> SPEED 		= Double.parseDouble(splitStr[1]);
 					case "ELEV_ERR:"	-> ELEV_ERR		= value;
 					// Ports
 					case "ELEV_RECV_PORT:" 				-> ELEV_RECV_PORT 				= value;
@@ -167,11 +167,11 @@ public class Test {
 			lines[i] = curLine;
 			writer.write(curLine + "\n");
 		}
-		writer.close();
-
+//		writer.close();
+		
 		// Error File
 		file = newFile("errorFile.txt");
-		writer = new FileWriter(file.getAbsoluteFile());
+//		writer = new FileWriter(file.getAbsoluteFile());
 
 		Integer errorIterations[] = generateError(ELEV_ERR, ROWS);
 		Integer brokenElevators[] = generateError(ELEV_ERR, ELEVATORS);
@@ -202,7 +202,7 @@ public class Test {
 	private void generateData() {
 		LocalTime referenceTime = LocalTime.now().plus(10, ChronoUnit.SECONDS);
 		for(int i = 0; i < ROWS; i++) {
-			String temp = (referenceTime.plus(10*i/SPEED,ChronoUnit.SECONDS)).toString();
+			String temp = (referenceTime.plus((int)(10*i/SPEED),ChronoUnit.SECONDS)).toString();
 			time[i] = temp;
 			floor[i] = rand.nextInt(FLOORS)+1;
 			carButton[i] = rand.nextInt(FLOORS)+1;
