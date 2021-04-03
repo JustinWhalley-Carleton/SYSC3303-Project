@@ -32,7 +32,9 @@ public class GUI extends JFrame{
 	public static JTextArea textPanel;
 	public static BasicArrowButton[] upButtons;
 	public static BasicArrowButton[] downButtons;
-	
+	// Ports
+	private static int SCHEDULER_RECV_GUI_PORT;
+	private static int GUI_RECV_SCHEDULER_PORT;
 	/**
 	 * constructor for GUI 
 	 */
@@ -48,7 +50,7 @@ public class GUI extends JFrame{
 		}
 		try {
 			// initialize communication between scheduler and GUI
-			transmitter = new RPC(InetAddress.getLocalHost(), 5, 6);
+			transmitter = new RPC(InetAddress.getLocalHost(), SCHEDULER_RECV_GUI_PORT, GUI_RECV_SCHEDULER_PORT);
 		} catch (UnknownHostException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -154,7 +156,7 @@ public class GUI extends JFrame{
 				String line = scanner.nextLine();
 				String[] splitStr = line.trim().split("\\s+");
 
-				if (splitStr.length == 1 || splitStr[0].trim().equals("//")){
+				if (splitStr.length == 1 || line.contains("/")){
 					// Empty line or Comment in setting file.
 					continue;
 				}
@@ -168,9 +170,11 @@ public class GUI extends JFrame{
 					case "FLOORS:"		-> FLOORS 		= value;
 					case "SPEED:"		-> SPEED 		= Double.parseDouble(splitStr[1]);
 					case "ELEV_ERR:"	-> ELEV_ERR		= value;
-
+					// GUI Ports
+					case "GUI_RECV_SCHEDULER_PORT:"		-> GUI_RECV_SCHEDULER_PORT 		= value;
+					case "SCHEDULER_RECV_GUI_PORT:"		-> SCHEDULER_RECV_GUI_PORT		= value;
 					// Unsupported settings
-					default -> System.out.println("Unexpected item in settings file.");
+					default -> {}
 				}
 			}
 			scanner.close();
