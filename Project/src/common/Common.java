@@ -351,7 +351,7 @@ public class Common {
 			case ELEVATOR -> text +=
 					"from elevator #" + results[0] + ": " +
 					"currently at floor " + results[1] +
-					", going " + (results[2] == 1 ? "up" : "down") +
+					", going " + (results[2] == 1 ? "up" : results[2] == 0 ? "idle" : "down") +
 					", destination floor " + results[3];
 
 			case FLOOR -> text +=

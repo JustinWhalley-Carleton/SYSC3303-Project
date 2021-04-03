@@ -11,18 +11,23 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.time.Duration;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Random;
 import java.util.Scanner;
 
+import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import ElevatorSubsystem.*;
 import FloorSubsystem.FileLoader;
+import FloorSubsystem.GUIFileLoader;
 import common.Common;
 import Timer.TimerController;
 import common.RPC;
+import common.Common.ELEV_ERROR;
 
 /**
  * @author jcwha
@@ -33,6 +38,15 @@ class JunitTestCases {
 	static final int FLOORS = 10;
 	static final String UP = "Up";
 	static final String DOWN = "Down";
+	static final GUIFileLoader loader = new GUIFileLoader();
+	/**
+	 * common code to run before each test
+	 */
+	@BeforeEach
+	void init() {
+		System.out.println("Deleting");
+		//GUIFileLoader.deleteFile();
+	}
 	
 	/**
 	 * create a new file to use as a test for file loader
@@ -212,6 +226,66 @@ class JunitTestCases {
 		assertTrue(0 == (int)msg[6], "returns the correct state");
 		assertTrue(dest == (int)msg[8], "returns correct destination floor");
 	}
+	
+	/**
+	 * test decode invalid elevator error
+	 */
+	@Test
+	void testEnumInvalidElevError() {
+		byte[] msg = Common.encodeElevError(ELEV_ERROR.INVALID, 1, 1, 1, true);
+		assertEquals(Common.TYPE.ELEV_ERROR,Common.findType(msg));
+		assertEquals(Common.ELEV_ERROR.INVALID,Common.ELEV_ERROR.decode(msg));
+	}
+	
+	/**
+	 * test decode unknown elevator error
+	 */
+	@Test
+	void testEnumUnknownElevError() {
+		byte[] msg = Common.encodeElevError(ELEV_ERROR.UNKNOWN, 1, 1, 1, true);
+		assertEquals(Common.TYPE.ELEV_ERROR,Common.findType(msg));
+		assertEquals(Common.ELEV_ERROR.UNKNOWN,Common.ELEV_ERROR.decode(msg));
+	}
+	
+	/**
+	 * test decode stuck elevator error
+	 */
+	@Test
+	void testEnumStuckElevError() {
+		byte[] msg = Common.encodeElevError(ELEV_ERROR.STUCK, 1, 1, 1, true);
+		assertEquals(Common.TYPE.ELEV_ERROR,Common.findType(msg));
+		assertEquals(Common.ELEV_ERROR.STUCK,Common.ELEV_ERROR.decode(msg));
+	}
+	
+	/**
+	 * test decode door open elevator error
+	 */
+	@Test
+	void testEnumDoorOpenError() {
+		byte[] msg = Common.encodeElevError(ELEV_ERROR.DOOR_OPEN, 1, 1, 1, true);
+		assertEquals(Common.TYPE.ELEV_ERROR,Common.findType(msg));
+		assertEquals(Common.ELEV_ERROR.DOOR_OPEN,ELEV_ERROR.decode(msg));
+	}
+	
+	/**
+	 * test decode door close elevator error
+	 */
+	@Test
+	void testEnumDoorCloseElevatorError() {
+		byte[] msg = Common.encodeElevError(ELEV_ERROR.DOOR_CLOSE, 1, 1, 1, true);
+		assertEquals(Common.TYPE.ELEV_ERROR,Common.findType(msg));
+		assertEquals(Common.ELEV_ERROR.DOOR_CLOSE,Common.ELEV_ERROR.decode(msg));
+	}
+	
+	/**
+	 * test decode recover elevator error
+	 */
+	@Test
+	void testEnumRecoverElev() {
+		byte[] msg = Common.encodeElevError(ELEV_ERROR.RECOVER, 1, 1, 1, true);
+		assertEquals(Common.TYPE.ELEV_ERROR,Common.findType(msg));
+		assertEquals(Common.ELEV_ERROR.RECOVER,Common.ELEV_ERROR.decode(msg));
+	}	
 	
 	/**
 	 * test the encode floor message up gives correct byte[]
@@ -541,7 +615,7 @@ class JunitTestCases {
 	void testEnumConfirmation() {
 		byte[] msg = Common.encodeConfirmation(Common.CONFIRMATION.RECEIVED);
 		Common.TYPE type = Common.findType(msg);
-		assertEquals(type, Common.TYPE.CONFIRMATION);
+		assertEquals(Common.TYPE.CONFIRMATION,type);
 	}
 	
 	/**
@@ -551,9 +625,9 @@ class JunitTestCases {
 	void testEnumConfirmationCheck() {
 		byte[] msg = Common.encodeConfirmation(Common.CONFIRMATION.CHECK);
 		Common.TYPE type = Common.findType(msg);
-		assertEquals(type, Common.TYPE.CONFIRMATION);
+		assertEquals(Common.TYPE.CONFIRMATION,type);
 		Common.CONFIRMATION confirmation = Common.findConfirmation(msg);
-		assertEquals(confirmation, Common.CONFIRMATION.CHECK);
+		assertEquals(Common.CONFIRMATION.CHECK,confirmation);
 	}
 	
 	/**
@@ -563,7 +637,7 @@ class JunitTestCases {
 	void testEnumConfirmationReceived() {
 		byte[] msg = Common.encodeConfirmation(Common.CONFIRMATION.RECEIVED);
 		Common.TYPE type = Common.findType(msg);
-		assertEquals(type, Common.TYPE.CONFIRMATION);
+		assertEquals(Common.TYPE.CONFIRMATION,type);
 		Common.CONFIRMATION confirmation = Common.findConfirmation(msg);
 		assertEquals(confirmation, Common.CONFIRMATION.RECEIVED);
 	}
@@ -575,9 +649,9 @@ class JunitTestCases {
 	void testEnumConfirmationNoMsg() {
 		byte[] msg = Common.encodeConfirmation(Common.CONFIRMATION.NO_MSG);
 		Common.TYPE type = Common.findType(msg);
-		assertEquals(type, Common.TYPE.CONFIRMATION);
+		assertEquals(Common.TYPE.CONFIRMATION,type);
 		Common.CONFIRMATION confirmation = Common.findConfirmation(msg);
-		assertEquals(confirmation, Common.CONFIRMATION.NO_MSG);
+		assertEquals(Common.CONFIRMATION.NO_MSG,confirmation);
 	}
 	
 	/**
@@ -587,7 +661,7 @@ class JunitTestCases {
 	void testEnumScheduler() {
 		byte[] msg = Common.encodeScheduler(1,2,3);
 		Common.TYPE type = Common.findType(msg);
-		assertEquals(type, Common.TYPE.SCHEDULER);
+		assertEquals(Common.TYPE.SCHEDULER,type);
 	}
 	
 	/**
@@ -597,7 +671,7 @@ class JunitTestCases {
 	void testEnumFloor() {
 		byte[] msg = Common.encodeFloor(1,true);
 		Common.TYPE type = Common.findType(msg);
-		assertEquals(type, Common.TYPE.FLOOR);
+		assertEquals(Common.TYPE.FLOOR,type);
 	}
 	
 	/**
@@ -607,7 +681,7 @@ class JunitTestCases {
 	void testEnumElevator() {
 		byte[] msg = Common.encodeElevator(1,2,(MotorState)new Idle(),3);
 		Common.TYPE type = Common.findType(msg);
-		assertEquals(type, Common.TYPE.ELEVATOR);
+		assertEquals(Common.TYPE.ELEVATOR,type);
 	}
 	
 	/**
@@ -617,8 +691,637 @@ class JunitTestCases {
 	void testEnumInvalid() {
 		byte[] msg = Common.encodeConfirmation(Common.CONFIRMATION.INVALID);
 		Common.TYPE type = Common.findType(msg);
-		assertEquals(type, Common.TYPE.CONFIRMATION);
+		assertEquals(Common.TYPE.CONFIRMATION,type);
 		Common.CONFIRMATION confirmation = Common.findConfirmation(msg);
-		assertEquals(confirmation, Common.CONFIRMATION.INVALID);
+		assertEquals(Common.CONFIRMATION.INVALID,confirmation);
+	}
+	
+	/**
+	 * test fault between floor stops elevator
+	 */
+	@Test
+	void testFaultBetweenFloors() {
+		
+	}
+	
+	/**
+	 * test fault door closed
+	 */
+	@Test
+	void testFaultDoorClosed() {
+		
+	}
+	
+	/**
+	 * test fault recovered
+	 */
+	@Test 
+	void testFaultRecovered() {
+		
+	}
+	
+	/**
+	 * test floor rescheduled
+	 */
+	@Test
+	void testFloorRescheduled() {
+		
+	}
+	
+	/**
+	 * test floor not rescheduled
+	 */
+	@Test
+	void testFloorNotRescheduled() {
+		
+	}
+	
+	/**
+	 * test elevator up state
+	 */
+	@Test
+	void testUpState() {
+		
+	}
+	
+	/**
+	 * test elevator down state
+	 */
+	@Test
+	void testDownState() {
+		
+	}
+	
+	/**
+	 * test elevator idle state
+	 */
+	@Test 
+	void testIdleState() {
+		
+	}
+	
+	/**
+	 * test floor increments in up state
+	 */
+	@Test
+	void testIncrementCurFloor() {
+		
+	}
+	
+	/**
+	 * test floor decrements in down state
+	 */
+	@Test
+	void testDecrementCurFloor() {
+		
+	}
+	
+	/**
+	 * test fault state
+	 */
+	@Test 
+	void testFaultState() {
+		
+	}
+	
+	/**
+	 * test time elapsed between floors
+	 */
+	@Test
+	void testTimeElapsed() {
+		
+	}
+	
+	/**
+	 * test scheduler get elevator messages
+	 */
+	@Test
+	void testschedulerReceiveElev() {
+		
+	}
+	
+	/**
+	 * test scheduler get floor messages
+	 */
+	@Test
+	void testSchedulerReceiveFloor() {
+		
+	}
+	
+	/**
+	 * test scheduler response to confirmation elev
+	 */
+	@Test
+	void testSchedulerResponseConfirmElev() {
+		
+	}
+	
+	/**
+	 * test scheduler response to confirmation floor
+	 */
+	@Test
+	void testSchedulerResponseConfirmFloor() {
+		
+	}
+	
+	/**
+	 * test scheduler response to regular message elev
+	 */
+	@Test
+	void testSchedulerResponseMsgElev() {
+		
+	}
+	
+	/**
+	 * test scheduler response to regular message floor
+	 */
+	@Test
+	void testSchedulerResponseMsgFloor() {
+		
+	}
+	
+	/**
+	 * test num elevators created
+	 */
+	@Test
+	void testNumberOfElevatorsCreate() {
+		
+	}
+	
+	/**
+	 * test ports used
+	 */
+	@Test 
+	void testPortsUsed() {
+		
+	}
+	
+	/**
+	 * test proper number of floors read
+	 */
+	@Test
+	void testNumFloors() {
+		
+	}
+	
+	/**
+	 * test read command floorsubsystem up
+	 */
+	@Test
+	void testReadCommandFloorUp() {
+		loader.writeToFile(1,5,1);
+		LocalTime curTime = LocalTime.now();
+		String[] floorCommand = loader.readLineFloor();
+		LocalTime commandTime = LocalTime.parse(floorCommand[0]);
+		Duration timeDiff = Duration.between(curTime,commandTime);
+		assertEquals(0,timeDiff.toHoursPart());
+		assertEquals(0,timeDiff.toMinutesPart());
+		assertEquals(0,timeDiff.toSecondsPart(),1); // allow a 1 second difference
+		assertEquals("UP", floorCommand[2]);
+	}
+	
+	/**
+	 * test read command floorsubsystem dowm
+	 */
+	@Test
+	void testReadCommandFloorDown() {
+		loader.writeToFile(1,5,0);
+		LocalTime curTime = LocalTime.now();
+		String[] floorCommand = loader.readLineFloor();
+		LocalTime commandTime = LocalTime.parse(floorCommand[0]);
+		Duration timeDiff = Duration.between(curTime,commandTime);
+		assertEquals(0,timeDiff.toHoursPart());
+		assertEquals(0,timeDiff.toMinutesPart());
+		assertEquals(0,timeDiff.toSecondsPart(),1); // allow a 1 second difference
+		assertEquals(5,Integer.parseInt(floorCommand[1]));
+		assertEquals("DOWN", floorCommand[2]);
+	}
+	
+	/**
+	 * test read floor lien delets command
+	 */
+	@Test
+	void testDeleteAfterReadFloor() {
+		loader.writeToFile(1,5,0);
+		loader.readLineFloor();
+		String[] floorCommand = loader.readLineFloor();
+		assertNull(floorCommand);
+	}
+	
+	/**
+	 * test read command elevatorSubsystem
+	 */
+	@Test
+	void testReadCommandElev() {
+		loader.writeToFile(2, 1, 10);
+		assertTrue(loader.elevHasCommand(1));
+		assertFalse(loader.elevHasCommand(2));
+		assertNull(loader.getElevButton(3));
+		assertEquals((Integer)10,loader.getElevButton(1)[0]);
+	}
+	
+	/**
+	 * test read command elevatorSubsystem multiple dest
+	 */
+	@Test
+	void testReadCommandElevMultipleDest() {
+		loader.writeToFile(2, 1, 10);
+		loader.writeToFile(2, 1, 11);
+		loader.writeToFile(2, 1, 12);
+		assertTrue(loader.elevHasCommand(1));
+		assertFalse(loader.elevHasCommand(2));
+		Integer[] result = loader.getElevButton(1);
+		System.out.println("\n\n\n\tVal1: "+result[0]+" Val2: "+result[1]+" Val3: " +result[2]+"\n\n\n");
+		assertEquals((Integer)10,result[0]);
+		assertEquals((Integer)11,result[1]);
+		assertEquals((Integer)12,result[2]);
+	}
+	
+	/**
+	 * test read elev deletes command
+	 */
+	@Test
+	void testElevCommandDeletesCommand() {
+		loader.writeToFile(2, 1, 10);
+		loader.writeToFile(2, 1, 11);
+		loader.writeToFile(2, 1, 12);
+		loader.getElevButton(1);
+		assertNull(loader.getElevButton(1));
+	}
+	
+	/**
+	 * test read fault command
+	 */
+	@Test
+	void testReadFaultCommand() {
+		loader.writeToFile(0, 1, -1);
+		assertFalse(loader.getFault(2));
+		assertTrue(loader.getFault(1));
+	}
+	
+	/**
+	 * test delete command after read fault
+	 */
+	@Test
+	void testDeleteFaultCommandAfterRead() {
+		loader.writeToFile(0, 1, -1);
+		loader.getFault(1);
+		assertFalse(loader.getFault(1));
+	}
+	
+	/**
+	 * test proper command deleted after read
+	 */
+	@Test
+	void testProperCommandDeletedAfterRead() {
+		loader.writeToFile(0, 1, -1);
+		loader.writeToFile(0, 2, -1);
+		loader.writeToFile(1, 4, 1);
+		loader.writeToFile(1, 5, 0);
+		loader.writeToFile(2, 1, 5);
+		loader.writeToFile(2, 4, 3);
+		
+		assertTrue(loader.getFault(1));
+		assertTrue(loader.getFault(2));
+		assertFalse(loader.getFault(1));
+		assertFalse(loader.getFault(2));
+		
+		assertEquals(5,loader.getElevButton(1));
+		assertEquals(3,loader.getElevButton(4));
+		assertNull(loader.getElevButton(1));
+		assertNull(loader.getElevButton(4));
+		
+		assertNotNull(loader.readLineFloor());
+		assertNotNull(loader.readLineFloor());
+		assertNull(loader.readLineFloor());
+	}
+	
+	/**
+	 * test elevator receive message
+	 */
+	@Test 
+	void testElevReceive() {
+		
+	}
+	
+	/**
+	 * test floor receive message
+	 */
+	@Test 
+	void testFloorReceive() {
+		
+	}
+	
+	/**
+	 * test receive elevSubsystem
+	 */
+	@Test
+	void testReceiveElevSub() {
+		
+	}
+	
+	/**
+	 * test send elevSub
+	 */
+	@Test
+	void testSendElevSub() {
+		
+	}
+	
+	/**
+	 * test bad floor input
+	 */
+	@Test
+	void testBadFloorInput() {
+		
+	}
+	
+	/**
+	 * test bad elev Input
+	 */
+	@Test
+	void testBadElevInput() {
+		
+	}
+	
+	/**
+	 * test elev button changes color when clicked
+	 */
+	@Test
+	void testGUIButtonColorElev() {
+		
+	}
+	
+	/**
+	 * test elev button disable once click
+	 */
+	@Test
+	void testElevButtonDisabled() {
+		
+	}
+	
+	/**
+	 * test elev button reenabled
+	 */
+	@Test
+	void testElevButtonReenabled() {
+		
+	}
+	
+	/**
+	 * test elev button color change back when reached
+	 */
+	@Test
+	void testElevColorChangeArrival() {
+		
+	}
+	
+	/**
+	 * test scroll panel gets text
+	 */
+	@Test
+	void testPrintToScrollPanel() {
+		
+	}
+	
+	/**
+	 * test write to gui command
+	 */
+	@Test 
+	void testWriteToGUICommand() {
+		
+	}
+	
+	/**
+	 * test get floor command 
+	 */
+	@Test
+	void testGetFloorCommand() {
+		
+	}
+	
+	/**
+	 * test get elev command
+	 */
+	@Test 
+	void testGetElevCommand() {
+		
+	}
+	
+	/**
+	 * test get fault command
+	 */
+	@Test
+	void testGetFaultCommand() {
+		
+	}
+	
+	/**
+	 * test number of buttons created Floor panel
+	 */
+	@Test 
+	void testNumFloorsGUI() {
+		
+	}
+	
+	/**
+	 * test number of buttons in elevator panel
+	 */
+	@Test
+	void testNumFloorsInElevGUI() {
+		
+	}
+	
+	/**
+	 * test number of elevators
+	 */
+	@Test
+	void testNumElevsGUI() {
+		
+	}
+	
+	/**
+	 * test get floor change in GUI
+	 */
+	@Test
+	void testCurFloorLabelGUI() {
+		
+	}
+	
+	/**
+	 * test get dest floor label GUI
+	 */
+	@Test
+	void testDestFloorLabelGUI() {
+		
+	}
+	
+	/**
+	 * test get fault state label GUI 
+	 */
+	@Test
+	void testStateFaultLabelGUI() {
+		
+	}
+	
+	/**
+	 * test get Idle state label GUI 
+	 */
+	@Test
+	void testStateIdleLabelGUI() {
+		
+	}
+	
+	/**
+	 * test get up state label GUI 
+	 */
+	@Test
+	void testStateUpLabelGUI() {
+		
+	}
+	
+	/**
+	 * test get down state label GUI 
+	 */
+	@Test
+	void testStateDownLabelGUI() {
+		
+	}
+	
+	/**
+	 * test floor button on up
+	 */
+	@Test
+	void testFloorButtonOnUp() {
+		
+	}
+	
+	/**
+	 * test floor button on down
+	 */
+	@Test
+	void testFloorButtonOnDown() {
+		
+	}
+	
+	/**
+	 * test floor button off up
+	 */
+	@Test
+	void testFloorButtonOffUp() {
+		
+	}
+	
+	/**
+	 * test floor button off down
+	 */
+	@Test
+	void testFloorButtonOffDown() {
+		
+	}
+	
+	/**
+	 * test elev button on
+	 */
+	@Test 
+	void testElevButtonOn() {
+		
+	}
+	
+	/**
+	 * test elev button off
+	 */
+	@Test
+	void testElevButtonOff() {
+		
+	}
+	
+	/**
+	 * test scheduler picks closeset elev using 1 elev path
+	 */
+	@Test
+	void testSchedulerPicksClosestElev() {
+		
+	}
+	
+	/**
+	 * test scheduler picks an alternate elev
+	 */
+	@Test
+	void testSchedulerPicksNewClosestElev() {
+		
+	}
+	
+	/**
+	 * test scheduler picks an alternate elev with direction
+	 */
+	@Test
+	void testSchedulerPicksProperDirElev() {
+		
+	}
+	
+	/**
+	 * test scheduler holds up state
+	 */
+	@Test
+	void testSchedulerHoldsUpState() {
+		
+	}
+	
+	/**
+	 * test scheduler holds down state
+	 */
+	@Test
+	void testSchedulerHoldsDownState() {
+		
+	}
+	
+	/**
+	 * test scheduler holds idle state
+	 */
+	@Test
+	void testSchedulerHoldsIdleState() {
+		
+	}
+	
+	/**
+	 * test scheduler holds transient fault state
+	 */
+	@Test
+	void testSchedulerHoldsTransientFaultState() {
+		
+	}
+	
+	/**
+	 * test scheduler holds actual fualt state
+	 */
+	@Test
+	void testSchedulerHoldsPermanentFaultState() {
+		
+	}
+	
+	/**
+	 * test scheduler elevator message queue
+	 */
+	@Test
+	void testSchedulerElevMessageQueue() {
+		
+	}
+	
+	/**
+	 * test scheduler floor message queue
+	 */
+	@Test 
+	void testSchedulerFloorMessageQueue() {
+		
+	}
+	
+	
+	/**
+	 * test elevator subsystem message queue
+	 */
+	@Test 
+	void testElevatorMessageQueue() {
+		
 	}
 }
