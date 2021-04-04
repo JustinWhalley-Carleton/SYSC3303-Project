@@ -128,7 +128,8 @@ public class Elevator implements Runnable {
 				closeDoor();
 				long doorEnd = System.currentTimeMillis();
 				String elapsedDoorTime = String.valueOf(doorEnd - doorStart);
-				logFileWriter ("Elevator Load/Unload", elapsedDoorTime);
+				String doorTime = "Elevator Load/Unload Time in ms: " + elapsedDoorTime;
+				FileLoader.logToFile(doorTime);
 				return;
 			}
 			moveStart = System.currentTimeMillis();
@@ -160,9 +161,10 @@ public class Elevator implements Runnable {
 			}
 			removeFloor(curFloor);
 			buttons[curFloor-1].reached();
-			long doorEnd = System.currentTimeMillis();
-			String elapsedDoorTime = String.valueOf(doorEnd - doorStart);
-			logFileWriter ("Elevator Load/Unload", elapsedDoorTime);
+			long moveEnd = System.currentTimeMillis();
+			String elapsedMoveTime = String.valueOf(moveEnd - moveStart);
+			String moveTime = "Elevator " + elevNum + " took " + elapsedMoveTime + "ms to move to Floor " + curFloor;
+			FileLoader.logToFile(moveTime);
 		}else if((state == up && curFloor < getFloor())||(state == down && curFloor > getFloor())){
 			// continue going in current direction
 			if(state == up) {
@@ -398,24 +400,24 @@ public class Elevator implements Runnable {
 		return doorStatus;
 	}
 	
-	public static void logFileWriter (String function, String duration) {
-		Logger logger = Logger.getLogger("Elevator Log");  
-		FileHandler fh;
-
-	    try {  
-
-	        fh = new FileHandler("src/test/logFile.txt");
-	        logger.addHandler(fh);
-	        SimpleFormatter formatter = new SimpleFormatter();  
-	        fh.setFormatter(formatter);  
-
-	        logger.info(function + ": " + duration);  
-
-	    } catch (IOException e) {  
-	        e.printStackTrace();  
-	    }
-		
-	}
+//	public static void logFileWriter (String function, String duration) {
+//		Logger logger = Logger.getLogger("Elevator Log");  
+//		FileHandler fh;
+//
+//	    try {  
+//
+//	        fh = new FileHandler("src/test/logFile.txt");
+//	        logger.addHandler(fh);
+//	        SimpleFormatter formatter = new SimpleFormatter();  
+//	        fh.setFormatter(formatter);  
+//
+//	        logger.info(function + ": " + duration);  
+//
+//	    } catch (IOException e) {  
+//	        e.printStackTrace();  
+//	    }
+//		
+//	}
 	
 	// receive method that first sends a check request to elevatorSubsystem
 	// and then receives instructions for a specific elevator
