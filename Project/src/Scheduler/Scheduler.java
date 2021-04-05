@@ -82,12 +82,15 @@ public class Scheduler implements Runnable {
 
 		//if the the elevator stops on a floor, dismiss floor buttons
 		if (dir == 0 ){
-
-			if (floor != 1 && (dest < floor || dest == floor)) {
+			// dismiss down button
+			if (floorStates[floor-1].getDown() == elevt) {
+				floorStates[floor-1].setDown(0);
 				byte[] oneMsgToFloorSub = Common.encodeScheduler(elevt, floor,0);
 				msgToFloorSub.offer(oneMsgToFloorSub);
 			}
-			if (floor != floorStates.length && (dest > floor || dest == floor)) {
+			// dismiss up button
+			if (floorStates[floor-1].getUp() == elevt) {
+				floorStates[floor-1].setUp(0);
 				byte[] oneMsgToFloorSub = Common.encodeScheduler(elevt, floor,1);
 				msgToFloorSub.offer(oneMsgToFloorSub);
 			}
@@ -158,6 +161,17 @@ public class Scheduler implements Runnable {
 	private void doSchedule(int floor, int dir) {
 		int closestElevt = findClosestElevt(floor,dir);
 		if (closestElevt < 0 ) return;
+
+		if( dir ==0 ){
+			// set assigned elevt# to floor button
+			floorStates[floor-1].setDown(closestElevt);
+			// update elevt destion immediately in case the other floor button pressed immediately
+			elevtStates[closestElevt-1].setDest(floor);
+		} else {
+			floorStates[floor-1].setUp(closestElevt);
+			elevtStates[closestElevt-1].setDest(floor);
+		}
+
 		byte[] oneMsgToElevtSub = Common.encodeScheduler(closestElevt, floor,dir);
 		msgToElevtSub.offer(oneMsgToElevtSub);
 		return;
@@ -183,18 +197,22 @@ public class Scheduler implements Runnable {
 				distances[i] = Integer.MAX_VALUE;
 			}
 			else {
-				int dis = findDistance(floor, dir, elevtStates[i]);
-				distances[i] = dis;
+				// if there is already an elevator coming to this floor, assign another elevator if there is one
+				if (elevtStates[i].getDest() == floor){
+					distances[i] = 90000;
+				} else {
+					distances[i] = findDistance(floor, dir, elevtStates[i]);
+				}
 
-//				 print out distance calculation result
-
+////				 print out distance calculation result
+//
 //				System.out.println("elevator: " + (i+1) + " is"
 //						+ " floor " + elevtStates[i].getFloor()
 //						+" state " + elevtStates[i].getDir()
 //						+" dest " + elevtStates[i].getDest() );
 //
 //				System.out.println("elevator: " + (i+1) + " to floor: " + floor + " dir: " + dir);
-//				System.out.println(dis);
+//				System.out.println(distances[i]);
 			}
 		}
 
