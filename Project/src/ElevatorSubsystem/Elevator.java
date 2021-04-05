@@ -191,6 +191,9 @@ public class Elevator implements Runnable {
 			transmitter.sendPacket(msg);
 			msg = transmitter.receivePacket();*/
 			if(map.get(curFloor) == null ? false : (boolean)map.get(curFloor)) {
+				byte[] msg = Common.encodeElevator(elevNum, curFloor, state, getFloor() == -1 ? curFloor : getFloor());
+				transmitter.sendPacket(msg);
+				transmitter.receivePacket();
 				removeFloor(curFloor);  //calls method remove floor to remove it from the arraylist
 				Integer[] nextFloors;
 				if(GUIFlag) {
@@ -206,6 +209,9 @@ public class Elevator implements Runnable {
 				}
 				
 			} else {
+				byte[] msg = Common.encodeElevator(elevNum, curFloor, state, getFloor() == -1 ? curFloor : getFloor());
+				transmitter.sendPacket(msg);
+				transmitter.receivePacket();
 				removeFloor(curFloor);  //calls method remove floor to remove it from the arraylist
 				buttons[curFloor-1].reached();
 				
@@ -219,10 +225,11 @@ public class Elevator implements Runnable {
 			}
 			timer2.start();
 			doorOpen= true;
+			return;
 		}
-		byte[] msg = Common.encodeElevator(elevNum, curFloor, state, getFloor() == -1 ? curFloor : getFloor());
-		transmitter.sendPacket(msg);
-		transmitter.receivePacket();
+//		byte[] msg = Common.encodeElevator(elevNum, curFloor, state, getFloor() == -1 ? curFloor : getFloor());
+//		transmitter.sendPacket(msg);
+//		transmitter.receivePacket();
 	}
 
 	//Method removeFloor takes chosen floor and removes it from the Arraylist of destination floors
