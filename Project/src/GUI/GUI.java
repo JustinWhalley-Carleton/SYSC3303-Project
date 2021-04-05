@@ -27,7 +27,7 @@ public class GUI extends JFrame{
 	private static int ELEVATORS;
 	private static int ELEV_ERR;
 	public static int FLOORS;
-	public static int SPEED;
+	public static double SPEED;
 	public static ElevatorPanel[] elevatorPanels;
 	private RPC transmitter;
 	public static JTextArea textPanel;
@@ -39,7 +39,9 @@ public class GUI extends JFrame{
 	private Thread floorThread;
 	private Thread elevatorThread;
 	private Thread schedulerThread;
-	
+	// Ports
+	private static int SCHEDULER_RECV_GUI_PORT;
+	private static int GUI_RECV_SCHEDULER_PORT;
 	/**
 	 * constructor for GUI 
 	 */
@@ -55,7 +57,7 @@ public class GUI extends JFrame{
 		}
 		try {
 			// initialize communication between scheduler and GUI
-			transmitter = new RPC(InetAddress.getLocalHost(), 5, 6);
+			transmitter = new RPC(InetAddress.getLocalHost(), SCHEDULER_RECV_GUI_PORT, GUI_RECV_SCHEDULER_PORT);
 		} catch (UnknownHostException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -167,16 +169,25 @@ public class GUI extends JFrame{
 				String line = scanner.nextLine();
 				String[] splitStr = line.trim().split("\\s+");
 
+				if (splitStr.length == 1 || line.contains("/")){
+					// Empty line or Comment in setting file.
+					continue;
+				}
+
 				// Get value
-				int value = Integer.parseInt(splitStr[1]);
+				int value = splitStr[1].contains(".") ? 0 : Integer.parseInt(splitStr[1]);
 				// Assign value to its according variable
 				switch(splitStr[0].trim()){
 					case "ELEVATORS:" 	-> ELEVATORS 	= value;
 					case "ROWS:"		-> ROWS 		= value;
 					case "FLOORS:"		-> FLOORS 		= value;
-					case "SPEED:"		-> SPEED 		= value;
+					case "SPEED:"		-> SPEED 		= Double.parseDouble(splitStr[1]);
 					case "ELEV_ERR:"	-> ELEV_ERR		= value;
-					default -> System.out.println("Unexpected item in settings file.");
+					// GUI Ports
+					case "GUI_RECV_SCHEDULER_PORT:"		-> GUI_RECV_SCHEDULER_PORT 		= value;
+					case "SCHEDULER_RECV_GUI_PORT:"		-> SCHEDULER_RECV_GUI_PORT		= value;
+					// Unsupported settings
+					default -> {}
 				}
 			}
 			scanner.close();
