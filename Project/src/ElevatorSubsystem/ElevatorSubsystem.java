@@ -39,6 +39,7 @@ public class ElevatorSubsystem implements Runnable{
 
 	// Class vars
 	private final int NUM_ELEV;
+	public Elevator[] elevs;
 	private Thread[] elevators;
 	private int serial = 0;
 
@@ -49,7 +50,7 @@ public class ElevatorSubsystem implements Runnable{
 
 	/* Common code */
 
-	public ElevatorSubsystem(int numElev,boolean GUI) throws Exception {
+	public ElevatorSubsystem(int numElev,boolean GUI,boolean isTest) throws Exception {
 		if (numElev <= 0){
 			throw new Exception("incompatible setting: numElev should be at least 1.");
 		}
@@ -60,15 +61,18 @@ public class ElevatorSubsystem implements Runnable{
 		// Init elevators
 		this.NUM_ELEV = numElev;
 		elevators = new Thread[NUM_ELEV];
+		elevs = new Elevator[NUM_ELEV];
 		FileLoader fileLoader = new FileLoader("errorFile.txt", false);
-		
-		for (int i = 0; i < NUM_ELEV; ++i){
-			int serialNum = i + 1;
-			elevators[i] = new Thread (new
-									Elevator(serialNum, 1, true,
-									ELEV_SUB_ELEV_RECV_PORT + serialNum,
-									ELEV_RECV_PORT + serialNum,
-									fileLoader,GUI));
+		if(!isTest) {
+			for (int i = 0; i < NUM_ELEV; ++i){
+				int serialNum = i + 1;
+				elevs[i] = new
+						Elevator(serialNum, 1, true,
+						ELEV_SUB_ELEV_RECV_PORT + serialNum,
+						ELEV_RECV_PORT + serialNum,
+						fileLoader,GUI);
+				elevators[i] = new Thread (elevs[i]);
+			}
 		}
 
 		// Init Buffer
@@ -102,19 +106,19 @@ public class ElevatorSubsystem implements Runnable{
 
 	// Initialize buffer for elevator with serialNumber
 	// ONLY used when starting new elevator communicators
-	private synchronized void initElevatorsBuffer(Integer serialNum){
+	public synchronized void initElevatorsBuffer(Integer serialNum){
 		msgToElevators.put(serialNum, new LinkedList<byte[]>());
 	}
 
 	// Add msg to scheduler queue
-	private synchronized void sendToScheduler(byte[] msg){
+	public synchronized void sendToScheduler(byte[] msg){
 //		System.out.println("ElevSub holding msg for Scheduler...");
 		// add msg to scheduler's queue
 		msgToScheduler.add(msg);
 	}
 
 	// Add msg to elevator queue
-	private synchronized void sendToElevator(byte[] msg){
+	public synchronized void sendToElevator(byte[] msg){
 //		System.out.println("ElevSub holding msg for Elevator...");
 		// message should be a scheduler msg
 		Common.TYPE messageType = Common.findType(msg);
@@ -129,7 +133,7 @@ public class ElevatorSubsystem implements Runnable{
 	}
 
 	// Get msg for scheduler
-	private synchronized byte[] getMsgScheduler(){
+	public synchronized byte[] getMsgScheduler(){
 		if(msgToScheduler.isEmpty()){
 			return null;
 		}
@@ -138,7 +142,7 @@ public class ElevatorSubsystem implements Runnable{
 	}
 
 	// Get msg for elevator (providing elevator number)
-	private synchronized byte[] getMsgElevator(Integer serialNum){
+	public synchronized byte[] getMsgElevator(Integer serialNum){
 		if(msgToElevators.get(serialNum).isEmpty()){
 			return null;
 		}
@@ -245,7 +249,7 @@ public class ElevatorSubsystem implements Runnable{
 	// For testing use ONLY!
 	// Spawn elevator subsystem
 	public static void main(String[] args) throws Exception{
-		ElevatorSubsystem elevatorSubsystem = new ElevatorSubsystem(3,false);
+		ElevatorSubsystem elevatorSubsystem = new ElevatorSubsystem(3,false,false);
 		elevatorSubsystem.run();
 	}
 

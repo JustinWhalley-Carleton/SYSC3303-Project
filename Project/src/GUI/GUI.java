@@ -33,6 +33,9 @@ public class GUI extends JFrame{
 	public static JTextArea textPanel;
 	public static BasicArrowButton[] upButtons;
 	public static BasicArrowButton[] downButtons;
+	private Scheduler scheduler;
+	private ElevatorSubsystem elev;
+	private FloorSubSystem floor;
 	private Thread floorThread;
 	private Thread elevatorThread;
 	private Thread schedulerThread;
@@ -136,9 +139,12 @@ public class GUI extends JFrame{
         thread.start();
         
         try {
-        	schedulerThread = new Thread(new Scheduler(ELEVATORS,FLOORS));
-        	elevatorThread = new Thread(new ElevatorSubsystem(ELEVATORS,true));
-        	floorThread = new Thread(new FloorSubSystem(FLOORS,true));
+        	scheduler = new Scheduler(ELEVATORS,FLOORS,false);
+        	floor = new FloorSubSystem(FLOORS,true);
+        	elev = new ElevatorSubsystem(ELEVATORS,true,false);
+        	schedulerThread = new Thread(scheduler);
+        	elevatorThread = new Thread(elev);
+        	floorThread = new Thread(floor);
 			schedulerThread.start();
 			elevatorThread.start();
 			floorThread.start();
@@ -244,6 +250,18 @@ public class GUI extends JFrame{
 		TextManager.print("Messages will appear here\nProgram starting...\n");
 		panel.add(scrollPane);
 		return panel;
+	}
+	
+	public ElevatorSubsystem getElev() {
+		return elev;
+	}
+	
+	public Scheduler getScheduler() {
+		return scheduler;
+	}
+	
+	public FloorSubSystem getFloor() {
+		return floor;
 	}
 	
 	public void stop() {

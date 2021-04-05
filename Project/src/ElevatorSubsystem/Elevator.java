@@ -26,7 +26,7 @@ public class Elevator implements Runnable {
 	public int curFloor;
 	private int elevNum;
 	
-	private HashMap<Integer,Boolean> map;
+	public HashMap<Integer,Boolean> map;
 	
 	private boolean doorStatus;  //True means door is closed, false for open door
 	private MotorState state;         
@@ -44,7 +44,7 @@ public class Elevator implements Runnable {
 	private boolean goingUp;
 	private FileLoader file;
 	private boolean GUIFlag;
-
+	public static final int floorTiming = 1000/Test.SPEED;
 	/**
 	 * no port elevator for junit testing
 	 */
@@ -62,7 +62,7 @@ public class Elevator implements Runnable {
 		for(int i = 0; i < NUM_FLOORS; i++) {
 			buttons[i] = new ElevatorButton(i+1,false);
 		}
-		timer = new TimerController(1000/Test.SPEED,this);
+		timer = new TimerController(floorTiming,this);
 		
 		map = new HashMap<Integer,Boolean>();
 		this.fileLoader = fileLoader;

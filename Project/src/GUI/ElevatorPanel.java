@@ -154,6 +154,9 @@ public class ElevatorPanel extends JPanel {
 		}
 	}
 	
+	public int getElevNum() {
+		return elevNum;
+	}
 	/**
 	 * turn on all buttons for floor reached
 	 */

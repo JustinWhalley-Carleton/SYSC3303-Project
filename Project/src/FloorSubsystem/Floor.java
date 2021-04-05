@@ -58,5 +58,13 @@ public class Floor {
         if (on){ targetButton.turnOn(); }
         else { targetButton.turnOff(); }
     }
+    
+    public boolean buttonUpOn() {
+    	return BUTTON_UP.isOn();
+    }
+    
+    public boolean buttonDownOn() {
+    	return BUTTON_DN.isOn();
+    }
 
 }
