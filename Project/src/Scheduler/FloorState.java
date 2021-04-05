@@ -9,8 +9,8 @@ package Scheduler;
 public class FloorState {
 
     private int floor;
-    private int up;
-    private int down;
+    private int up;  // the elevt# that is assigned for it; 0 means the button is off
+    private int down; // the elevt# that is assigned for it; 0 means the button is off
 
 
     /**
@@ -28,18 +28,18 @@ public class FloorState {
     //getter:
 
     /**
-     * get the light state of up button
+     * get the  state of up button
      *
-     * @return the light state of up button
+     * @return the  state of up button
      */
     public int getUp() {
         return up;
     }
 
     /**
-     * get the light state of down button
+     * get state of down button
      *
-     * @return the light state of down button
+     * @return state of down button
      */
     public int getDown() {
         return down;
@@ -49,9 +49,9 @@ public class FloorState {
     //setter:
 
     /**
-     * set the light state of up button
+     * set state of up button
      *
-     * @param up the light state of up button
+     * @param up the state of up button
      */
     public void setUp(int up) {
         this.up = up;
@@ -59,9 +59,9 @@ public class FloorState {
 
 
     /**
-     * set the light state of down button
+     * set state of down button
      *
-     * @param down the light state of down button
+     * @param down state of down button
      */
     public void setDown(int down) { this.down = down; }
 
