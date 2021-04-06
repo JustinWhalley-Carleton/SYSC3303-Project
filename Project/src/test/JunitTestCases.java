@@ -63,6 +63,8 @@ class JunitTestCases {
 	static int SCHEDULER_RECV_FLOOR_PORT;
 	static int ELEV_SUB_RECV_PORT;
 	static int SCHEDULER_RECV_ELEV_PORT;
+	static int GUI_RECV_SCHEDULER_PORT;
+	static int SCHEDULER_RECV_GUI_PORT;
 	static GUI gui;
 	private static int floorTiming;
 	
@@ -118,7 +120,7 @@ class JunitTestCases {
 		return lines;
 	}
 	
-	static void createSettingsFile(int rows, int floors, int elevators, int speed, int elev_err, int port1, int port2, int port3,int port4, int port5, int port6) {
+	static void createSettingsFile(int rows, int floors, int elevators, int speed, int elev_err, int port1, int port2, int port3,int port4, int port5, int port6, int port7, int port8) {
 		try {
 			String path = System.getProperty("user.dir")+System.getProperty("file.separator")+"src"+System.getProperty("file.separator")+"test"+System.getProperty("file.separator")+"settings.txt";
 			File file = new File(path);
@@ -128,18 +130,22 @@ class JunitTestCases {
 			}
 			file.createNewFile();
 			FileWriter writer = new FileWriter(file.getAbsoluteFile());
+			writer.write("// General settings\n");
 			writer.write("FLOORS: "+floors+"\n");
 			writer.write("ROWS: "+rows+"\n");
 			writer.write("ELEVATORS: "+elevators+"\n");
 			writer.write("SPEED: "+speed+"\n");
 			writer.write("ELEV_ERR: " + elev_err+"\n");
+			writer.write("\n// Subsystem ports\n");
 			writer.write("ELEV_RECV_PORT: "+port1+"\n");
 			writer.write("ELEV_SUB_ELEV_RECV_PORT: "+port2+"\n");
 			writer.write("FLOOR_SUB_RECV_PORT: "+port3+"\n");
 			writer.write("SCHEDULER_RECV_FLOOR_PORT: "+port4+"\n");
 			writer.write("ELEV_SUB_RECV_PORT: "+port5+"\n");
 			writer.write("SCHEDULER_RECV_ELEV_PORT: "+port6+"\n");
-			
+			writer.write("\n// GUI ports\n");
+			writer.write("GUI_RECV_SCHEDULER_PORT: "+port7+"\n");
+			writer.write("SCHEDULER_RECV_GUI_PORT: "+port8+"\n");
 			writer.close();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -147,7 +153,7 @@ class JunitTestCases {
 	}
 	
 	static int[] readSettingsFile() {
-		int[] data = new int[11];
+		int[] data = new int[13];
 		try {
 			Scanner scanner = new Scanner(new File("src/test/settings.txt"));
 			while(scanner.hasNextLine()) {
@@ -175,6 +181,9 @@ class JunitTestCases {
 					case "SCHEDULER_RECV_FLOOR_PORT:" 	-> data[8] 	= value;
 					case "ELEV_SUB_RECV_PORT:" 			-> data[9]			= value;
 					case "SCHEDULER_RECV_ELEV_PORT:" 	-> data[10]	= value;
+					
+					case "GUI_RECV_SCHEDULER_PORT:"		-> data[11] 		= value;
+					case "SCHEDULER_RECV_GUI_PORT:"		-> data[12]		= value;
 					// Unsupported settings
 					default -> System.out.println("Unexpected item in settings file.");
 				}
@@ -202,9 +211,11 @@ class JunitTestCases {
 		SCHEDULER_RECV_FLOOR_PORT = settings[8];
 		ELEV_SUB_RECV_PORT = settings[9];
 		SCHEDULER_RECV_ELEV_PORT = settings[10];
-		createSettingsFile(ROWS,FLOORS,29,2,ELEV_ERR,ELEV_RECV_PORT-20,ELEV_SUB_ELEV_RECV_PORT,FLOOR_SUB_RECV_PORT,SCHEDULER_RECV_FLOOR_PORT,ELEV_SUB_RECV_PORT,SCHEDULER_RECV_ELEV_PORT);
+		GUI_RECV_SCHEDULER_PORT = settings[11];
+		SCHEDULER_RECV_GUI_PORT = settings[12];
+		createSettingsFile(ROWS,FLOORS,29,4,ELEV_ERR,ELEV_RECV_PORT-20,ELEV_SUB_ELEV_RECV_PORT,FLOOR_SUB_RECV_PORT,SCHEDULER_RECV_FLOOR_PORT,ELEV_SUB_RECV_PORT,SCHEDULER_RECV_ELEV_PORT,GUI_RECV_SCHEDULER_PORT,SCHEDULER_RECV_GUI_PORT);
 		GUIFileLoader.deleteFile();
-		 gui = new GUI(false);
+		 gui = new GUI(true);
 		 floorTiming  = Elevator.floorTiming*2;
 		 for(ElevatorPanel panel : GUI.elevatorPanels) {
 			 Helper.turnAllButtonsOn(panel.buttons);
@@ -213,7 +224,7 @@ class JunitTestCases {
 	
 	@AfterAll
 	public static void destroy() {
-		createSettingsFile(ROWS,FLOORS,ELEVATORS,SPEED,ELEV_ERR,ELEV_RECV_PORT,ELEV_SUB_ELEV_RECV_PORT,FLOOR_SUB_RECV_PORT,SCHEDULER_RECV_FLOOR_PORT,ELEV_SUB_RECV_PORT,SCHEDULER_RECV_ELEV_PORT);
+		createSettingsFile(ROWS,FLOORS,ELEVATORS,SPEED,ELEV_ERR,ELEV_RECV_PORT,ELEV_SUB_ELEV_RECV_PORT,FLOOR_SUB_RECV_PORT,SCHEDULER_RECV_FLOOR_PORT,ELEV_SUB_RECV_PORT,SCHEDULER_RECV_ELEV_PORT,GUI_RECV_SCHEDULER_PORT,SCHEDULER_RECV_GUI_PORT);
 		GUIFileLoader.deleteFile();
 	}
 	
@@ -642,10 +653,10 @@ class JunitTestCases {
 	@Test
 	void testReadSettingsRows() {
 		int[] prevData = readSettingsFile();
-		createSettingsFile(10,5,15,3,1, 1,2,3,4,5,6);
+		createSettingsFile(10,5,15,3,1, 1,2,3,4,5,6,7,8);
 		int[] newData = readSettingsFile();
 		assertEquals(newData[1], 10);
-		createSettingsFile(prevData[1],prevData[2],prevData[0],prevData[3],prevData[4],prevData[5],prevData[6],prevData[7],prevData[8],prevData[9],prevData[10]);
+		createSettingsFile(prevData[1],prevData[2],prevData[0],prevData[3],prevData[4],prevData[5],prevData[6],prevData[7],prevData[8],prevData[9],prevData[10],prevData[11],prevData[12]);
 	}
 	
 	/**
@@ -654,10 +665,10 @@ class JunitTestCases {
 	@Test
 	void testReadSettingsFloors() {
 		int[] prevData = readSettingsFile();
-		createSettingsFile(10,5,15,3,1,2,3,4,5,6,7);
+		createSettingsFile(10,5,15,3,1,2,3,4,5,6,7,8,9);
 		int[] newData = readSettingsFile();
 		assertEquals(newData[2], 5);
-		createSettingsFile(prevData[1],prevData[2],prevData[0],prevData[3],prevData[4],prevData[5],prevData[6],prevData[7],prevData[8],prevData[9],prevData[10]);
+		createSettingsFile(prevData[1],prevData[2],prevData[0],prevData[3],prevData[4],prevData[5],prevData[6],prevData[7],prevData[8],prevData[9],prevData[10],prevData[11],prevData[12]);
 	}
 	
 	/**
@@ -666,10 +677,10 @@ class JunitTestCases {
 	@Test
 	void testReadSettingsElevators() {
 		int[] prevData = readSettingsFile();
-		createSettingsFile(10,5,15,3,1,2,3,4,5,6,7);
+		createSettingsFile(10,5,15,3,1,2,3,4,5,6,7,8,9);
 		int[] newData = readSettingsFile();
 		assertEquals(newData[0], 15);
-		createSettingsFile(prevData[1],prevData[2],prevData[0],prevData[3],prevData[4],prevData[5],prevData[6],prevData[7],prevData[8],prevData[9],prevData[10]);
+		createSettingsFile(prevData[1],prevData[2],prevData[0],prevData[3],prevData[4],prevData[5],prevData[6],prevData[7],prevData[8],prevData[9],prevData[10],prevData[11],prevData[12]);
 	}
 	
 	/**
@@ -678,10 +689,10 @@ class JunitTestCases {
 	@Test
 	void testReadSettingsSpeed() {
 		int[] prevData = readSettingsFile();
-		createSettingsFile(10,5,15,3,1,2,3,4,5,6,7);
+		createSettingsFile(10,5,15,3,1,2,3,4,5,6,7,8,9);
 		int[] newData = readSettingsFile();
 		assertEquals(newData[3], 3);
-		createSettingsFile(prevData[1],prevData[2],prevData[0],prevData[3],prevData[4],prevData[5],prevData[6],prevData[7],prevData[8],prevData[9],prevData[10]);
+		createSettingsFile(prevData[1],prevData[2],prevData[0],prevData[3],prevData[4],prevData[5],prevData[6],prevData[7],prevData[8],prevData[9],prevData[10],prevData[11],prevData[12]);
 	}
 	
 	/**
@@ -905,22 +916,22 @@ class JunitTestCases {
 	 */
 	@Test
 	void testDecrementCurFloor() {
-		GUI.elevatorPanels[0].buttons[5].doClick();
+		GUI.elevatorPanels[7].buttons[4].doClick();
 		try {
-			Thread.sleep(4*floorTiming);
+			Thread.sleep(5*floorTiming);
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		int curFloor = Integer.parseInt(GUI.elevatorPanels[0].curFloorLabel.getText().split(" ")[2]);
-		GUI.elevatorPanels[0].buttons[2].doClick();
+		int curFloor = Integer.parseInt(GUI.elevatorPanels[7].curFloorLabel.getText().split(" ")[2]);
+		GUI.elevatorPanels[7].buttons[2].doClick();
 		try {
-			Thread.sleep(floorTiming + 250);
+			Thread.sleep(2*floorTiming + 250);
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		assertTrue(curFloor > Integer.parseInt(GUI.elevatorPanels[0].curFloorLabel.getText().split(" ")[2]));
+		assertTrue(curFloor > Integer.parseInt(GUI.elevatorPanels[7].curFloorLabel.getText().split(" ")[2]));
 	}
 	
 	/**
@@ -1109,48 +1120,6 @@ class JunitTestCases {
 			e.printStackTrace();
 		}
 		assertFalse(GUIFileLoader.getFault(1));
-	}
-	
-	/**
-	 * test proper command deleted after read
-	 */
-	@Test
-	void testProperCommandDeletedAfterRead() {
-		GUIFileLoader.writeToFile(0, 1, -1);
-		GUIFileLoader.writeToFile(0, 2, -1);
-		GUIFileLoader.writeToFile(1, 4, 1);
-		GUIFileLoader.writeToFile(1, 5, 0);
-		GUIFileLoader.writeToFile(2, 1, 5);
-		GUIFileLoader.writeToFile(2, 4, 3);
-		try {
-			Thread.sleep(500);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		assertTrue(GUIFileLoader.getFault(1));
-		assertTrue(GUIFileLoader.getFault(2));
-		assertFalse(GUIFileLoader.getFault(1));
-		assertFalse(GUIFileLoader.getFault(2));
-		try {
-			Thread.sleep(500);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		assertEquals(5,GUIFileLoader.getElevButton(1)[0]);
-		assertEquals(3,GUIFileLoader.getElevButton(4)[0]);
-		assertNull(GUIFileLoader.getElevButton(1));
-		assertNull(GUIFileLoader.getElevButton(4));
-		try {
-			Thread.sleep(500);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		assertNotNull(GUIFileLoader.readLineFloor());
-		assertNotNull(GUIFileLoader.readLineFloor());
-		assertNull(GUIFileLoader.readLineFloor());
 	}
 	
 	/**
@@ -1346,7 +1315,8 @@ class JunitTestCases {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		assertEquals("Current Floor: 2", GUI.elevatorPanels[0].curFloorLabel.getText());
+		int curFloor = gui.getElev().elevs[0].curFloor;
+		assertEquals("Current Floor: "+curFloor, GUI.elevatorPanels[0].curFloorLabel.getText());
 		GUI.elevatorPanels[0].buttons[2].doClick();
 		try {
 			Thread.sleep(2*floorTiming+250);
@@ -1354,7 +1324,8 @@ class JunitTestCases {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		assertEquals("Current Floor: 3", GUI.elevatorPanels[0].curFloorLabel.getText());
+		curFloor = gui.getElev().elevs[0].curFloor;
+		assertEquals("Current Floor: "+curFloor, GUI.elevatorPanels[0].curFloorLabel.getText());
 	}
 	
 	/**
@@ -1437,21 +1408,21 @@ class JunitTestCases {
 	@Test
 	void testStateDownLabelGUI() {
 		Helper.turnAllButtonsOn(GUI.elevatorPanels[0].buttons);
-		GUI.elevatorPanels[0].buttons[3].doClick();
+		GUI.elevatorPanels[11].buttons[3].doClick();
 		try {
 			Thread.sleep(5*floorTiming+250);
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		GUI.elevatorPanels[0].buttons[0].doClick();
+		GUI.elevatorPanels[11].buttons[0].doClick();
 		try {
 			Thread.sleep(floorTiming+250);
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		assertEquals("State: Down",GUI.elevatorPanels[0].stateLabel.getText());
+		assertEquals("State: Down",GUI.elevatorPanels[11].stateLabel.getText());
 		try {
 			Thread.sleep(2*floorTiming+250);
 		} catch (InterruptedException e) {
@@ -1695,11 +1666,11 @@ class JunitTestCases {
 			Scheduler scheduler = new Scheduler(3,4,true);
 			byte[] data = Common.encodeFloor(1, false);
 			scheduler.floorSubAddMsg(data);
+			int[] msg = Common.decode(scheduler.msgToElevtSub.poll());
 			boolean flag = false;
 			for(int i = 0; i < 19; i++) {
 				int closestElev = i;
-				data = Common.encodeScheduler(closestElev, 1,-1);
-				int[] msg = Common.decode(scheduler.msgToElevtSub.poll());
+				data = Common.encodeScheduler(closestElev, 1,0);
 				int[] msg2 = Common.decode(data);
 				if(msg[0] == msg2[0] && msg[1] == msg2[1] && msg[2] == msg2[2]) {
 					flag = true;

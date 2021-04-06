@@ -124,12 +124,12 @@ public class Elevator implements Runnable {
 				}
 				timer2.start();
 				doorOpen = true;
-				
+				/**
 				closeDoor();
 				long doorEnd = System.currentTimeMillis();
 				String elapsedDoorTime = String.valueOf(doorEnd - doorStart);
 				String doorTime = "Elevator Load/Unload Time in ms: " + elapsedDoorTime;
-				FileLoader.logToFile(doorTime);
+				FileLoader.logToFile(doorTime);**/
 				return;
 			}
 			moveStart = System.currentTimeMillis();
@@ -337,6 +337,7 @@ public class Elevator implements Runnable {
 				Integer min = Integer.MAX_VALUE;
 				for(Integer key : map.keySet()) {
 					if(key > curFloor && key < min) {
+						min = key;
 						target = key;
 					}
 				}
@@ -344,6 +345,7 @@ public class Elevator implements Runnable {
 					min = -1;
 					for(Integer key : map.keySet()) {
 						if(key <= curFloor && key > min) {
+							min = key;
 							target = key;
 						}
 					}
@@ -352,6 +354,7 @@ public class Elevator implements Runnable {
 				Integer min = -1;
 				for(Integer key : map.keySet()) {
 					if(key <= curFloor && key > min) {
+						min = key;
 						target = key;
 					}
 				}
@@ -359,6 +362,7 @@ public class Elevator implements Runnable {
 					min = Integer.MAX_VALUE;
 					for(Integer key : map.keySet()) {
 						if(key > curFloor && key < min) {
+							min = key;
 							target = key;
 						}
 					}

@@ -1,3 +1,130 @@
-Scheduler started at: 21:14:20.398279300
-Scheduler finished at: 21:15:22.670834800
-Scheduler exec time in ms: 62272
+Elevator 3 took 10571ms to move to Floor 16
+Elevator 4 took 12846ms to move to Floor 20
+Elevator 4 took 2634ms to move to Floor 19
+Elevator 2 took 12846ms to move to Floor 20
+Elevator 1 took 6610ms to move to Floor 9
+Elevator 4 took 3770ms to move to Floor 16
+Elevator 3 took 7172ms to move to Floor 7
+Elevator 2 took 2635ms to move to Floor 19
+Elevator 1 took 3204ms to move to Floor 7
+Elevator 4 took 2634ms to move to Floor 15
+Elevator 3 took 3203ms to move to Floor 5
+Elevator 2 took 2639ms to move to Floor 18
+Elevator 4 took 2637ms to move to Floor 14
+Elevator 1 took 3202ms to move to Floor 5
+Elevator 3 took 3200ms to move to Floor 3
+Elevator 2 took 3770ms to move to Floor 15
+Elevator 4 took 3203ms to move to Floor 12
+Elevator 1 took 3204ms to move to Floor 3
+Elevator 1 took 2637ms to move to Floor 2
+Elevator 3 took 5470ms to move to Floor 9
+Elevator 4 took 4904ms to move to Floor 7
+Elevator 1 took 2636ms to move to Floor 1
+Elevator 2 took 6606ms to move to Floor 7
+Elevator 4 took 3203ms to move to Floor 5
+Elevator 2 took 3203ms to move to Floor 5
+Elevator 4 took 3201ms to move to Floor 3
+Elevator 2 took 7168ms to move to Floor 14
+Elevator 4 took 10011ms to move to Floor 17
+Scheduler started at: 13:05:44.410453800
+Scheduler finished at: 13:07:22.212792100
+Scheduler execution time in ms: 97802
+
+
+
+Elevator 4 took 6608ms to move to Floor 9
+Elevator 4 took 3771ms to move to Floor 12
+Elevator 4 took 8310ms to move to Floor 1
+Elevator 2 took 7173ms to move to Floor 10
+Elevator 2 took 7741ms to move to Floor 20
+Elevator 2 took 7739ms to move to Floor 10
+Elevator 4 took 13977ms to move to Floor 22
+Elevator 4 took 2634ms to move to Floor 21
+Elevator 3 took 13976ms to move to Floor 22
+Elevator 4 took 3200ms to move to Floor 19
+Elevator 3 took 2635ms to move to Floor 21
+Elevator 4 took 2637ms to move to Floor 17
+Elevator 2 took 13980ms to move to Floor 22
+Elevator 1 took 3767ms to move to Floor 4
+Elevator 4 took 2637ms to move to Floor 16
+Elevator 3 took 6607ms to move to Floor 13
+Elevator 2 took 2638ms to move to Floor 21
+Elevator 4 took 2635ms to move to Floor 15
+Elevator 1 took 3201ms to move to Floor 2
+Elevator 2 took 3770ms to move to Floor 18
+Elevator 3 took 4908ms to move to Floor 8
+Elevator 4 took 3768ms to move to Floor 12
+Elevator 2 took 2634ms to move to Floor 17
+Elevator 2 took 3203ms to move to Floor 15
+Elevator 4 took 4335ms to move to Floor 8
+Elevator 3 took 7740ms to move to Floor 18
+Elevator 2 took 4908ms to move to Floor 10
+Elevator 4 took 4336ms to move to Floor 4
+Elevator 3 took 2634ms to move to Floor 17
+Elevator 2 took 3205ms to move to Floor 8
+Elevator 4 took 3201ms to move to Floor 2
+Elevator 3 took 3201ms to move to Floor 15
+Elevator 2 took 5474ms to move to Floor 2
+Scheduler started at: 13:25:27.605265200
+Scheduler finished at: 13:27:02.201606
+Scheduler execution time in ms: 94596
+
+
+
+Elevator 4 took 38ms to move to Floor 5
+Elevator 3 took 38ms to move to Floor 17
+Elevator 4 took 3501ms to move to Floor 18
+Elevator 4 took 37ms to move to Floor 11
+Elevator 3 took 3230ms to move to Floor 11
+Elevator 3 took 1652ms to move to Floor 8
+Elevator 4 took 3039ms to move to Floor 10
+Elevator 2 took 38ms to move to Floor 18
+Elevator 3 took 1656ms to move to Floor 5
+Elevator 3 took 37ms to move to Floor 2
+Elevator 4 took 1576ms to move to Floor 9
+Elevator 4 took 37ms to move to Floor 6
+Elevator 2 took 3266ms to move to Floor 11
+Elevator 4 took 3039ms to move to Floor 5
+Elevator 3 took 3610ms to move to Floor 18
+Elevator 2 took 1769ms to move to Floor 5
+Elevator 4 took 1650ms to move to Floor 2
+Elevator 2 took 1576ms to move to Floor 4
+Elevator 4 took 1575ms to move to Floor 1
+Elevator 2 took 1579ms to move to Floor 3
+Elevator 4 took 2346ms to move to Floor 22
+Elevator 2 took 1577ms to move to Floor 2
+Elevator 2 took 1576ms to move to Floor 1
+Elevator 4 took 1654ms to move to Floor 19
+Elevator 4 took 1576ms to move to Floor 18
+Scheduler started at: 13:30:28.091991400
+Scheduler finished at: 13:32:01.425241
+Scheduler execution time in ms: 93334
+
+
+
+Elevator 4 took 1956ms to move to Floor 12
+Elevator 4 took 8307ms to move to Floor 12
+Elevator 4 took 3201ms to move to Floor 10
+Elevator 4 took 7737ms to move to Floor 20
+Elevator 3 took 6039ms to move to Floor 8
+Elevator 3 took 4341ms to move to Floor 12
+Elevator 3 took 7742ms to move to Floor 2
+Elevator 3 took 12275ms to move to Floor 20
+Elevator 2 took 7174ms to move to Floor 10
+Elevator 4 took 12854ms to move to Floor 1
+Elevator 3 took 2635ms to move to Floor 19
+Elevator 3 took 2638ms to move to Floor 18
+Elevator 3 took 4338ms to move to Floor 22
+Elevator 4 took 10582ms to move to Floor 16
+Elevator 4 took 2636ms to move to Floor 15
+Elevator 4 took 2635ms to move to Floor 14
+Elevator 3 took 8884ms to move to Floor 13
+Elevator 4 took 12844ms to move to Floor 20
+Elevator 4 took 7170ms to move to Floor 11
+Elevator 4 took 2635ms to move to Floor 10
+Elevator 4 took 8873ms to move to Floor 13
+Elevator 3 took 7741ms to move to Floor 11
+Elevator 4 took 6032ms to move to Floor 20
+Elevator 4 took 10009ms to move to Floor 15
+Elevator 3 took 8874ms to move to Floor 13
+Elevator 4 took 2635ms to move to Floor 14
