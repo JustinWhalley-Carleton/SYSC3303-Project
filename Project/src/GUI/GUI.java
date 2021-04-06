@@ -1,6 +1,7 @@
 package GUI;
 
 import java.awt.*;
+import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.net.InetAddress;
@@ -27,18 +28,24 @@ public class GUI extends JFrame{
 	private static int ELEV_ERR;
 	public static int FLOORS;
 	public static double SPEED;
-	private ElevatorPanel[] elevatorPanels;
+	public static ElevatorPanel[] elevatorPanels;
 	private RPC transmitter;
 	public static JTextArea textPanel;
 	public static BasicArrowButton[] upButtons;
 	public static BasicArrowButton[] downButtons;
+	private Scheduler scheduler;
+	private ElevatorSubsystem elev;
+	private FloorSubSystem floor;
+	private Thread floorThread;
+	private Thread elevatorThread;
+	private Thread schedulerThread;
 	// Ports
 	private static int SCHEDULER_RECV_GUI_PORT;
 	private static int GUI_RECV_SCHEDULER_PORT;
 	/**
 	 * constructor for GUI 
 	 */
-	public GUI() {
+	public GUI(boolean show) {
 		//read the settings file 
 		getSettings();
 		GUIFileLoader.deleteFile();
@@ -91,7 +98,7 @@ public class GUI extends JFrame{
         
         // dont allow resizing of the frame and show frame on screen
         setResizable(false);
-        setVisible(true);
+        if(show) setVisible(true);
         
         // create and run a thread to continously wait on a message from scheduler and update GUI based on message
         Thread thread = new Thread() {
@@ -134,9 +141,15 @@ public class GUI extends JFrame{
         thread.start();
         
         try {
-			new Thread(new Scheduler(ELEVATORS,FLOORS)).start();
-			new Thread(new ElevatorSubsystem(ELEVATORS,true)).start();
-			new Thread(new FloorSubSystem(FLOORS,true)).start();
+        	scheduler = new Scheduler(ELEVATORS,FLOORS,false);
+        	floor = new FloorSubSystem(FLOORS,true);
+        	elev = new ElevatorSubsystem(ELEVATORS,true,false);
+        	schedulerThread = new Thread(scheduler);
+        	elevatorThread = new Thread(elev);
+        	floorThread = new Thread(floor);
+			schedulerThread.start();
+			elevatorThread.start();
+			floorThread.start();
 			TextManager.print("Program now ready\n\n");
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -250,9 +263,25 @@ public class GUI extends JFrame{
 		return panel;
 	}
 	
+	public ElevatorSubsystem getElev() {
+		return elev;
+	}
+	
+	public Scheduler getScheduler() {
+		return scheduler;
+	}
+	
+	public FloorSubSystem getFloor() {
+		return floor;
+	}
+	
+	public void stop() {
+		elevatorThread.interrupt();
+		schedulerThread.interrupt();
+		floorThread.interrupt();
+	}
 	public static void main(String[] args) {
-		new GUI();
-       
+		new GUI(true);
 	}
 
 }

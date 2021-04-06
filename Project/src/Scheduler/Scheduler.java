@@ -21,9 +21,9 @@ public class Scheduler implements Runnable {
 	private int inState = 0; // 0 is wait; 1 is sending; -1 is receiving
 	private int totalElevts;
 	private int totalFloors = 0;
-	private ElevtState[] elevtStates; // also is the state of the scheduler
+	public ElevtState[] elevtStates; // also is the state of the scheduler
 	private FloorState[] floorStates;
-	private Queue<byte[]> msgToElevtSub, msgToFloorSub;
+	public Queue<byte[]> msgToElevtSub, msgToFloorSub;
 
 	private long startMS, endMS;
 	private LocalTime endTime;
@@ -38,7 +38,7 @@ public class Scheduler implements Runnable {
 	 * @param totalElevts total Elevts number
 	 * @param totalElevts total Floors number
 	 */
-	public Scheduler (int totalElevts, int totalFloors) throws Exception {
+	public Scheduler (int totalElevts, int totalFloors, boolean isTest) throws Exception {
 		this.inState = 0;
 		this.totalElevts = totalElevts;
 		this.totalFloors = totalFloors;
@@ -51,12 +51,13 @@ public class Scheduler implements Runnable {
 
 		for (int i=0;i<elevtStates.length;i++) { elevtStates[i]= new ElevtState(i+1); }
 		for (int i=0;i<floorStates.length;i++) { floorStates[i]= new FloorState(i+1); }
-
-		rpcElevt = new RPC(InetAddress.getLocalHost(), Test.ELEV_SUB_RECV_PORT, Test.SCHEDULER_RECV_ELEV_PORT);
-		rpcFloor = new RPC(InetAddress.getLocalHost(),Test.FLOOR_SUB_RECV_PORT,Test.SCHEDULER_RECV_FLOOR_PORT);
-		rpcGUI = new RPC(InetAddress.getLocalHost(),Test.GUI_RECV_SCHEDULER_PORT,Test.SCHEDULER_RECV_GUI_PORT);
-		rpcElevt.setTimeout(2000);
-		rpcFloor.setTimeout(2000);
+		if(!isTest) {
+			rpcElevt = new RPC(InetAddress.getLocalHost(), Test.ELEV_SUB_RECV_PORT, Test.SCHEDULER_RECV_ELEV_PORT);
+			rpcFloor = new RPC(InetAddress.getLocalHost(),Test.FLOOR_SUB_RECV_PORT,Test.SCHEDULER_RECV_FLOOR_PORT);
+			rpcGUI = new RPC(InetAddress.getLocalHost(),Test.GUI_RECV_SCHEDULER_PORT,Test.SCHEDULER_RECV_GUI_PORT);
+			rpcElevt.setTimeout(2000);
+			rpcFloor.setTimeout(2000);
+		}
 	}
 
 
@@ -65,7 +66,7 @@ public class Scheduler implements Runnable {
 	 *
      * @param msg The message sent by the elevator subsystem.
      */
-	private void elevtSubAddMsg (byte[] msg) {
+	public void elevtSubAddMsg (byte[] msg) {
 
 		int[] message = Common.decode(msg);
 		int elevt = message[0];
@@ -141,7 +142,7 @@ public class Scheduler implements Runnable {
 	 *
 	 * @param msg The message sent by the floor subsystem.
 	 */
-	private void floorSubAddMsg (byte[] msg) {
+	public void floorSubAddMsg (byte[] msg) {
 		int[] message = Common.decode(msg);
 		int floor = message[0];
 		int dir = message[1];
@@ -402,7 +403,7 @@ public class Scheduler implements Runnable {
 				}
 
 			} catch (InterruptedException e) {
-				e.printStackTrace();
+				System.exit(1);
 			}
 		}
 		//Scheduler finish

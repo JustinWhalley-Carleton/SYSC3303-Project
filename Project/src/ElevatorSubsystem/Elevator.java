@@ -32,7 +32,7 @@ public class Elevator implements Runnable {
 	public int curFloor;
 	private int elevNum;
 	
-	private HashMap<Integer,Boolean> map;
+	public HashMap<Integer,Boolean> map;
 	
 	private boolean doorStatus;  //True means door is closed, false for open door
 	private MotorState state;         
@@ -50,7 +50,7 @@ public class Elevator implements Runnable {
 	private boolean goingUp;
 	private FileLoader file;
 	private boolean GUIFlag;
-
+	public static final int floorTiming = (int) 2266/(int)Test.SPEED;
 	private long moveStart;
 	private boolean doorOpen = false;
 	private long doorStart;
@@ -71,7 +71,7 @@ public class Elevator implements Runnable {
 		for(int i = 0; i < NUM_FLOORS; i++) {
 			buttons[i] = new ElevatorButton(i+1,false);
 		}
-		timer = new TimerController((int)(2266/Test.SPEED),this);
+		timer = new TimerController((int)(floorTiming),this);
 		timer2 = new TimerController(1500,this);
 		map = new HashMap<Integer,Boolean>();
 		this.fileLoader = fileLoader;
@@ -124,12 +124,12 @@ public class Elevator implements Runnable {
 				}
 				timer2.start();
 				doorOpen = true;
-				
+				/**
 				closeDoor();
 				long doorEnd = System.currentTimeMillis();
 				String elapsedDoorTime = String.valueOf(doorEnd - doorStart);
 				String doorTime = "Elevator Load/Unload Time in ms: " + elapsedDoorTime;
-				FileLoader.logToFile(doorTime);
+				FileLoader.logToFile(doorTime);**/
 				return;
 			}
 			moveStart = System.currentTimeMillis();
@@ -344,6 +344,7 @@ public class Elevator implements Runnable {
 				Integer min = Integer.MAX_VALUE;
 				for(Integer key : map.keySet()) {
 					if(key > curFloor && key < min) {
+						min = key;
 						target = key;
 					}
 				}
@@ -351,6 +352,7 @@ public class Elevator implements Runnable {
 					min = -1;
 					for(Integer key : map.keySet()) {
 						if(key <= curFloor && key > min) {
+							min = key;
 							target = key;
 						}
 					}
@@ -359,6 +361,7 @@ public class Elevator implements Runnable {
 				Integer min = -1;
 				for(Integer key : map.keySet()) {
 					if(key <= curFloor && key > min) {
+						min = key;
 						target = key;
 					}
 				}
@@ -366,6 +369,7 @@ public class Elevator implements Runnable {
 					min = Integer.MAX_VALUE;
 					for(Integer key : map.keySet()) {
 						if(key > curFloor && key < min) {
+							min = key;
 							target = key;
 						}
 					}

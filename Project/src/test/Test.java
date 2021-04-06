@@ -65,9 +65,9 @@ public class Test {
 			carButton = new int[ROWS];
 			lines = new String[ROWS];
 			createFile();
-			scheduler = new Thread(new Scheduler(ELEVATORS,FLOORS));
+			scheduler = new Thread(new Scheduler(ELEVATORS,FLOORS,false));
 			floorSubsystem = new Thread(new FloorSubSystem(FLOORS,false), "Producer");
-			elevatorSubsystem = new Thread(new ElevatorSubsystem(ELEVATORS,false), "Consumer");
+			elevatorSubsystem = new Thread(new ElevatorSubsystem(ELEVATORS,false,false), "Consumer");
 			floorSubsystem.start();
 			elevatorSubsystem.start();
 			scheduler.start();

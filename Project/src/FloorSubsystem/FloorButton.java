@@ -13,4 +13,8 @@ public class FloorButton {
     public void turnOff(){
         light = false;
     }
+    
+    public boolean isOn() {
+    	return light;
+    }
 }

@@ -11,7 +11,7 @@ public class FloorSubSystem implements Runnable{
     private final int MIN_FLOOR;
     private final int MAX_FLOOR;
     private byte[] requestedDir;
-    private Floor[] floors;
+    public Floor[] floors;
 
     public FileLoader instructionFile;
     
@@ -115,15 +115,16 @@ public class FloorSubSystem implements Runnable{
     	System.out.println(departureFloor +" "+goingUp);
     	 if(MIN_FLOOR <= departureFloor && departureFloor <= MAX_FLOOR){
              // Register corresponding button
-             floors[departureFloor - 1].register(instructionFile.requestUp());
+             floors[departureFloor - 1].register(goingUp);
+             byte[] msg = Common.encodeFloor(departureFloor,goingUp);
+         	addToQueue(msg);
          }else{
              // Unexpected floor in instruction, ignore.
              System.out.println("WARNING! Departure floor " + departureFloor + " out of range!");
              return;
          }
     	
-    	byte[] msg = Common.encodeFloor(departureFloor,goingUp);
-    	addToQueue(msg);
+    	
     }
     
     // send method: send data to scheduler.
@@ -135,16 +136,17 @@ public class FloorSubSystem implements Runnable{
         if(MIN_FLOOR <= departureFloor && departureFloor <= MAX_FLOOR){
             // Register corresponding button
             floors[departureFloor - 1].register(instructionFile.requestUp());
+         // encode and send request to scheduler
+            byte[] message = Common.encodeFloor(departureFloor, instructionFile.requestUp());
+
+            addToQueue(message);
         }else{
             // Unexpected floor in instruction, ignore.
             System.out.println("WARNING! Departure floor " + departureFloor + " out of range!");
             return;
         }
 
-        // encode and send request to scheduler
-        byte[] message = Common.encodeFloor(departureFloor, instructionFile.requestUp());
-
-        addToQueue(message);
+        
     }
 
     private void addToQueue(byte[] msg) {

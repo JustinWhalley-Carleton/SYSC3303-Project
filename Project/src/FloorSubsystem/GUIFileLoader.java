@@ -165,10 +165,10 @@ public  class GUIFileLoader {
 			pw.close();
 			reader.close();
 			if(!instructionFile.delete() ) {
-				System.out.println("Error deleting file");
+				//System.out.println("Error deleting file");
 			}
 			if(!tempFile.renameTo(instructionFile)) {
-				System.out.println("Error renaming file");
+				//System.out.println("Error renaming file");
 			}
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -194,6 +194,7 @@ public  class GUIFileLoader {
 				// if command found return destination floor
 				String line = scanner.nextLine();
 				if(line.split(" ")[0].equals("2") && line.split(" ")[2].equals(Integer.toString(elevNum))) {
+					scanner.close();
 					return true;
 				}
 			}
