@@ -18,7 +18,7 @@ public class Scheduler implements Runnable {
 
 	private final byte[] CheckMSG = Common.encodeConfirmation(Common.CONFIRMATION.CHECK);
 
-	private int inState = 0; // 0 is wait; 1 is sending; -1 is receiving
+	private int inProcessing = 0; // 0 is idle; 1 is processing;
 	private int totalElevts;
 	private int totalFloors = 0;
 	public ElevtState[] elevtStates; // also is the state of the scheduler
@@ -39,7 +39,7 @@ public class Scheduler implements Runnable {
 	 * @param totalElevts total Floors number
 	 */
 	public Scheduler (int totalElevts, int totalFloors, boolean isTest) throws Exception {
-		this.inState = 0;
+		this.inProcessing = 0;
 		this.totalElevts = totalElevts;
 		this.totalFloors = totalFloors;
 		this.elevtStates = new ElevtState[totalElevts];
@@ -287,7 +287,6 @@ public class Scheduler implements Runnable {
 	// communicate with FloorSub
 	private void sendReceiveFloorSub() {
 		// send to FloorSub
-		this.inState = 1;
 		byte[] msgSend = msgToFloorSub.poll();
 		if (msgSend != null) {
 			rpcFloor.sendPacket(msgSend);
@@ -298,16 +297,15 @@ public class Scheduler implements Runnable {
 		else {
 			rpcFloor.sendPacket(CheckMSG);
 		}
-		this.inState = 0;
 
 		// receive from FloorSub
-		this.inState = -1;
 		byte[] msgReceive = rpcFloor.receivePacket();
 		if(msgReceive == null) {
-			this.inState = 0;
 			return;
 		}
-
+		this.inProcessing = 1;
+		long s = System.nanoTime();
+		FileLoader.logToFile("Scheduler received processing for FloorSub request at nanoseconds: " + s);
 		if (Common.findType(msgReceive) == Common.TYPE.CONFIRMATION) {
 
 			Common.CONFIRMATION comfirmMsg_receive = Common.CONFIRMATION.findConfirmation(msgReceive[1]);
@@ -324,13 +322,17 @@ public class Scheduler implements Runnable {
 			Common.print(msgReceive);
 
 		}
-		this.inState = 0;
+		this.inProcessing = 0;
+		long e = System.nanoTime();
+		FileLoader.logToFile("Scheduler finished processing request for FloorSub at nanoseconds: " + e);
+		long pTime = e-s;
+		FileLoader.logToFile("Scheduler processing time for FloorSub in nanoseconds: " + pTime);
+
 	}
 
 	// communicate with ElevtSub
 	private void sendReceiveElevtSub(){
 		// check ElevtSub
-		this.inState = 1;
 		byte[] msgSend = msgToElevtSub.poll();
 		if ( msgSend != null) {
 			rpcElevt.sendPacket(msgSend);
@@ -340,16 +342,17 @@ public class Scheduler implements Runnable {
 		} else{
 			rpcElevt.sendPacket(CheckMSG);
 		}
-		this.inState = 0;
 
 		// receive from ElevtSub
-		this.inState = -1;
 		byte[] msgReceive = rpcElevt.receivePacket();
 
 		if(msgReceive ==null) {
-			this.inState = 0;
 			return;
 		}
+
+		this.inProcessing = 1;
+		long s = System.nanoTime();
+		FileLoader.logToFile("Scheduler received processing for ElevtSub request at nanoseconds: " + s);
 		if (Common.findType(msgReceive) == Common.TYPE.ELEV_ERROR){
 			//rpcGUI.sendPacket(msgReceive);
 			elevtSubAddErrorMsg(msgReceive);
@@ -366,8 +369,11 @@ public class Scheduler implements Runnable {
 			System.out.println("Sending");
 			rpcGUI.sendPacket(msgReceive);
 		}
-		this.inState = 0;
-
+		this.inProcessing = 0;
+		long e = System.nanoTime();
+		FileLoader.logToFile("Scheduler finished processing for ElevtSub request at nanoseconds: " + e);
+		long pTime = e-s;
+		FileLoader.logToFile("Scheduler processing for ElevtSub time in nanoseconds: " + pTime);
 	}
 
 
