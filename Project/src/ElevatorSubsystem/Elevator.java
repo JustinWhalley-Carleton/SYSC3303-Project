@@ -54,6 +54,7 @@ public class Elevator implements Runnable {
 	private long moveStart;
 	private boolean doorOpen = false;
 	private long doorStart;
+	private MotorState prevState;
 	/**
 	 * no port elevator for junit testing
 	 */
@@ -61,6 +62,7 @@ public class Elevator implements Runnable {
 	
 	// Constructor
 	public Elevator(int elevNum, int curFloor, boolean doorStatus, int destPort, int recPort, FileLoader fileLoader, boolean GUI) throws UnknownHostException {
+		prevState = idle;
 		this.curFloor = curFloor;  
 		GUIFlag = GUI;
 		this.doorStatus = doorStatus;            //Initializing variables
@@ -100,9 +102,11 @@ public class Elevator implements Runnable {
 			//If statements to checks the location of the destination floor relative to the current floor
 			if(curFloor > floor) {
 				System.out.println("Elevator " + elevNum + " State Change: GOING DOWN @ time = " + LocalTime.now());  //Going down if target floor is lower
+				prevState = state;
 				state = down;
 			} else if (floor > curFloor) {
 				System.out.println("Elevator " + elevNum + " State Change: GOING UP @ time = " + LocalTime.now());  //Going up if target floor is higher
+				prevState = state;
 				state = up;
 			} else {
 				System.out.println("Same floor. No state change\n");  //No movement if same floor
@@ -150,6 +154,7 @@ public class Elevator implements Runnable {
 			//if stuck do nothing
 			return;
 		} else if(doorOpen) { 
+			System.out.println("\n\n\n\nOPEN\n\n\n\n");
 			doorOpen = false;
 			closeDoor();
 			if(map.get(curFloor) == null ? false : (boolean)map.get(curFloor)) {
@@ -166,6 +171,7 @@ public class Elevator implements Runnable {
 			String moveTime = "Elevator " + elevNum + " took " + elapsedMoveTime + "ms to move to Floor " + curFloor;
 			FileLoader.logToFile(moveTime);
 		}else if((state == up && curFloor < getFloor())||(state == down && curFloor > getFloor())){
+			System.out.println("\n\n\n curFloor = "+curFloor+" geFloor() = " +getFloor()+"\n\n\n");
 			// continue going in current direction
 			if(state == up) {
 				curFloor++;
@@ -175,6 +181,7 @@ public class Elevator implements Runnable {
 				timer.start();
 			}
 		} else {
+			System.out.println("\n\n\n\nENDING\n\n\n\n");
 			// arrived at floor
 			if(stuckMsg != null && !GUIFlag) {
 				if(stuckMsg.equals("StuckClose")) {
@@ -185,11 +192,11 @@ public class Elevator implements Runnable {
 			}
 			openDoor();
 			System.out.println("Elevator " + elevNum + " State Change: IN IDLE @ time = " + LocalTime.now() + "\n");  //Printing time stamps
+			prevState = state;
 			state = idle;    // set state to idle
-			/*
-			byte[] msg = Common.encodeElevator(elevNum, curFloor, state,curFloor);
-			transmitter.sendPacket(msg);
-			msg = transmitter.receivePacket();*/
+			
+			byte[] msg1 = Common.encodeElevator(elevNum, curFloor, state,curFloor);
+			transmitter.sendPacket(msg1);
 			if(map.get(curFloor) == null ? false : (boolean)map.get(curFloor)) {
 				byte[] msg = Common.encodeElevator(elevNum, curFloor, state, getFloor() == -1 ? curFloor : getFloor());
 				transmitter.sendPacket(msg);
@@ -227,9 +234,9 @@ public class Elevator implements Runnable {
 			doorOpen= true;
 			return;
 		}
-//		byte[] msg = Common.encodeElevator(elevNum, curFloor, state, getFloor() == -1 ? curFloor : getFloor());
-//		transmitter.sendPacket(msg);
-//		transmitter.receivePacket();
+		byte[] msg = Common.encodeElevator(elevNum, curFloor, state, getFloor() == -1 ? curFloor : getFloor());
+		transmitter.sendPacket(msg);
+		transmitter.receivePacket();
 	}
 
 	//Method removeFloor takes chosen floor and removes it from the Arraylist of destination floors
@@ -340,10 +347,10 @@ public class Elevator implements Runnable {
 	public Integer getFloor() {
 		int target = -1;
 		try {
-			if(state==up) {
+			if(state==up || prevState == up) {
 				Integer min = Integer.MAX_VALUE;
 				for(Integer key : map.keySet()) {
-					if(key > curFloor && key < min) {
+					if(key >= curFloor && key < min) {
 						min = key;
 						target = key;
 					}
@@ -357,7 +364,7 @@ public class Elevator implements Runnable {
 						}
 					}
 				}
-			} else if(state == down) {
+			} else if(state == down || prevState == down) {
 				Integer min = -1;
 				for(Integer key : map.keySet()) {
 					if(key <= curFloor && key > min) {
@@ -368,7 +375,7 @@ public class Elevator implements Runnable {
 				if(target == -1) {
 					min = Integer.MAX_VALUE;
 					for(Integer key : map.keySet()) {
-						if(key > curFloor && key < min) {
+						if(key >= curFloor && key < min) {
 							min = key;
 							target = key;
 						}

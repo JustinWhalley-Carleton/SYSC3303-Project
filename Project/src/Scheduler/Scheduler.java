@@ -207,13 +207,13 @@ public class Scheduler implements Runnable {
 
 ////				 print out distance calculation result
 //
-//				System.out.println("elevator: " + (i+1) + " is"
-//						+ " floor " + elevtStates[i].getFloor()
-//						+" state " + elevtStates[i].getDir()
-//						+" dest " + elevtStates[i].getDest() );
-//
-//				System.out.println("elevator: " + (i+1) + " to floor: " + floor + " dir: " + dir);
-//				System.out.println(distances[i]);
+				System.out.println("elevator: " + (i+1) + " is"
+						+ " floor " + elevtStates[i].getFloor()
+						+" state " + elevtStates[i].getDir()
+						+" dest " + elevtStates[i].getDest() );
+
+				System.out.println("elevator: " + (i+1) + " to floor: " + floor + " dir: " + dir);
+				System.out.println(distances[i]);
 			}
 		}
 
