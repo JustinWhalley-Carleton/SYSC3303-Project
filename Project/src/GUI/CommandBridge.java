@@ -2,9 +2,12 @@ package GUI;
 
 import common.RPC;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.LinkedList;
+import java.util.Scanner;
 
 public class CommandBridge{
 
@@ -56,7 +59,7 @@ public class CommandBridge{
     // Class vars
     private final TYPE msgType;
     private final Boolean isSender;
-    private final int senderPort, receiverPort;
+    private int senderPort, receiverPort;
     private RPC transmitter;
 
     // Receiver buffer
@@ -67,9 +70,7 @@ public class CommandBridge{
         msgType = type;
         isSender = sender;
 
-        // Initialize ports
-        senderPort = 4399;
-        receiverPort = 4400;
+        readSettings();
 
         // Initialize transmitter
         try {
@@ -87,6 +88,38 @@ public class CommandBridge{
             // Start receiver thread in background.
             Thread receiverThread = new Thread(this::backgroundReceiver);
             receiverThread.start();
+        }
+    }
+
+    private void readSettings(){
+        try {
+            Scanner scanner = new Scanner(new File("src/test/settings.txt"));
+            while(scanner.hasNextLine()) {
+                String line = scanner.nextLine();
+                String[] splitStr = line.trim().split("\\s+");
+
+                if (splitStr.length == 1 || line.contains("/")){
+                    // Empty line or Comment in setting file.
+                    continue;
+                }
+
+                // Get value
+                int value = splitStr[1].contains(".") ? 0 : Integer.parseInt(splitStr[1]);
+                // Assign value to its according variable
+                switch(splitStr[0].trim()){
+                    case "BRIDGE_FAULT_SEND:" -> { if (msgType == TYPE.FAULT) senderPort   = value; }
+                    case "BRIDGE_FAULT_RECV:" -> { if (msgType == TYPE.FAULT) receiverPort = value; }
+                    case "BRIDGE_FLOOR_SEND:" -> { if (msgType == TYPE.FLOOR_BUTTON) senderPort   = value; }
+                    case "BRIDGE_FLOOR_RECV:" -> { if (msgType == TYPE.FLOOR_BUTTON) receiverPort = value; }
+                    case "BRIDGE_ELEV_SEND:"  -> { if (msgType == TYPE.ELEV_BUTTON) senderPort   = value; }
+                    case "BRIDGE_ELEV_RECV:"  -> { if (msgType == TYPE.ELEV_BUTTON) receiverPort = value; }
+                    // Unsupported settings
+                    default -> {}
+                }
+            }
+            scanner.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
         }
     }
 
