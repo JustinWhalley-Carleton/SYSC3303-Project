@@ -27,13 +27,17 @@ public class ElevatorPanel extends JPanel {
 	private boolean faultState = false;
 	private boolean buttonsActive = false;
 	private int fontSize = 20;
-	
+
+	// send fault to Elevator
+	private final CommandBridge commandBridge;
+
 	/**
 	 * constructor for an elevator panel
 	 * @param elevNum
 	 */
-	public ElevatorPanel(int elevNum) {
+	public ElevatorPanel(int elevNum, CommandBridge bridge) {
 		this.elevNum = elevNum;
+		this.commandBridge = bridge;
 		// add border and padding 
 		setBorder(new CompoundBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10),BorderFactory.createLineBorder(Color.BLACK)));
 		// center the panel
@@ -57,7 +61,8 @@ public class ElevatorPanel extends JPanel {
 				if(e.getSource() instanceof JButton) {
 					// print to scroll panel, write to command file, change background to signify button is disabled and set button disabled (no double faulting)
 					TextManager.print("Fault generated on elevator "+elevNum);
-					GUIFileLoader.writeToFile(0, elevNum, -1);
+					// send fault
+					commandBridge.send(elevNum, -1);
 					((JButton)e.getSource()).setBackground(Color.GRAY);
 					((JButton)e.getSource()).setEnabled(false);
 				}

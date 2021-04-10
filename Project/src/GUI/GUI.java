@@ -42,11 +42,16 @@ public class GUI extends JFrame{
 	// Ports
 	private static int SCHEDULER_RECV_GUI_PORT;
 	private static int GUI_RECV_SCHEDULER_PORT;
+	// Command Bridges
+	// send fault to Elevator
+	private CommandBridge commandBridge_fault;
+
+
 	/**
 	 * constructor for GUI 
 	 */
 	public GUI(boolean show) {
-		//read the settings file 
+		// Read the settings file
 		getSettings();
 		GUIFileLoader.deleteFile();
 		try {
@@ -55,13 +60,17 @@ public class GUI extends JFrame{
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
+		// Initialize communication between scheduler and GUI
 		try {
-			// initialize communication between scheduler and GUI
 			transmitter = new RPC(InetAddress.getLocalHost(), SCHEDULER_RECV_GUI_PORT, GUI_RECV_SCHEDULER_PORT);
 		} catch (UnknownHostException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		// Initialize Command bridge
+		commandBridge_fault = new CommandBridge(CommandBridge.TYPE.FAULT, true);
+
+
 		//create an array of panels for elevators
 		elevatorPanels = new ElevatorPanel[ELEVATORS];
 		
@@ -79,7 +88,7 @@ public class GUI extends JFrame{
 		JPanel topPanel = new JPanel();
 		topPanel.setLayout(new GridLayout(1,ELEVATORS));
 		for(int i = 0; i < ELEVATORS; i++) {
-			ElevatorPanel panel = new ElevatorPanel(i+1);
+			ElevatorPanel panel = new ElevatorPanel(i+1, commandBridge_fault);
 			topPanel.add(panel);
 			elevatorPanels[i] = panel;
 		}

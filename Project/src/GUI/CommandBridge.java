@@ -4,11 +4,9 @@ import common.RPC;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
 import java.util.LinkedList;
 
 public class CommandBridge{
-
 
     /* Message types */
     public enum TYPE{
@@ -70,8 +68,8 @@ public class CommandBridge{
         isSender = sender;
 
         // Initialize ports
-        senderPort = 0;
-        receiverPort = 0;
+        senderPort = 4399;
+        receiverPort = 4400;
 
         // Initialize transmitter
         try {
@@ -164,7 +162,7 @@ public class CommandBridge{
         // Update buffer and return
         if (targetFault != TYPE.INVALID){
             receiverBuffer.remove(targetFault);
-            return targetFault.payload2 == 1;
+            return true;
         }
 
         return false;

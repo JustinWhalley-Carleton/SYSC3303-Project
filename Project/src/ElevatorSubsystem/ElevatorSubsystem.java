@@ -3,6 +3,7 @@
  */
 package ElevatorSubsystem;
 import FloorSubsystem.FileLoader;
+import GUI.CommandBridge;
 import Scheduler.Scheduler;
 import common.Common;
 import common.RPC;
@@ -47,6 +48,9 @@ public class ElevatorSubsystem implements Runnable{
 	private HashMap<Integer, LinkedList<byte[]>> msgToElevators;
 	private LinkedList<byte[]> msgToScheduler;
 
+	// Command Bridge
+	CommandBridge commandBridge_fault;
+
 
 	/* Common code */
 
@@ -57,6 +61,9 @@ public class ElevatorSubsystem implements Runnable{
 		// Init inet address
 		SCHEDULER_ADDR = InetAddress.getLocalHost();
 		ELEVATOR_ADDR = InetAddress.getLocalHost();
+
+		// Init command bridge
+		commandBridge_fault = new CommandBridge(CommandBridge.TYPE.FAULT, false);
 
 		// Init elevators
 		this.NUM_ELEV = numElev;
@@ -70,7 +77,7 @@ public class ElevatorSubsystem implements Runnable{
 						Elevator(serialNum, 1, true,
 						ELEV_SUB_ELEV_RECV_PORT + serialNum,
 						ELEV_RECV_PORT + serialNum,
-						fileLoader,GUI);
+						fileLoader, GUI, commandBridge_fault);
 				elevators[i] = new Thread (elevs[i]);
 			}
 		}

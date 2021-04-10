@@ -17,6 +17,7 @@ import java.util.logging.SimpleFormatter;
 
 import FloorSubsystem.FileLoader;
 import FloorSubsystem.GUIFileLoader;
+import GUI.CommandBridge;
 import Timer.TimerController;
 import common.RPC;
 import common.Common.ELEV_ERROR;
@@ -55,28 +56,40 @@ public class Elevator implements Runnable {
 	private boolean doorOpen = false;
 	private long doorStart;
 	private MotorState prevState;
+
+	// Command bridge
+	private CommandBridge commandBridge_fault;
+
 	/**
 	 * no port elevator for junit testing
 	 */
 	public Elevator() {testing=true;}
 	
 	// Constructor
-	public Elevator(int elevNum, int curFloor, boolean doorStatus, int destPort, int recPort, FileLoader fileLoader, boolean GUI) throws UnknownHostException {
-		prevState = idle;
-		this.curFloor = curFloor;  
-		GUIFlag = GUI;
-		this.doorStatus = doorStatus;            //Initializing variables
-		state = idle;   // setting motor state to idle
-		transmitter = new RPC(InetAddress.getLocalHost(), destPort, recPort);
+	public Elevator(int elevNum, int curFloor, boolean doorStatus,
+					int destPort, int recPort, FileLoader fileLoader,
+					boolean GUI, CommandBridge bridge_fault) throws UnknownHostException {
+
+		// Initializing variables
+		this.prevState = idle;
+		this.curFloor = curFloor;
+		this.GUIFlag = GUI;
+		this.commandBridge_fault = bridge_fault;
+		this.doorStatus = doorStatus;
+		this.state = idle;   // setting motor state to idle
+		this.transmitter = new RPC(InetAddress.getLocalHost(), destPort, recPort);
 		this.elevNum = elevNum;
-		buttons = new ElevatorButton[NUM_FLOORS];
+		this.buttons = new ElevatorButton[NUM_FLOORS];
+
 		for(int i = 0; i < NUM_FLOORS; i++) {
 			buttons[i] = new ElevatorButton(i+1,false);
 		}
+
 		timer = new TimerController((int)(floorTiming),this);
 		timer2 = new TimerController(1500,this);
 		map = new HashMap<Integer,Boolean>();
 		this.fileLoader = fileLoader;
+
 		try {
 			file = new FileLoader();
 			while(file.hasNextInstruction()) {
@@ -305,7 +318,7 @@ public class Elevator implements Runnable {
 	
 	private void pollStop() throws FileNotFoundException {
 		if(GUIFlag) {
-			if(GUIFileLoader.getFault(elevNum)) {
+			if(commandBridge_fault.getFault(elevNum)) {
 				int reason = 2;
 				if(state == up || state == down) {
 					reason = 0;
