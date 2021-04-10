@@ -169,7 +169,9 @@ public class Elevator implements Runnable {
 			long moveEnd = System.currentTimeMillis();
 			String elapsedMoveTime = String.valueOf(moveEnd - moveStart);
 			String moveTime = "Elevator " + elevNum + " took " + elapsedMoveTime + "ms to move to Floor " + curFloor;
+			FileLoader.logToFile("********");
 			FileLoader.logToFile(moveTime);
+			FileLoader.logToFile("********");
 		}else if((state == up && curFloor < getFloor())||(state == down && curFloor > getFloor())){
 			System.out.println("\n\n\n curFloor = "+curFloor+" geFloor() = " +getFloor()+"\n\n\n");
 			// continue going in current direction
