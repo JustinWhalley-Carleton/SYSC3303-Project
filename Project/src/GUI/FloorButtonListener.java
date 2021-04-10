@@ -11,15 +11,17 @@ import FloorSubsystem.GUIFileLoader;
 public class FloorButtonListener implements ActionListener{
 	private int floorNum;
 	private boolean up;
+	private CommandBridge commandBridge;
 	
 	/**
 	 * constructor for a floor button listener
 	 * @param floorNum
 	 * @param up
 	 */
-	public FloorButtonListener(int floorNum, boolean up) {
+	public FloorButtonListener(int floorNum, boolean up, CommandBridge bridge) {
 		this.floorNum = floorNum;
 		this.up = up;
+		this.commandBridge = bridge;
 	}
 	
 	/**
@@ -29,7 +31,7 @@ public class FloorButtonListener implements ActionListener{
 		if(e.getSource() instanceof JButton) {
 			//print to scroll panel, add to command file, set color to yellow and disable button
 			TextManager.print("Floor: "+floorNum+ " " + (up? "up ":"down ")+" button clicked");
-			GUIFileLoader.writeToFile(1, floorNum, up?1:0);
+			commandBridge.send(floorNum, up ? 1 : 0);
 			((JButton)e.getSource()).setForeground(Color.YELLOW);
 			((JButton)e.getSource()).setEnabled(false);
 		}

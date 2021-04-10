@@ -125,7 +125,7 @@ public class CommandBridge{
 
 
     // send function call by sender, to send payload.
-    public void send(int payload1, int payload2){
+    public synchronized void send(int payload1, int payload2){
         if (!isSender) {
             System.out.println("Unexpected behaviour! CommandBridge::send() called by receiver. Abort.");
             return;

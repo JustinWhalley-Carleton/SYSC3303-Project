@@ -45,7 +45,7 @@ public class GUI extends JFrame{
 	// Command Bridges
 	// send fault to Elevator
 	private CommandBridge commandBridge_fault;
-
+	private CommandBridge commandBridge_floor;
 
 	/**
 	 * constructor for GUI 
@@ -69,6 +69,7 @@ public class GUI extends JFrame{
 		}
 		// Initialize Command bridge
 		commandBridge_fault = new CommandBridge(CommandBridge.TYPE.FAULT, true);
+		commandBridge_floor = new CommandBridge(CommandBridge.TYPE.FLOOR_BUTTON, true);
 
 
 		//create an array of panels for elevators
@@ -230,7 +231,7 @@ public class GUI extends JFrame{
 			upButton.setBounds(0, 0, 30, 25);
 			upButton.setBorder(new RoundedBorder(5));
 			upButton.setForeground(Color.BLUE);
-			upButton.addActionListener(new FloorButtonListener(i+1,true));
+			upButton.addActionListener(new FloorButtonListener(i+1,true, commandBridge_floor));
 			upButtons[i] = upButton;
 			// add a label stating the floor number
 			JLabel label = new JLabel(Integer.toString(i+1), SwingConstants.CENTER);
@@ -239,7 +240,7 @@ public class GUI extends JFrame{
 			downButton.setBounds(0, 0, 30, 25);
 			downButton.setBorder(new RoundedBorder(5));
 			downButton.setForeground(Color.BLUE);
-			downButton.addActionListener(new FloorButtonListener(i+1,false));
+			downButton.addActionListener(new FloorButtonListener(i+1,false, commandBridge_floor));
 			downButtons[i] = downButton;
 			// add buttons and label to the temp panel
 			tempPanel.add(upButton);

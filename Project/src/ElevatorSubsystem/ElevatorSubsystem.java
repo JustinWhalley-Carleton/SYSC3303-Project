@@ -63,7 +63,9 @@ public class ElevatorSubsystem implements Runnable{
 		ELEVATOR_ADDR = InetAddress.getLocalHost();
 
 		// Init command bridge
-		commandBridge_fault = new CommandBridge(CommandBridge.TYPE.FAULT, false);
+		if (GUI) {
+			commandBridge_fault = new CommandBridge(CommandBridge.TYPE.FAULT, false);
+		}
 
 		// Init elevators
 		this.NUM_ELEV = numElev;
