@@ -49,7 +49,8 @@ public class ElevatorSubsystem implements Runnable{
 	private LinkedList<byte[]> msgToScheduler;
 
 	// Command Bridge
-	CommandBridge commandBridge_fault;
+	private CommandBridge commandBridge_fault;
+	private CommandBridge commandBridge_button;
 
 
 	/* Common code */
@@ -65,6 +66,7 @@ public class ElevatorSubsystem implements Runnable{
 		// Init command bridge
 		if (GUI) {
 			commandBridge_fault = new CommandBridge(CommandBridge.TYPE.FAULT, false);
+			commandBridge_button = new CommandBridge(CommandBridge.TYPE.ELEV_BUTTON, false);
 		}
 
 		// Init elevators
@@ -79,7 +81,8 @@ public class ElevatorSubsystem implements Runnable{
 						Elevator(serialNum, 1, true,
 						ELEV_SUB_ELEV_RECV_PORT + serialNum,
 						ELEV_RECV_PORT + serialNum,
-						fileLoader, GUI, commandBridge_fault);
+						fileLoader,
+						GUI, commandBridge_fault, commandBridge_button);
 				elevators[i] = new Thread (elevs[i]);
 			}
 		}

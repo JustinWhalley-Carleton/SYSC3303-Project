@@ -102,18 +102,6 @@ public class FloorSubSystem implements Runnable{
         }
     }
 
-    public void selectFloor(byte[] in) {
-
-    }
-
-    // read command from a file
-    public void readCommand(String str) {
-
-    }
-
-    public byte[] getInfo() {
-        return null;
-    }
 
     public void getInstruction() {
         // Retrive instruction from bridge

@@ -43,9 +43,9 @@ public class GUI extends JFrame{
 	private static int SCHEDULER_RECV_GUI_PORT;
 	private static int GUI_RECV_SCHEDULER_PORT;
 	// Command Bridges
-	// send fault to Elevator
 	private CommandBridge commandBridge_fault;
 	private CommandBridge commandBridge_floor;
+	private CommandBridge commandBridge_button;
 
 	/**
 	 * constructor for GUI 
@@ -70,6 +70,7 @@ public class GUI extends JFrame{
 		// Initialize Command bridge
 		commandBridge_fault = new CommandBridge(CommandBridge.TYPE.FAULT, true);
 		commandBridge_floor = new CommandBridge(CommandBridge.TYPE.FLOOR_BUTTON, true);
+		commandBridge_button = new CommandBridge(CommandBridge.TYPE.ELEV_BUTTON, true);
 
 
 		//create an array of panels for elevators
@@ -89,7 +90,7 @@ public class GUI extends JFrame{
 		JPanel topPanel = new JPanel();
 		topPanel.setLayout(new GridLayout(1,ELEVATORS));
 		for(int i = 0; i < ELEVATORS; i++) {
-			ElevatorPanel panel = new ElevatorPanel(i+1, commandBridge_fault);
+			ElevatorPanel panel = new ElevatorPanel(i+1, commandBridge_fault, commandBridge_button);
 			topPanel.add(panel);
 			elevatorPanels[i] = panel;
 		}

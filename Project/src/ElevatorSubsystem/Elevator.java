@@ -59,6 +59,7 @@ public class Elevator implements Runnable {
 
 	// Command bridge
 	private CommandBridge commandBridge_fault;
+	private CommandBridge commandBridge_button;
 
 	/**
 	 * no port elevator for junit testing
@@ -68,13 +69,14 @@ public class Elevator implements Runnable {
 	// Constructor
 	public Elevator(int elevNum, int curFloor, boolean doorStatus,
 					int destPort, int recPort, FileLoader fileLoader,
-					boolean GUI, CommandBridge bridge_fault) throws UnknownHostException {
+					boolean GUI, CommandBridge bridge_fault, CommandBridge bridge_button) throws UnknownHostException {
 
 		// Initializing variables
 		this.prevState = idle;
 		this.curFloor = curFloor;
 		this.GUIFlag = GUI;
 		this.commandBridge_fault = bridge_fault;
+		this.commandBridge_button = bridge_button;
 		this.doorStatus = doorStatus;
 		this.state = idle;   // setting motor state to idle
 		this.transmitter = new RPC(InetAddress.getLocalHost(), destPort, recPort);
@@ -219,7 +221,9 @@ public class Elevator implements Runnable {
 				removeFloor(curFloor);  //calls method remove floor to remove it from the arraylist
 				Integer[] nextFloors;
 				if(GUIFlag) {
-					nextFloors = GUIFileLoader.getElevButton(elevNum);
+					// Get next floor from bridge
+					int nextFloor = commandBridge_button.getElevButton(elevNum);
+					nextFloors = nextFloor == -1 ? null : new Integer[]{nextFloor};
 				} else {
 					nextFloors = file.popDestinations(curFloor, goingUp);
 				}
@@ -341,12 +345,12 @@ public class Elevator implements Runnable {
 
 	public void pollCommand() {
 		if(GUIFlag) {
-			Integer[] command = GUIFileLoader.getElevButton(elevNum);
-			if(command != null) {
-				for (Integer floorNum: command){
-					buttons[floorNum-1].register();
-					addDest(floorNum, false);
-				}
+			// Get next floor from bridge
+			int nextFloor = commandBridge_button.getElevButton(elevNum);
+			if (nextFloor != -1){
+				// Add floor if floor number valid
+				buttons[nextFloor-1].register();
+				addDest(nextFloor, false);
 			}
 		} else {
 			Integer[] command =  file.popDestinations(curFloor, goingUp);
