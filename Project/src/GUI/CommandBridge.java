@@ -4,6 +4,8 @@ import common.RPC;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.LinkedList;
 
 public class CommandBridge{
 
@@ -17,6 +19,8 @@ public class CommandBridge{
 
         private final byte value;
         private TYPE(byte b){ this.value = b; }
+        // Payload
+        private int payload1, payload2;
 
         // Determine which type the byte corresponds to
         public static TYPE findType(byte b){
@@ -24,6 +28,29 @@ public class CommandBridge{
                 if(type.value == b) return type;
             }
             return INVALID;
+        }
+
+        // Initialize payload
+        public void setPayload(int p1, int p2){
+            payload1 = p1;
+            payload2 = p2;
+        }
+
+        // Generate a byte[] with current payload
+        public byte[] encode(){
+            byte[] result = new byte[3];
+            result[0] = value;
+            result[1] = (byte) payload1;
+            result[2] = (byte) payload2;
+            return result;
+        }
+
+        // Convert a byte[] back to TYPE
+        public static TYPE decode(byte[] msg){
+            TYPE command = findType(msg[0]);
+            command.payload1 = msg[1];
+            command.payload2 = msg[2];
+            return command;
         }
     }
 
@@ -34,14 +61,18 @@ public class CommandBridge{
     private final int senderPort, receiverPort;
     private RPC transmitter;
 
+    // Receiver buffer
+    private LinkedList<TYPE> receiverBuffer;
 
     public CommandBridge(TYPE type, Boolean sender){
         // Initial identity
         msgType = type;
         isSender = sender;
+
         // Initialize ports
         senderPort = 0;
         receiverPort = 0;
+
         // Initialize transmitter
         try {
             transmitter = new RPC(InetAddress.getLocalHost(),
@@ -51,8 +82,11 @@ public class CommandBridge{
             e.printStackTrace();
         }
 
-        // Start receiver thread in background.
+        // Initialize Receiver
         if (!sender){
+            // Initialize receiver buffer
+            receiverBuffer = new LinkedList<TYPE>();
+            // Start receiver thread in background.
             Thread receiverThread = new Thread(this::backgroundReceiver);
             receiverThread.start();
         }
@@ -67,53 +101,136 @@ public class CommandBridge{
         }
 
         // Encode
+        msgType.setPayload(payload1, payload2);
+        byte[] msg = msgType.encode();
 
         // Send
-
+        transmitter.sendPacket(msg);
     }
 
 
     /* Background Thread for receiver */
     public void backgroundReceiver() {
 
+        while(true){
+            // Receive msg
+            byte[] msg = transmitter.receivePacket();
+
+            // Decode
+            TYPE received = TYPE.decode(msg);
+
+            // Error check
+            if (received != msgType){
+                System.out.println("Unexpected " + received + "command received! Expecting " + msgType);
+                continue;
+            }
+
+            // Update local buffer
+            storeMsg(received);
+        }
     }
 
 
+    /* Synchronized functions for receivers */
+
+    private synchronized void storeMsg(TYPE received){
+        receiverBuffer.add(received);
+    }
+
     /* Receiver caller functions */
 
-    public boolean getFault(int elevNum){
+    public synchronized boolean getFault(int elevNum){
         if (msgType != TYPE.FAULT){
             System.out.println(
                     "Unexpected behaviour! CommandBridge::getFault() called by " + msgType + ". Abort.");
             return false;
         }
-        // Check / update msg pool
+
+        if (receiverBuffer.size() == 0) {
+            // buffer is empty
+            return false;
+        }
+
+        TYPE targetFault = TYPE.INVALID;
+
+        // Check buffer
+        for (TYPE fault: receiverBuffer){
+            if (fault.payload1 == elevNum){
+                targetFault = fault;
+                break;
+            }
+        }
+
+        // Update buffer and return
+        if (targetFault != TYPE.INVALID){
+            receiverBuffer.remove(targetFault);
+            return targetFault.payload2 == 1;
+        }
 
         return false;
     }
 
 
-    public String[] readlineFloor(){
+    /**
+     * old name: readlineFloor()
+     * For FloorSubsystem
+     * @return { FloorNum, Up (1) / Down (0) }
+     */
+    public synchronized Integer[] getFloorButton(){
         if (msgType != TYPE.FLOOR_BUTTON){
             System.out.println(
                     "Unexpected behaviour! CommandBridge::readlineFloor() called by " + msgType + ". Abort.");
             return null;
         }
-        // Check / update msg pool
 
-        return null;
+        if (receiverBuffer.size() == 0) {
+            // buffer is empty
+            return null;
+        }
+
+        // Pop the first item from buffer
+        TYPE targetLine = receiverBuffer.pop();
+
+        // Return
+        return new Integer[]{targetLine.payload1, targetLine.payload2};
     }
 
 
-    public Integer[] getElevButton(int elevNum){
+    /**
+     *
+     * @param elevNum
+     * @return -1 if not found. Floor number if button clicked.
+     */
+    public synchronized int getElevButton(int elevNum){
         if (msgType != TYPE.ELEV_BUTTON){
             System.out.println(
                     "Unexpected behaviour! CommandBridge::getElevButton() called by " + msgType + ". Abort.");
-            return null;
+            return -1;
         }
-        // Check / update msg pool
 
-        return null;
+        // Check / update msg pool
+        if (receiverBuffer.size() == 0) {
+            // buffer is empty
+            return -1;
+        }
+
+        TYPE targetButton = TYPE.INVALID;
+
+        // Check buffer
+        for (TYPE button: receiverBuffer){
+            if(button.payload1 == elevNum){
+                targetButton = button;
+                break;
+            }
+        }
+
+        // Update buffer and return
+        if (targetButton != TYPE.INVALID){
+            receiverBuffer.remove(targetButton);
+            return targetButton.payload2;
+        }
+
+        return -1;
     }
 
 }
