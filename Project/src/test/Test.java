@@ -121,7 +121,7 @@ public class Test {
 					case "GUI_RECV_SCHEDULER_PORT:"		-> GUI_RECV_SCHEDULER_PORT 		= value;
 					case "SCHEDULER_RECV_GUI_PORT:"		-> SCHEDULER_RECV_GUI_PORT		= value;
 					// Unsupported settings
-					default -> System.out.println("Unexpected item in settings file.");
+					default -> {}
 				}
 			}
 			scanner.close();

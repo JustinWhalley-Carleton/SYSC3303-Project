@@ -1,4 +1,5 @@
 package FloorSubsystem;
+import GUI.CommandBridge;
 import common.Common;
 import common.RPC;
 import test.Test;
@@ -19,6 +20,10 @@ public class FloorSubSystem implements Runnable{
     private boolean GUIFlag;
 
     private LinkedList<byte[]> messageQueue;
+
+    // Command Bridge
+    CommandBridge commandBridge_floor;
+
     public FloorSubSystem(int maxFloor, boolean GUI) throws Exception{
     	GUIFlag = GUI;
         // Error checking
@@ -41,6 +46,11 @@ public class FloorSubSystem implements Runnable{
         rpc = new RPC(InetAddress.getLocalHost(), Test.SCHEDULER_RECV_FLOOR_PORT, Test.FLOOR_SUB_RECV_PORT);
         rpc.setTimeout(2000);
         messageQueue = new LinkedList<byte[]>();
+
+        // Command Bridge
+        if (GUI){
+            commandBridge_floor = new CommandBridge(CommandBridge.TYPE.FLOOR_BUTTON, false);
+        }
     }
 
     public void run() {
@@ -92,26 +102,18 @@ public class FloorSubSystem implements Runnable{
         }
     }
 
-    public void selectFloor(byte[] in) {
-
-    }
-
-    // read command from a file
-    public void readCommand(String str) {
-
-    }
-
-    public byte[] getInfo() {
-        return null;
-    }
 
     public void getInstruction() {
-    	String[] line = GUIFileLoader.readLineFloor();
-    	if(line == null) {
+        // Retrive instruction from bridge
+    	Integer[] buttonPress = commandBridge_floor.getFloorButton();
+        // No instruction
+    	if(buttonPress == null) {
     		return;
     	}
-    	int departureFloor = Integer.parseInt(line[1]);
-    	boolean goingUp = line[2].equals("UP");
+        // Decode Instruction
+    	int departureFloor  = buttonPress[0];
+    	boolean goingUp     = buttonPress[1] == 1;
+
     	System.out.println(departureFloor +" "+goingUp);
     	 if(MIN_FLOOR <= departureFloor && departureFloor <= MAX_FLOOR){
              // Register corresponding button
