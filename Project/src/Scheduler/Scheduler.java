@@ -254,7 +254,7 @@ public class Scheduler implements Runnable {
 		if (elevtFloor == elevtDest){
 			distance = Math.abs(floorDiff);
 		}
-		else if ((floorDiff > 0 && dir == -1 && elevtDir == -1) || (floorDiff < 0 && dir == 1 && elevtDir == 1)) { // on elevt's way
+		else if ((floorDiff > 0 && elevtDest < elevtFloor && elevtDir == -1) || (floorDiff < 0 && elevtDest > elevtFloor && elevtDir == 1)) { // on elevt's way
 			distance = Math.min(Math.abs(elevtFloor - floor),Math.abs(elevtDest - floor));
 		}
 		else { // elevt needs turn around
