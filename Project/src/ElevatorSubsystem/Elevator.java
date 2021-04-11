@@ -143,6 +143,10 @@ public class Elevator implements Runnable {
 				}
 				timer2.start();
 				doorOpen = true;
+				byte[] msg = Common.encodeElevator(elevNum, curFloor, state, getFloor() == -1 ? curFloor : getFloor());
+				transmitter.sendPacket(msg);
+				transmitter.receivePacket();
+				removeFloor(getFloor());
 				/**
 				closeDoor();
 				long doorEnd = System.currentTimeMillis();

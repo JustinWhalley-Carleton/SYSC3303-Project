@@ -199,7 +199,7 @@ public class Scheduler implements Runnable {
 			}
 			else {
 				// if there is already an elevator coming to this floor, assign another elevator if there is one
-				if (elevtStates[i].getDest() == floor){
+				if (elevtStates[i].getDest() == floor && elevtStates[i].getDir() !=0){
 					distances[i] = 90000;
 				} else {
 					distances[i] = findDistance(floor, dir, elevtStates[i]);
