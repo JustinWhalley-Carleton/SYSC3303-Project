@@ -23,19 +23,20 @@ public class FloorSubSystem implements Runnable{
     // Command Bridge
     CommandBridge commandBridge_floor;
 
-    public FloorSubSystem(int maxFloor, boolean GUI) throws Exception{
+    public FloorSubSystem(boolean GUI) throws Exception{
     	GUIFlag = GUI;
+    	Common.initializeVars();
+    	this.MAX_FLOOR = Common.FLOORS;
         // Error checking
-        if (maxFloor <= 1) {
-            throw new Exception("incompatible setting: maxFloor should be at least 2.");
+        if (MAX_FLOOR <= 1) {
+            throw new Exception("incompatible setting: MAX_FLOOR should be at least 2.");
         }
 
         // Init floors
         this.MIN_FLOOR = 1;
-        this.MAX_FLOOR = maxFloor;
 
         floors = new Floor[MAX_FLOOR];
-        for (int f = 1; f <= maxFloor; ++f) {
+        for (int f = 1; f <= MAX_FLOOR; ++f) {
             floors[f - 1] = new Floor(f, f == MIN_FLOOR, f == MAX_FLOOR);
         }
 
@@ -43,7 +44,7 @@ public class FloorSubSystem implements Runnable{
         instructionFile = new FileLoader();
 
         // Get port numbers
-        Common.initializeVars();
+        
         rpc = new RPC(InetAddress.getLocalHost(), Common.SCHEDULER_RECV_FLOOR_PORT, Common.FLOOR_SUB_RECV_PORT);
         rpc.setTimeout(2000);
         messageQueue = new LinkedList<byte[]>();
@@ -197,6 +198,15 @@ public class FloorSubSystem implements Runnable{
         }
         rpc.sendPacket(msg);
 
+    }
+    
+    public static void main(String[] args) {
+    	try {
+			new FloorSubSystem(true);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
     }
 
 }
