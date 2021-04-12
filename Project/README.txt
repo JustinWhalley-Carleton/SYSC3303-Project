@@ -2,9 +2,9 @@ Group Number: 5
 
 Breakdown of responsibilities:
 
-Justin Whalley #101117127:   Test, JunitTestCases, Common, Timer, TimerController, FloorSubSystem UDP, Elevator faults
-Yisheng Li     #101028686:   Scheduler
-Yixiang Huang  #101071528:   ElevatorSubSystem, Common, RPC, Test faults,Floor subsystem
+Justin Whalley #101117127:   Test, JunitTestCases, Common, Timer, TimerController, FloorSubSystem UDP, Elevator faults, GUI
+Yisheng Li     #101028686:   Scheduler and its relative classes
+Yixiang Huang  #101071528:   ElevatorSubSystem, Common, RPC, Test faults, Floor subsystem, GUI UDP
 Gurjit Gill    #101110071:   Elevator, Fileloader errorfile
 Everyone: 	   UML
 
@@ -14,6 +14,14 @@ Running Instruction:
 
 -Import Project
 -Run Project/src/test/Test.java
+
+
+
+Running GUI: 
+
+-Import Project
+-Run Project/src/GUI/GUI.java
+
 
 Running Junit Instruction:
 
@@ -62,6 +70,20 @@ Timer:
     - TimerThread.java
         *sleep until interrupted for specified time & notify timer controller on completion
 
+GUI:
+    - CommandBridge.java
+        *connect GUI to the system by UDP (new GUI fileloader)
+    - ElevatorPanel.java
+	*construct Elevator Panel that holds elevator panels and buttons
+    - ElevatorButtonListener.java
+        *Listen for elevator button click
+    - FloorButtonListener.java
+        *Listen for floor button click
+    - GUI.java
+        *main function shows whole GUI
+
+
+
 test:
 	- Test.java
 		*create data file
@@ -76,4 +98,4 @@ Junit:
 	- run junit test cases on common and file loader 
 	
 Common:
-	- holds methods that are common between classes(encode/decode messages)
+	- holds methods that are common between classes(encode/decode messages; decode and print out byte arrays)
