@@ -6,6 +6,7 @@ import java.net.*;
 import java.util.*;
 
 import FloorSubsystem.FileLoader;
+import GUI.GUI;
 import common.*;
 
 /**
@@ -34,13 +35,13 @@ public class Scheduler implements Runnable {
 	/**
 	 * Constructor
 	 *
-	 * @param totalElevts total Elevts number
-	 * @param totalElevts total Floors number
+	 * @param isTest
 	 */
-	public Scheduler (int totalElevts, int totalFloors, boolean isTest) throws Exception {
+	public Scheduler (boolean isTest) throws Exception {
+		Common.initializeVars();
 		this.inProcessing = 0;
-		this.totalElevts = totalElevts;
-		this.totalFloors = totalFloors;
+		this.totalElevts = Common.ELEVATORS;
+		this.totalFloors = Common.FLOORS;;
 		this.elevtStates = new ElevtState[totalElevts];
 		this.floorStates = new FloorState[totalFloors];
 		this.msgToElevtSub = new LinkedList<byte[]>();
@@ -51,7 +52,6 @@ public class Scheduler implements Runnable {
 		for (int i=0;i<elevtStates.length;i++) { elevtStates[i]= new ElevtState(i+1); }
 		for (int i=0;i<floorStates.length;i++) { floorStates[i]= new FloorState(i+1); }
 		if(!isTest) {
-			Common.initializeVars();
 			rpcElevt = new RPC(InetAddress.getLocalHost(), Common.ELEV_SUB_RECV_PORT, Common.SCHEDULER_RECV_ELEV_PORT);
 			rpcFloor = new RPC(InetAddress.getLocalHost(),Common.FLOOR_SUB_RECV_PORT,Common.SCHEDULER_RECV_FLOOR_PORT);
 			rpcGUI = new RPC(InetAddress.getLocalHost(),Common.GUI_RECV_SCHEDULER_PORT,Common.SCHEDULER_RECV_GUI_PORT);
@@ -418,5 +418,10 @@ public class Scheduler implements Runnable {
 		FileLoader.logToFile(end);
 		FileLoader.logToFile(exec);
 		FileLoader.logToFile("\n\n");
+	}
+
+	public static void main(String[] args) throws Exception {
+		Thread scheduler = new Thread(new Scheduler(false));
+		scheduler.start();
 	}
 }
