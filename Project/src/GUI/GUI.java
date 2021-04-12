@@ -22,6 +22,8 @@ import test.Test;
 
 public class GUI extends JFrame{
 
+	private static final boolean CREATE_ALL_SUBSYSTEMS = true;
+	
 	private File instructionFile = new File("src/test/settings.txt");
 	private static int ROWS;
 	private static int ELEVATORS;
@@ -152,15 +154,17 @@ public class GUI extends JFrame{
         thread.start();
         
         try {
-        	scheduler = new Scheduler(ELEVATORS,FLOORS,false);
-        	floor = new FloorSubSystem(FLOORS,true);
-        	elev = new ElevatorSubsystem(ELEVATORS,true,false);
-        	schedulerThread = new Thread(scheduler);
-        	elevatorThread = new Thread(elev);
-        	floorThread = new Thread(floor);
-			schedulerThread.start();
-			elevatorThread.start();
-			floorThread.start();
+        	if(CREATE_ALL_SUBSYSTEMS) {
+	        	scheduler = new Scheduler(ELEVATORS,FLOORS,false);
+	        	floor = new FloorSubSystem(FLOORS,true);
+	        	elev = new ElevatorSubsystem(ELEVATORS,true,false);
+	        	schedulerThread = new Thread(scheduler);
+	        	elevatorThread = new Thread(elev);
+	        	floorThread = new Thread(floor);
+				schedulerThread.start();
+				elevatorThread.start();
+				floorThread.start();
+        	}
 			TextManager.print("Program now ready\n\n");
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
