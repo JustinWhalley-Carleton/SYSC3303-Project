@@ -202,7 +202,7 @@ public class FloorSubSystem implements Runnable{
     
     public static void main(String[] args) {
     	try {
-			new FloorSubSystem(true);
+			new Thread(new FloorSubSystem(true)).start();
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

@@ -1969,3 +1969,180 @@ Scheduler processing for ElevtSub time in nanoseconds: 389101
 Scheduler received processing for FloorSub request at nanoseconds: 16390927172299
 Scheduler finished processing request for FloorSub at nanoseconds: 16390927498199
 Scheduler processing time for FloorSub in nanoseconds: 325900
+Scheduler received processing for FloorSub request at nanoseconds: 16591280790900
+Scheduler finished processing request for FloorSub at nanoseconds: 16591281506800
+Scheduler processing time for FloorSub in nanoseconds: 715900
+Scheduler received processing for ElevtSub request at nanoseconds: 16591482228400
+Scheduler finished processing for ElevtSub request at nanoseconds: 16591482545399
+Scheduler processing for ElevtSub time in nanoseconds: 316999
+Scheduler received processing for FloorSub request at nanoseconds: 16591686869300
+Scheduler finished processing request for FloorSub at nanoseconds: 16591687191900
+Scheduler processing time for FloorSub in nanoseconds: 322600
+Scheduler received processing for ElevtSub request at nanoseconds: 16591888867500
+Scheduler finished processing for ElevtSub request at nanoseconds: 16591889182899
+Scheduler processing for ElevtSub time in nanoseconds: 315399
+Scheduler received processing for FloorSub request at nanoseconds: 16592092557799
+Scheduler finished processing request for FloorSub at nanoseconds: 16592092863800
+Scheduler processing time for FloorSub in nanoseconds: 306001
+Scheduler received processing for ElevtSub request at nanoseconds: 16592295137199
+Scheduler finished processing for ElevtSub request at nanoseconds: 16592295433700
+Scheduler processing for ElevtSub time in nanoseconds: 296501
+Scheduler received processing for FloorSub request at nanoseconds: 16592496152200
+Scheduler finished processing request for FloorSub at nanoseconds: 16592496488300
+Scheduler processing time for FloorSub in nanoseconds: 336100
+Scheduler received processing for ElevtSub request at nanoseconds: 16592699198200
+Scheduler finished processing for ElevtSub request at nanoseconds: 16592699493299
+Scheduler processing for ElevtSub time in nanoseconds: 295099
+Scheduler received processing for FloorSub request at nanoseconds: 16592900212300
+Scheduler finished processing request for FloorSub at nanoseconds: 16592900841400
+Scheduler processing time for FloorSub in nanoseconds: 629100
+Scheduler received processing for ElevtSub request at nanoseconds: 16593102180300
+Scheduler finished processing for ElevtSub request at nanoseconds: 16593102514999
+Scheduler processing for ElevtSub time in nanoseconds: 334699
+Scheduler received processing for FloorSub request at nanoseconds: 16593305167200
+Scheduler finished processing request for FloorSub at nanoseconds: 16593305498599
+Scheduler processing time for FloorSub in nanoseconds: 331399
+Scheduler received processing for ElevtSub request at nanoseconds: 16593508000700
+Scheduler finished processing for ElevtSub request at nanoseconds: 16593508295100
+Scheduler processing for ElevtSub time in nanoseconds: 294400
+Scheduler received processing for FloorSub request at nanoseconds: 16593709559200
+Scheduler finished processing request for FloorSub at nanoseconds: 16593709873299
+Scheduler processing time for FloorSub in nanoseconds: 314099
+Scheduler received processing for ElevtSub request at nanoseconds: 16593912146600
+Scheduler finished processing for ElevtSub request at nanoseconds: 16593912653000
+Scheduler processing for ElevtSub time in nanoseconds: 506400
+Scheduler received processing for FloorSub request at nanoseconds: 16594113763099
+Scheduler finished processing request for FloorSub at nanoseconds: 16594114045600
+Scheduler processing time for FloorSub in nanoseconds: 282501
+Scheduler received processing for ElevtSub request at nanoseconds: 16594314815200
+Scheduler finished processing for ElevtSub request at nanoseconds: 16594315108300
+Scheduler processing for ElevtSub time in nanoseconds: 293100
+Scheduler received processing for FloorSub request at nanoseconds: 16594515765900
+Scheduler finished processing request for FloorSub at nanoseconds: 16594516029200
+Scheduler processing time for FloorSub in nanoseconds: 263300
+Scheduler received processing for ElevtSub request at nanoseconds: 16594716878100
+Scheduler finished processing for ElevtSub request at nanoseconds: 16594717298000
+Scheduler processing for ElevtSub time in nanoseconds: 419900
+Scheduler received processing for FloorSub request at nanoseconds: 16594918514600
+Scheduler finished processing request for FloorSub at nanoseconds: 16594918824199
+Scheduler processing time for FloorSub in nanoseconds: 309599
+Scheduler received processing for ElevtSub request at nanoseconds: 16595119801100
+Scheduler finished processing for ElevtSub request at nanoseconds: 16595120185500
+Scheduler processing for ElevtSub time in nanoseconds: 384400
+Scheduler received processing for FloorSub request at nanoseconds: 16595320853400
+Scheduler finished processing request for FloorSub at nanoseconds: 16595321133000
+Scheduler processing time for FloorSub in nanoseconds: 279600
+Scheduler received processing for ElevtSub request at nanoseconds: 16595523144100
+Scheduler finished processing for ElevtSub request at nanoseconds: 16595523433300
+Scheduler processing for ElevtSub time in nanoseconds: 289200
+Scheduler received processing for FloorSub request at nanoseconds: 16595726455299
+Scheduler finished processing request for FloorSub at nanoseconds: 16595726786700
+Scheduler processing time for FloorSub in nanoseconds: 331401
+Scheduler received processing for ElevtSub request at nanoseconds: 16595929577300
+Scheduler finished processing for ElevtSub request at nanoseconds: 16595930004800
+Scheduler processing for ElevtSub time in nanoseconds: 427500
+Scheduler received processing for FloorSub request at nanoseconds: 16596130754000
+Scheduler finished processing request for FloorSub at nanoseconds: 16596131044500
+Scheduler processing time for FloorSub in nanoseconds: 290500
+Scheduler received processing for ElevtSub request at nanoseconds: 16596332806400
+Scheduler finished processing for ElevtSub request at nanoseconds: 16596333216700
+Scheduler processing for ElevtSub time in nanoseconds: 410300
+Scheduler received processing for FloorSub request at nanoseconds: 16596533771900
+Scheduler finished processing request for FloorSub at nanoseconds: 16596534075700
+Scheduler processing time for FloorSub in nanoseconds: 303800
+Scheduler received processing for ElevtSub request at nanoseconds: 16596734833800
+Scheduler finished processing for ElevtSub request at nanoseconds: 16596735242899
+Scheduler processing for ElevtSub time in nanoseconds: 409099
+Scheduler received processing for FloorSub request at nanoseconds: 16596937838999
+Scheduler finished processing request for FloorSub at nanoseconds: 16596938148400
+Scheduler processing time for FloorSub in nanoseconds: 309401
+Scheduler received processing for ElevtSub request at nanoseconds: 16597138836999
+Scheduler finished processing for ElevtSub request at nanoseconds: 16597139129000
+Scheduler processing for ElevtSub time in nanoseconds: 292001
+Scheduler received processing for FloorSub request at nanoseconds: 16597340121500
+Scheduler finished processing request for FloorSub at nanoseconds: 16597340409699
+Scheduler processing time for FloorSub in nanoseconds: 288199
+Scheduler received processing for ElevtSub request at nanoseconds: 16597541778399
+Scheduler finished processing for ElevtSub request at nanoseconds: 16597542134200
+Scheduler processing for ElevtSub time in nanoseconds: 355801
+Scheduler received processing for FloorSub request at nanoseconds: 16597744719999
+Scheduler finished processing request for FloorSub at nanoseconds: 16597745075200
+Scheduler processing time for FloorSub in nanoseconds: 355201
+Scheduler received processing for ElevtSub request at nanoseconds: 16597947225700
+Scheduler finished processing for ElevtSub request at nanoseconds: 16597947683900
+Scheduler processing for ElevtSub time in nanoseconds: 458200
+Scheduler received processing for FloorSub request at nanoseconds: 16598149256500
+Scheduler finished processing request for FloorSub at nanoseconds: 16598149546800
+Scheduler processing time for FloorSub in nanoseconds: 290300
+Scheduler received processing for ElevtSub request at nanoseconds: 16598351664700
+Scheduler finished processing for ElevtSub request at nanoseconds: 16598352185200
+Scheduler processing for ElevtSub time in nanoseconds: 520500
+Scheduler received processing for FloorSub request at nanoseconds: 16598553183799
+Scheduler finished processing request for FloorSub at nanoseconds: 16598553520500
+Scheduler processing time for FloorSub in nanoseconds: 336701
+Scheduler received processing for ElevtSub request at nanoseconds: 16598755862600
+Scheduler finished processing for ElevtSub request at nanoseconds: 16598756173300
+Scheduler processing for ElevtSub time in nanoseconds: 310700
+Scheduler received processing for FloorSub request at nanoseconds: 16598957886500
+Scheduler finished processing request for FloorSub at nanoseconds: 16598958197500
+Scheduler processing time for FloorSub in nanoseconds: 311000
+Scheduler received processing for ElevtSub request at nanoseconds: 16599161099000
+Scheduler finished processing for ElevtSub request at nanoseconds: 16599161381300
+Scheduler processing for ElevtSub time in nanoseconds: 282300
+********
+Elevator 4 took 6035ms to move to Floor 8
+********
+Scheduler received processing for FloorSub request at nanoseconds: 16599363507900
+Scheduler finished processing request for FloorSub at nanoseconds: 16599363753099
+Scheduler processing time for FloorSub in nanoseconds: 245199
+Scheduler received processing for ElevtSub request at nanoseconds: 16599564845199
+Scheduler finished processing for ElevtSub request at nanoseconds: 16599565275300
+Scheduler processing for ElevtSub time in nanoseconds: 430101
+Scheduler received processing for FloorSub request at nanoseconds: 16599766640999
+Scheduler finished processing request for FloorSub at nanoseconds: 16599767088500
+Scheduler processing time for FloorSub in nanoseconds: 447501
+Scheduler received processing for ElevtSub request at nanoseconds: 16599968692300
+Scheduler finished processing for ElevtSub request at nanoseconds: 16599968984600
+Scheduler processing for ElevtSub time in nanoseconds: 292300
+Scheduler received processing for FloorSub request at nanoseconds: 16600172222000
+Scheduler finished processing request for FloorSub at nanoseconds: 16600172586800
+Scheduler processing time for FloorSub in nanoseconds: 364800
+Scheduler received processing for ElevtSub request at nanoseconds: 16600373104400
+Scheduler finished processing for ElevtSub request at nanoseconds: 16600373400199
+Scheduler processing for ElevtSub time in nanoseconds: 295799
+Scheduler received processing for FloorSub request at nanoseconds: 16600573892000
+Scheduler finished processing request for FloorSub at nanoseconds: 16600574188300
+Scheduler processing time for FloorSub in nanoseconds: 296300
+Scheduler received processing for ElevtSub request at nanoseconds: 16600775935400
+Scheduler finished processing for ElevtSub request at nanoseconds: 16600776258800
+Scheduler processing for ElevtSub time in nanoseconds: 323400
+Scheduler received processing for FloorSub request at nanoseconds: 16600976953200
+Scheduler finished processing request for FloorSub at nanoseconds: 16600977267100
+Scheduler processing time for FloorSub in nanoseconds: 313900
+Scheduler received processing for ElevtSub request at nanoseconds: 16601177898300
+Scheduler finished processing for ElevtSub request at nanoseconds: 16601178301200
+Scheduler processing for ElevtSub time in nanoseconds: 402900
+Scheduler received processing for FloorSub request at nanoseconds: 16601378890500
+Scheduler finished processing request for FloorSub at nanoseconds: 16601379169799
+Scheduler processing time for FloorSub in nanoseconds: 279299
+Scheduler received processing for ElevtSub request at nanoseconds: 16601581116599
+Scheduler finished processing for ElevtSub request at nanoseconds: 16601581478000
+Scheduler processing for ElevtSub time in nanoseconds: 361401
+Scheduler received processing for FloorSub request at nanoseconds: 16601783769000
+Scheduler finished processing request for FloorSub at nanoseconds: 16601784092599
+Scheduler processing time for FloorSub in nanoseconds: 323599
+Scheduler received processing for ElevtSub request at nanoseconds: 16601985766999
+Scheduler finished processing for ElevtSub request at nanoseconds: 16601986165200
+Scheduler processing for ElevtSub time in nanoseconds: 398201
+Scheduler received processing for FloorSub request at nanoseconds: 16602188474700
+Scheduler finished processing request for FloorSub at nanoseconds: 16602188777600
+Scheduler processing time for FloorSub in nanoseconds: 302900
+Scheduler received processing for ElevtSub request at nanoseconds: 16602389661300
+Scheduler finished processing for ElevtSub request at nanoseconds: 16602389982800
+Scheduler processing for ElevtSub time in nanoseconds: 321500
+Scheduler received processing for FloorSub request at nanoseconds: 16602593105600
+Scheduler finished processing request for FloorSub at nanoseconds: 16602593426300
+Scheduler processing time for FloorSub in nanoseconds: 320700
+Scheduler received processing for ElevtSub request at nanoseconds: 16602795307400
+Scheduler finished processing for ElevtSub request at nanoseconds: 16602795624100
+Scheduler processing for ElevtSub time in nanoseconds: 316700

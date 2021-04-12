@@ -157,7 +157,7 @@ public class GUI extends JFrame{
         	if(CREATE_ALL_SUBSYSTEMS) {
 	        	scheduler = new Scheduler(ELEVATORS,FLOORS,false);
 	        	floor = new FloorSubSystem(true);
-	        	elev = new ElevatorSubsystem(ELEVATORS,true,false);
+	        	elev = new ElevatorSubsystem(true,false);
 	        	schedulerThread = new Thread(scheduler);
 	        	elevatorThread = new Thread(elev);
 	        	floorThread = new Thread(floor);

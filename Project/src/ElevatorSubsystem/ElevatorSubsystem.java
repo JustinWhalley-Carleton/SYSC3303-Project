@@ -50,16 +50,18 @@ public class ElevatorSubsystem implements Runnable{
 
 	/* Common code */
 
-	public ElevatorSubsystem(int numElev,boolean GUI,boolean isTest) throws Exception {
-		if (numElev <= 0){
-			throw new Exception("incompatible setting: numElev should be at least 1.");
+	public ElevatorSubsystem(boolean GUI,boolean isTest) throws Exception {
+		Common.initializeVars();
+		NUM_ELEV = Common.ELEVATORS;
+		if (NUM_ELEV <= 0){
+			throw new Exception("incompatible setting: NUM_ELEV should be at least 1.");
 		}
 		// Init inet address
 		SCHEDULER_ADDR = InetAddress.getLocalHost();
 		ELEVATOR_ADDR = InetAddress.getLocalHost();
 
 		// Get port numbers
-		Common.initializeVars();
+		
 		SCHEDULER_RECV_PORT 	= Common.SCHEDULER_RECV_ELEV_PORT;
 		ELEV_SUB_RECV_PORT 		= Common.ELEV_SUB_RECV_PORT;
 		ELEV_SUB_ELEV_RECV_PORT = Common.ELEV_SUB_ELEV_RECV_PORT;
@@ -72,7 +74,6 @@ public class ElevatorSubsystem implements Runnable{
 		}
 
 		// Init elevators
-		this.NUM_ELEV = numElev;
 		elevators = new Thread[NUM_ELEV];
 		elevs = new Elevator[NUM_ELEV];
 		FileLoader fileLoader = new FileLoader("errorFile.txt", false);
@@ -263,8 +264,8 @@ public class ElevatorSubsystem implements Runnable{
 	// For testing use ONLY!
 	// Spawn elevator subsystem
 	public static void main(String[] args) throws Exception{
-		ElevatorSubsystem elevatorSubsystem = new ElevatorSubsystem(3,false,false);
-		elevatorSubsystem.run();
+		ElevatorSubsystem elevatorSubsystem = new ElevatorSubsystem(true,false);
+		new Thread(elevatorSubsystem).start();
 	}
 
 }
