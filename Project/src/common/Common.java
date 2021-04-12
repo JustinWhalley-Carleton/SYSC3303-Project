@@ -5,14 +5,79 @@ package common;
 
 import ElevatorSubsystem.*;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.time.LocalTime;
 import java.util.Random;
+import java.util.Scanner;
 
 /**
  * @author jcwha
  *
  */
 public class Common {
+
+	private static boolean initialized = false;
+	public static int ELEVATORS;
+	public static int FLOORS;
+	public static double SPEED;
+	// Port numbers
+	public static int ELEV_RECV_PORT;
+	public static int ELEV_SUB_ELEV_RECV_PORT;
+	public static int FLOOR_SUB_RECV_PORT;
+	public static int SCHEDULER_RECV_FLOOR_PORT;
+	public static int ELEV_SUB_RECV_PORT;
+	public static int SCHEDULER_RECV_ELEV_PORT;
+	// GUI Ports
+	public static int SCHEDULER_RECV_GUI_PORT;
+	public static int GUI_RECV_SCHEDULER_PORT;
+
+
+	public static void initializeVars() {
+		// If already initialized, abort.
+		if(initialized) return;
+
+		try {
+			Scanner scanner = new Scanner(new File("src/test/settings.txt"));
+			while(scanner.hasNextLine()) {
+				String line = scanner.nextLine();
+				String[] splitStr = line.trim().split("\\s+");
+
+				if (splitStr.length == 1 || line.contains("/")){
+					// Empty line or Comment in setting file.
+					continue;
+				}
+
+				// Get value
+				int value = splitStr[1].contains(".") ? 0 : Integer.parseInt(splitStr[1]);
+				// Assign value to its according variable
+				switch(splitStr[0].trim()){
+					case "ELEVATORS:" 	-> ELEVATORS 	= value;
+					case "FLOORS:"		-> FLOORS 		= value;
+					case "SPEED:"		-> SPEED 		= Double.parseDouble(splitStr[1]);
+					// Ports
+					case "ELEV_RECV_PORT:" 				-> ELEV_RECV_PORT 				= value;
+					case "ELEV_SUB_ELEV_RECV_PORT:" 	-> ELEV_SUB_ELEV_RECV_PORT 		= value;
+					case "FLOOR_SUB_RECV_PORT:" 		-> FLOOR_SUB_RECV_PORT 			= value;
+					case "SCHEDULER_RECV_FLOOR_PORT:" 	-> SCHEDULER_RECV_FLOOR_PORT 	= value;
+					case "ELEV_SUB_RECV_PORT:" 			-> ELEV_SUB_RECV_PORT 			= value;
+					case "SCHEDULER_RECV_ELEV_PORT:" 	-> SCHEDULER_RECV_ELEV_PORT 	= value;
+					// GUI Ports
+					case "GUI_RECV_SCHEDULER_PORT:"		-> GUI_RECV_SCHEDULER_PORT 		= value;
+					case "SCHEDULER_RECV_GUI_PORT:"		-> SCHEDULER_RECV_GUI_PORT		= value;
+					// Unsupported settings
+					default -> {}
+				}
+			}
+			scanner.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+
+		// Update init flag
+		initialized = true;
+	}
+
 
 	/* Message types */
 	public enum TYPE{

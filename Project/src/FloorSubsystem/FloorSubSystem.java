@@ -2,11 +2,10 @@ package FloorSubsystem;
 import GUI.CommandBridge;
 import common.Common;
 import common.RPC;
-import test.Test;
-
 import java.net.InetAddress;
 import java.time.LocalTime;
 import java.util.LinkedList;
+
 public class FloorSubSystem implements Runnable{
     // Constants
     private final int MIN_FLOOR;
@@ -42,8 +41,10 @@ public class FloorSubSystem implements Runnable{
 
         // Init instruction reader
         instructionFile = new FileLoader();
-        
-        rpc = new RPC(InetAddress.getLocalHost(), Test.SCHEDULER_RECV_FLOOR_PORT, Test.FLOOR_SUB_RECV_PORT);
+
+        // Get port numbers
+        Common.initializeVars();
+        rpc = new RPC(InetAddress.getLocalHost(), Common.SCHEDULER_RECV_FLOOR_PORT, Common.FLOOR_SUB_RECV_PORT);
         rpc.setTimeout(2000);
         messageQueue = new LinkedList<byte[]>();
 
