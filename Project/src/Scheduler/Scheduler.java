@@ -7,7 +7,6 @@ import java.util.*;
 
 import FloorSubsystem.FileLoader;
 import common.*;
-import test.Test;
 
 /**
  * @author Yisheng Li
@@ -52,9 +51,10 @@ public class Scheduler implements Runnable {
 		for (int i=0;i<elevtStates.length;i++) { elevtStates[i]= new ElevtState(i+1); }
 		for (int i=0;i<floorStates.length;i++) { floorStates[i]= new FloorState(i+1); }
 		if(!isTest) {
-			rpcElevt = new RPC(InetAddress.getLocalHost(), Test.ELEV_SUB_RECV_PORT, Test.SCHEDULER_RECV_ELEV_PORT);
-			rpcFloor = new RPC(InetAddress.getLocalHost(),Test.FLOOR_SUB_RECV_PORT,Test.SCHEDULER_RECV_FLOOR_PORT);
-			rpcGUI = new RPC(InetAddress.getLocalHost(),Test.GUI_RECV_SCHEDULER_PORT,Test.SCHEDULER_RECV_GUI_PORT);
+			Common.initializeVars();
+			rpcElevt = new RPC(InetAddress.getLocalHost(), Common.ELEV_SUB_RECV_PORT, Common.SCHEDULER_RECV_ELEV_PORT);
+			rpcFloor = new RPC(InetAddress.getLocalHost(),Common.FLOOR_SUB_RECV_PORT,Common.SCHEDULER_RECV_FLOOR_PORT);
+			rpcGUI = new RPC(InetAddress.getLocalHost(),Common.GUI_RECV_SCHEDULER_PORT,Common.SCHEDULER_RECV_GUI_PORT);
 			rpcElevt.setTimeout(2000);
 			rpcFloor.setTimeout(2000);
 		}

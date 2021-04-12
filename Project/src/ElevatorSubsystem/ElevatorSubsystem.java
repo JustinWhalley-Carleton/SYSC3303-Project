@@ -4,14 +4,9 @@
 package ElevatorSubsystem;
 import FloorSubsystem.FileLoader;
 import GUI.CommandBridge;
-import Scheduler.Scheduler;
 import common.Common;
 import common.RPC;
-import test.Test;
-
 import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 
@@ -19,8 +14,8 @@ public class ElevatorSubsystem implements Runnable{
 	// Ports (maybe move this to Common class?)
 	private final InetAddress SCHEDULER_ADDR;
 	private final InetAddress ELEVATOR_ADDR;
-	private static final int SCHEDULER_RECV_PORT = Test.SCHEDULER_RECV_ELEV_PORT;
-	private static final int ELEV_SUB_RECV_PORT  = Test.ELEV_SUB_RECV_PORT;
+	private final int SCHEDULER_RECV_PORT;
+	private final int ELEV_SUB_RECV_PORT;
 
 	/* The Initial port number used for receiving from elevator
 	*  (max 100 elevators)
@@ -28,7 +23,7 @@ public class ElevatorSubsystem implements Runnable{
 	*  2nd elevator = 10012
 	*  3rd elevator = 10013
 	*  etc... */
-	private static final int ELEV_SUB_ELEV_RECV_PORT = Test.ELEV_SUB_ELEV_RECV_PORT;
+	private final int ELEV_SUB_ELEV_RECV_PORT;
 
 	/* The Initial port number used for receiving by elevator
 	 *  (max 100 elevators)
@@ -36,7 +31,7 @@ public class ElevatorSubsystem implements Runnable{
 	 *  2nd elevator = 10202
 	 *  3rd elevator = 10203
 	 *  etc... */
-	private static final int ELEV_RECV_PORT = Test.ELEV_RECV_PORT;
+	private final int ELEV_RECV_PORT;
 
 	// Class vars
 	private final int NUM_ELEV;
@@ -62,6 +57,13 @@ public class ElevatorSubsystem implements Runnable{
 		// Init inet address
 		SCHEDULER_ADDR = InetAddress.getLocalHost();
 		ELEVATOR_ADDR = InetAddress.getLocalHost();
+
+		// Get port numbers
+		Common.initializeVars();
+		SCHEDULER_RECV_PORT 	= Common.SCHEDULER_RECV_ELEV_PORT;
+		ELEV_SUB_RECV_PORT 		= Common.ELEV_SUB_RECV_PORT;
+		ELEV_SUB_ELEV_RECV_PORT = Common.ELEV_SUB_ELEV_RECV_PORT;
+		ELEV_RECV_PORT 			= Common.ELEV_RECV_PORT;
 
 		// Init command bridge
 		if (GUI) {
