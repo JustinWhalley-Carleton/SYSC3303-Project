@@ -6,6 +6,7 @@ import java.net.*;
 import java.util.*;
 
 import FloorSubsystem.FileLoader;
+import GUI.GUI;
 import common.*;
 
 /**
@@ -34,10 +35,9 @@ public class Scheduler implements Runnable {
 	/**
 	 * Constructor
 	 *
-	 * @param totalElevts total Elevts number
-	 * @param totalElevts total Floors number
+	 * @param isTest
 	 */
-	public Scheduler (int totalElevts, int totalFloors, boolean isTest) throws Exception {
+	public Scheduler (boolean isTest) throws Exception {
 		this.inProcessing = 0;
 		this.totalElevts = totalElevts;
 		this.totalFloors = totalFloors;
@@ -427,5 +427,10 @@ public class Scheduler implements Runnable {
 		FileLoader.logToFile(end);
 		FileLoader.logToFile(exec);
 		FileLoader.logToFile("\n\n");
+	}
+
+	public static void main(String[] args) throws Exception {
+		Scheduler s = new Scheduler(false);
+		s.run();
 	}
 }
