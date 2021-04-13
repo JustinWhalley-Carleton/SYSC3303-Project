@@ -22,7 +22,7 @@ import test.Test;
 
 public class GUI extends JFrame{
 
-	private static final boolean CREATE_ALL_SUBSYSTEMS = false;
+	private static final boolean CREATE_ALL_SUBSYSTEMS = true;
 	
 	private File instructionFile = new File("src/test/settings.txt");
 	private static int ROWS;
