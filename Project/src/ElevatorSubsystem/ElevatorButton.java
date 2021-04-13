@@ -1,21 +1,17 @@
 package ElevatorSubsystem;
 
 /**
- * 
- */
-
-/**
  * @author Gill
  *
  */
 public class ElevatorButton {
 	
 	//Constants
-	private int floorNum;
+	private final int floorNum;
 	private boolean light;
 	
 	public ElevatorButton(int floorNum, boolean light) {
-		
+
 		this.floorNum = floorNum;
 		this.light = light;
 	}

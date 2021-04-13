@@ -13,7 +13,6 @@ import Timer.TimerController;
 import common.RPC;
 import common.Common.ELEV_ERROR;
 import common.Common;
-import test.Test;
 
 /**
  * @author Gill
@@ -28,13 +27,12 @@ public class Elevator implements Runnable {
 	
 	private boolean doorStatus;  //True means door is closed, false for open door
 	private MotorState state;         
-	private Up up = new Up();
-	private Down down = new Down();    // The 3 states as per the motor interface
-	private Idle idle = new Idle();
+	private final Up up = new Up();
+	private final Down down = new Down();    // The 3 states as per the motor interface
+	private final Idle idle = new Idle();
 	private RPC transmitter;
 	private TimerController timer, timer2;
 	private boolean testing = false;
-	private int NUM_FLOORS = Common.FLOORS;
 	private ElevatorButton[] buttons;
 	private boolean stuck=false;
 	private FileLoader fileLoader;
@@ -42,10 +40,9 @@ public class Elevator implements Runnable {
 	private boolean goingUp;
 	private FileLoader file;
 	private boolean GUIFlag;
-	public static final int floorTiming = (int) 2266/(int)Common.SPEED;
+	public static final int floorTiming = (int) (2266 / Common.SPEED);
 	private long moveStart;
 	private boolean doorOpen = false;
-	private long doorStart;
 	private MotorState prevState;
 
 	// Command bridge
@@ -84,13 +81,14 @@ public class Elevator implements Runnable {
 		this.state = idle;   // setting motor state to idle
 		this.transmitter = new RPC(InetAddress.getLocalHost(), destPort, recPort);
 		this.elevNum = elevNum;
+		int NUM_FLOORS = Common.FLOORS;
 		this.buttons = new ElevatorButton[NUM_FLOORS];
 
 		for(int i = 0; i < NUM_FLOORS; i++) {
 			buttons[i] = new ElevatorButton(i+1,false);
 		}
 
-		timer = new TimerController((int)(floorTiming),this);
+		timer = new TimerController(floorTiming,this);
 		timer2 = new TimerController(1500,this);
 		map = new HashMap<Integer,Boolean>();
 		this.fileLoader = fileLoader;
@@ -141,7 +139,7 @@ public class Elevator implements Runnable {
 						makeStuck(2);
 					}
 				}
-				doorStart = System.currentTimeMillis();
+
 				openDoor();
 
 				if(stuckMsg != null && !GUIFlag) {
@@ -155,12 +153,6 @@ public class Elevator implements Runnable {
 				transmitter.sendPacket(msg);
 				transmitter.receivePacket();
 				removeFloor(getFloor());
-				/**
-				closeDoor();
-				long doorEnd = System.currentTimeMillis();
-				String elapsedDoorTime = String.valueOf(doorEnd - doorStart);
-				String doorTime = "Elevator Load/Unload Time in ms: " + elapsedDoorTime;
-				FileLoader.logToFile(doorTime);**/
 				return;
 			}
 			moveStart = System.currentTimeMillis();
@@ -185,7 +177,7 @@ public class Elevator implements Runnable {
 		} else if(doorOpen) { 
 			doorOpen = false;
 			closeDoor();
-			if(map.get(curFloor) == null ? false : (boolean)map.get(curFloor)) {
+			if(map.get(curFloor) != null && (boolean) map.get(curFloor)) {
 				removeFloor(curFloor);
 
 				pollCommand();
@@ -224,7 +216,7 @@ public class Elevator implements Runnable {
 			
 			byte[] msg1 = Common.encodeElevator(elevNum, curFloor, state,curFloor);
 			transmitter.sendPacket(msg1);
-			if(map.get(curFloor) == null ? false : (boolean)map.get(curFloor)) {
+			if(map.get(curFloor) != null && (boolean) map.get(curFloor)) {
 				byte[] msg = Common.encodeElevator(elevNum, curFloor, state, getFloor() == -1 ? curFloor : getFloor());
 				transmitter.sendPacket(msg);
 				transmitter.receivePacket();
@@ -473,25 +465,6 @@ public class Elevator implements Runnable {
 		return doorStatus;
 	}
 	
-//	public static void logFileWriter (String function, String duration) {
-//		Logger logger = Logger.getLogger("Elevator Log");  
-//		FileHandler fh;
-//
-//	    try {  
-//
-//	        fh = new FileHandler("src/test/logFile.txt");
-//	        logger.addHandler(fh);
-//	        SimpleFormatter formatter = new SimpleFormatter();  
-//	        fh.setFormatter(formatter);  
-//
-//	        logger.info(function + ": " + duration);  
-//
-//	    } catch (IOException e) {  
-//	        e.printStackTrace();  
-//	    }
-//		
-//	}
-	
 	/**
 	 * receive command from scheduler
 	 * @throws FileNotFoundException
@@ -517,7 +490,7 @@ public class Elevator implements Runnable {
 		} else{
 			int received[] = Common.decode(receiveMsg);  //decode the received msg that stores the info in an integer array
 			addDest(received[1],true);   //Common.java identifies msg[1] as destination floor
-			goingUp = received[2] == 1 ? true : false;
+			goingUp = received[2] == 1;
 		}
 		pollStop();
 		pollCommand();
