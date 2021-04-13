@@ -218,11 +218,49 @@ class JunitTestCases {
 		return data;
 	}
 
+	@BeforeAll
+	public static void init() {
+		int[] settings = readSettingsFile();
+		ELEVATORS = settings[0];
+		ROWS = settings[1];
+		FLOORS = settings[2];
+		SPEED = settings[3];
+		ELEV_ERR = settings[4];
+		ELEV_RECV_PORT = settings[5];
+		ELEV_SUB_ELEV_RECV_PORT = settings[6];
+		FLOOR_SUB_RECV_PORT = settings[7];
+		SCHEDULER_RECV_FLOOR_PORT = settings[8];
+		ELEV_SUB_RECV_PORT = settings[9];
+		SCHEDULER_RECV_ELEV_PORT = settings[10];
+		GUI_RECV_SCHEDULER_PORT = settings[11];
+		SCHEDULER_RECV_GUI_PORT = settings[12];
+		BRIDGE_FAULT_SEND = settings[13];
+		BRIDGE_FAULT_RECV = settings[14];
+		BRIDGE_FLOOR_SEND = settings[15];
+		BRIDGE_FLOOR_RECV = settings[16];
+		BRIDGE_ELEV_SEND = settings[17];
+		BRIDGE_ELEV_RECV = settings[18];
+		createSettingsFile(ROWS,FLOORS,29,4,ELEV_ERR,ELEV_RECV_PORT-20,ELEV_SUB_ELEV_RECV_PORT,FLOOR_SUB_RECV_PORT,SCHEDULER_RECV_FLOOR_PORT,ELEV_SUB_RECV_PORT,
+					SCHEDULER_RECV_ELEV_PORT,GUI_RECV_SCHEDULER_PORT,SCHEDULER_RECV_GUI_PORT,BRIDGE_FAULT_SEND,BRIDGE_FAULT_RECV,BRIDGE_FLOOR_SEND ,BRIDGE_FLOOR_RECV,BRIDGE_ELEV_SEND,BRIDGE_ELEV_RECV);
+		 gui = new GUI(false);
+		 floorTiming  = Elevator.floorTiming*2;
+		 for(ElevatorPanel panel : GUI.elevatorPanels) {
+			 Helper.turnAllButtonsOn(panel.buttons);
+		 }
+	}
+	
+	@AfterAll
+	public static void destroy() {
+		createSettingsFile(ROWS,FLOORS,ELEVATORS,SPEED,ELEV_ERR,ELEV_RECV_PORT,ELEV_SUB_ELEV_RECV_PORT,FLOOR_SUB_RECV_PORT,SCHEDULER_RECV_FLOOR_PORT,ELEV_SUB_RECV_PORT,
+				SCHEDULER_RECV_ELEV_PORT,GUI_RECV_SCHEDULER_PORT,SCHEDULER_RECV_GUI_PORT,BRIDGE_FAULT_SEND,BRIDGE_FAULT_RECV,BRIDGE_FLOOR_SEND ,BRIDGE_FLOOR_RECV,BRIDGE_ELEV_SEND,BRIDGE_ELEV_RECV);
+	}
+
+	
 	/**
 	 * test the fileloader to ensure lines read properly
 	 */
 	@Test
-	void testFileReader() {
+	 void testFileReader() {
 		String[] lines = createFile();
 		try {
 			FileLoader fileLoader = new FileLoader("JunitTestFile.txt", true);
