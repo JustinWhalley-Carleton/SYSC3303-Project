@@ -7,9 +7,9 @@ import javax.swing.JButton;
 
 
 public class FloorButtonListener implements ActionListener{
-	private int floorNum;
-	private boolean up;
-	private CommandBridge commandBridge;
+	private final int floorNum;
+	private final boolean up;
+	private final CommandBridge commandBridge;
 	
 	/**
 	 * constructor for a floor button listener

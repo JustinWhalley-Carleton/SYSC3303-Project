@@ -7,9 +7,9 @@ import javax.swing.JButton;
 
 
 public class ElevatorButtonListener implements ActionListener{
-	private int floorNum;
-	private int elevNum;
-	private CommandBridge commandBridge;
+	private final int floorNum;
+	private final int elevNum;
+	private final CommandBridge commandBridge;
 	
 	/**
 	 * constructor for an elevator button listener

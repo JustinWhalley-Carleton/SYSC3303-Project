@@ -18,7 +18,7 @@ public class CommandBridge{
         ELEV_BUTTON     ((byte) 2);
 
         private final byte value;
-        private TYPE(byte b){ this.value = b; }
+        TYPE(byte b){ this.value = b; }
         // Payload
         private int payload1, payload2;
 

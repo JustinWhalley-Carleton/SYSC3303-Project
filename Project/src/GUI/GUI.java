@@ -41,9 +41,9 @@ public class GUI extends JFrame{
 	private static int SCHEDULER_RECV_GUI_PORT;
 	private static int GUI_RECV_SCHEDULER_PORT;
 	// Command Bridges
-	private CommandBridge commandBridge_fault;
-	private CommandBridge commandBridge_floor;
-	private CommandBridge commandBridge_button;
+	private final CommandBridge commandBridge_fault;
+	private final CommandBridge commandBridge_floor;
+	private final CommandBridge commandBridge_button;
 
 	/**
 	 * constructor for GUI 
