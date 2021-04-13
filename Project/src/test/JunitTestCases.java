@@ -33,7 +33,6 @@ import org.junit.jupiter.api.Test;
 
 import ElevatorSubsystem.*;
 import FloorSubsystem.FileLoader;
-import FloorSubsystem.GUIFileLoader;
 import GUI.ElevatorPanel;
 import GUI.GUI;
 import GUI.Helper;
@@ -219,50 +218,6 @@ class JunitTestCases {
 		return data;
 	}
 
-	@BeforeAll
-	public static void init() {
-		int[] settings = readSettingsFile();
-		ELEVATORS = settings[0];
-		ROWS = settings[1];
-		FLOORS = settings[2];
-		SPEED = settings[3];
-		ELEV_ERR = settings[4];
-		ELEV_RECV_PORT = settings[5];
-		ELEV_SUB_ELEV_RECV_PORT = settings[6];
-		FLOOR_SUB_RECV_PORT = settings[7];
-		SCHEDULER_RECV_FLOOR_PORT = settings[8];
-		ELEV_SUB_RECV_PORT = settings[9];
-		SCHEDULER_RECV_ELEV_PORT = settings[10];
-		GUI_RECV_SCHEDULER_PORT = settings[11];
-		SCHEDULER_RECV_GUI_PORT = settings[12];
-		BRIDGE_FAULT_SEND = settings[13];
-		BRIDGE_FAULT_RECV = settings[14];
-		BRIDGE_FLOOR_SEND = settings[15];
-		BRIDGE_FLOOR_RECV = settings[16];
-		BRIDGE_ELEV_SEND = settings[17];
-		BRIDGE_ELEV_RECV = settings[18];
-		createSettingsFile(ROWS,FLOORS,29,4,ELEV_ERR,ELEV_RECV_PORT-20,ELEV_SUB_ELEV_RECV_PORT,FLOOR_SUB_RECV_PORT,SCHEDULER_RECV_FLOOR_PORT,ELEV_SUB_RECV_PORT,
-					SCHEDULER_RECV_ELEV_PORT,GUI_RECV_SCHEDULER_PORT,SCHEDULER_RECV_GUI_PORT,BRIDGE_FAULT_SEND,BRIDGE_FAULT_RECV,BRIDGE_FLOOR_SEND ,BRIDGE_FLOOR_RECV,BRIDGE_ELEV_SEND,BRIDGE_ELEV_RECV);
-		GUIFileLoader.deleteFile();
-		 gui = new GUI(false);
-		 floorTiming  = Elevator.floorTiming*2;
-		 for(ElevatorPanel panel : GUI.elevatorPanels) {
-			 Helper.turnAllButtonsOn(panel.buttons);
-		 }
-	}
-	
-	@AfterAll
-	public static void destroy() {
-		createSettingsFile(ROWS,FLOORS,ELEVATORS,SPEED,ELEV_ERR,ELEV_RECV_PORT,ELEV_SUB_ELEV_RECV_PORT,FLOOR_SUB_RECV_PORT,SCHEDULER_RECV_FLOOR_PORT,ELEV_SUB_RECV_PORT,
-				SCHEDULER_RECV_ELEV_PORT,GUI_RECV_SCHEDULER_PORT,SCHEDULER_RECV_GUI_PORT,BRIDGE_FAULT_SEND,BRIDGE_FAULT_RECV,BRIDGE_FLOOR_SEND ,BRIDGE_FLOOR_RECV,BRIDGE_ELEV_SEND,BRIDGE_ELEV_RECV);
-		GUIFileLoader.deleteFile();
-	}
-	
-	@AfterEach
-	public void destroyFile() {
-		GUIFileLoader.deleteFile();
-	}
-	
 	/**
 	 * test the fileloader to ensure lines read properly
 	 */
@@ -1003,141 +958,7 @@ class JunitTestCases {
 		int[] settings = readSettingsFile();
 		assertEquals(settings[2],gui.getFloor().floors.length);
 	}
-	
-	/**
-	 * test read command floorsubsystem up
-	 */
-	@Test
-	void testReadCommandFloorUp() {
-		GUIFileLoader.writeToFile(1,5,1);
-		LocalTime curTime = LocalTime.now();
-		String[] floorCommand = GUIFileLoader.readLineFloor();
-		LocalTime commandTime = LocalTime.parse(floorCommand[0]);
-		Duration timeDiff = Duration.between(curTime,commandTime);
-		assertEquals(0,timeDiff.toHoursPart());
-		assertEquals(0,timeDiff.toMinutesPart());
-		assertEquals(0,timeDiff.toSecondsPart(),1); // allow a 1 second difference
-		assertEquals("UP", floorCommand[2]);
-	}
-	
-	/**
-	 * test read command floorsubsystem dowm
-	 */
-	@Test
-	void testReadCommandFloorDown() {
-		GUIFileLoader.writeToFile(1,5,0);
-		LocalTime curTime = LocalTime.now();
-		String[] floorCommand = GUIFileLoader.readLineFloor();
-		LocalTime commandTime = LocalTime.parse(floorCommand[0]);
-		Duration timeDiff = Duration.between(curTime,commandTime);
-		assertEquals(0,timeDiff.toHoursPart());
-		assertEquals(0,timeDiff.toMinutesPart());
-		assertEquals(0,timeDiff.toSecondsPart(),1); // allow a 1 second difference
-		assertEquals(5,Integer.parseInt(floorCommand[1]));
-		assertEquals("DOWN", floorCommand[2]);
-	}
-	
-	/**
-	 * test read floor lien delets command
-	 */
-	@Test
-	void testDeleteAfterReadFloor() {
-		GUIFileLoader.writeToFile(1,5,0);
-		GUIFileLoader.readLineFloor();
-		String[] floorCommand = GUIFileLoader.readLineFloor();
-		assertNull(floorCommand);
-	}
-	
-	/**
-	 * test read command elevatorSubsystem
-	 */
-	@Test
-	void testReadCommandElev() {
-		GUIFileLoader.writeToFile(2, 1, 10);
-		assertTrue(GUIFileLoader.elevHasCommand(1));
-		assertFalse(GUIFileLoader.elevHasCommand(2));
-		assertNull(GUIFileLoader.getElevButton(3));
-		assertEquals((Integer)10,GUIFileLoader.getElevButton(1)[0]);
-	}
-	
-	/**
-	 * test read command elevatorSubsystem multiple dest
-	 */
-	@Test
-	void testReadCommandElevMultipleDest() {
-		GUIFileLoader.writeToFile(2, 1, 10);
-		GUIFileLoader.writeToFile(2, 1, 11);
-		GUIFileLoader.writeToFile(2, 1, 12);
-		assertTrue(GUIFileLoader.elevHasCommand(1));
-		assertFalse(GUIFileLoader.elevHasCommand(2));
-		Integer[] result = GUIFileLoader.getElevButton(1);
-		assertEquals((Integer)10,result[0]);
-		assertEquals((Integer)11,result[1]);
-		assertEquals((Integer)12,result[2]);
-	}
-	
-	/**
-	 * test read elev deletes command
-	 */
-	@Test
-	void testElevCommandDeletesCommand() {
-		GUIFileLoader.writeToFile(2, 1, 10);
-		GUIFileLoader.writeToFile(2, 1, 11);
-		GUIFileLoader.writeToFile(2, 1, 12);
-		GUIFileLoader.getElevButton(1);
-		try {
-			Thread.sleep(500);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		assertNull(GUIFileLoader.getElevButton(1));
-	}
-	
-	/**
-	 * test read fault command
-	 */
-	@Test
-	void testReadFaultCommand() {
-		GUIFileLoader.writeToFile(0, 1, -1);
-		try {
-			Thread.sleep(500);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		assertFalse(GUIFileLoader.getFault(2));
-		try {
-			Thread.sleep(500);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		assertTrue(GUIFileLoader.getFault(1));
-	}
-	
-	/**
-	 * test delete command after read fault
-	 */
-	@Test
-	void testDeleteFaultCommandAfterRead() {
-		GUIFileLoader.writeToFile(0, 1, -1);
-		try {
-			Thread.sleep(500);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		GUIFileLoader.getFault(1);
-		try {
-			Thread.sleep(500);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		assertFalse(GUIFileLoader.getFault(1));
-	}
-	
+
 	/**
 	 * test elevator receive message
 	 */
@@ -1180,49 +1001,7 @@ class JunitTestCases {
 		}
 		assertFalse(gui.getFloor().floors[8].buttonUpOn());
 	}
-	
-	/**
-	 * test bad floor input
-	 */
-	@Test
-	void testBadFloorInput() {
-		GUIFileLoader.writeToFile(1,25, 0);
-		try {
-			Thread.sleep(2000);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		boolean flag = false;
-		for(ElevatorPanel elev : GUI.elevatorPanels) {
-			if(elev.destLabel.getText().equals("Destination Floor: 25")) {
-				flag = true;
-			}
-		}
-		assertFalse(flag);
-	}
-	
-	/**
-	 * test bad elev Input
-	 */
-	@Test
-	void testBadElevInput() {
-		GUIFileLoader.writeToFile(1,100, 25);
-		try {
-			Thread.sleep(2000);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		boolean flag = false;
-		for(ElevatorPanel elev : GUI.elevatorPanels) {
-			if(elev.destLabel.getText().equals("Destination Floor: 25")) {
-				flag = true;
-			}
-		}
-		assertFalse(flag);
-	}
-	
+
 	/**
 	 * test elev button changes color when clicked
 	 */
