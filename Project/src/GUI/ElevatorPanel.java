@@ -160,6 +160,10 @@ public class ElevatorPanel extends JPanel {
 		}
 	}
 	
+	/**
+	 * get the elevator number
+	 * @return
+	 */
 	public int getElevNum() {
 		return elevNum;
 	}

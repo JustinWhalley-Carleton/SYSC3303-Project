@@ -66,7 +66,19 @@ public class Elevator implements Runnable {
 	 */
 	public Elevator() {testing=true;}
 	
-	// Constructor
+	/**
+	 * Constructor for regular elev
+	 * @param elevNum
+	 * @param curFloor
+	 * @param doorStatus
+	 * @param destPort
+	 * @param recPort
+	 * @param fileLoader
+	 * @param GUI
+	 * @param bridge_fault
+	 * @param bridge_button
+	 * @throws UnknownHostException
+	 */
 	public Elevator(int elevNum, int curFloor, boolean doorStatus,
 					int destPort, int recPort, FileLoader fileLoader,
 					boolean GUI, CommandBridge bridge_fault, CommandBridge bridge_button) throws UnknownHostException {
@@ -104,12 +116,19 @@ public class Elevator implements Runnable {
 		
 	}
 
-	//Method addDest sets the new target floor to move towards
+	/**
+	 * add a destination to the elevator
+	 * @param floor
+	 * @param type
+	 */
 	public void addDest(int floor,boolean type) {
 		map.put((Integer)floor, (Boolean)type);
 		move();
 	}
 
+	/**
+	 * move the elevator
+	 */
 	public void move() {
 		int floor = getFloor();
 		if(floor!=-1 && state == idle && !stuck && !doorOpen) {
@@ -128,7 +147,6 @@ public class Elevator implements Runnable {
 
 				if(stuckMsg != null && !GUIFlag) {
 					if(stuckMsg.equals("StuckClose")) {
-						System.out.println("1");
 						makeStuck(2);
 					}
 				}
@@ -137,7 +155,6 @@ public class Elevator implements Runnable {
 
 				if(stuckMsg != null && !GUIFlag) {
 					if(stuckMsg.equals("StuckOpen")) {
-						System.out.println("2");
 						makeStuck(1);
 					}
 				}
@@ -160,20 +177,21 @@ public class Elevator implements Runnable {
 
 			if(stuckMsg != null && !GUIFlag) {
 				if(stuckMsg.equals("StuckBetween")) {
-					System.out.println("3");
 					makeStuck(0);
 				}
 			}
 		}
 	}
 	
+	/**
+	 * receive a callback from the timer
+	 */
 	public void notifyElev() {
 		if(testing) return;
 		if(stuck) {
 			//if stuck do nothing
 			return;
 		} else if(doorOpen) { 
-			System.out.println("\n\n\n\nOPEN\n\n\n\n");
 			doorOpen = false;
 			closeDoor();
 			if(map.get(curFloor) == null ? false : (boolean)map.get(curFloor)) {
@@ -192,7 +210,6 @@ public class Elevator implements Runnable {
 			FileLoader.logToFile(moveTime);
 			FileLoader.logToFile("********");
 		}else if((state == up && curFloor < getFloor())||(state == down && curFloor > getFloor())){
-			System.out.println("\n\n\n curFloor = "+curFloor+" geFloor() = " +getFloor()+"\n\n\n");
 			// continue going in current direction
 			if(state == up) {
 				curFloor++;
@@ -202,11 +219,9 @@ public class Elevator implements Runnable {
 				timer.start();
 			}
 		} else {
-			System.out.println("\n\n\n\nENDING\n\n\n\n");
 			// arrived at floor
 			if(stuckMsg != null && !GUIFlag) {
 				if(stuckMsg.equals("StuckClose")) {
-					System.out.println("4");
 					makeStuck(2);
 					return;
 				}
@@ -249,7 +264,6 @@ public class Elevator implements Runnable {
 
 			if(stuckMsg != null && !GUIFlag) {
 				if(stuckMsg.equals("StuckOpen")) {
-					System.out.println("5");
 					makeStuck(1);
 				}
 			}
@@ -262,11 +276,18 @@ public class Elevator implements Runnable {
 		transmitter.receivePacket();
 	}
 
-	//Method removeFloor takes chosen floor and removes it from the Arraylist of destination floors
+	/**
+	 * remove the floor from the map
+	 * @param floor
+	 */
 	public void removeFloor(int floor) {
 		map.remove((Integer)floor);
 	}
 	
+	/**
+	 * make the elevator stuck (used for test file mode)
+	 * @param reason
+	 */
 	private void makeStuck(int reason) {
 		System.out.println("*******\n\n");
 		byte[] msg;
@@ -293,15 +314,13 @@ public class Elevator implements Runnable {
 
 		timer.stop();
 		if (getFloor() == -1){
-			System.out.println("Removing floors..");
-			System.out.println("Nothing");
+			System.out.println("No floors to remove");
 			msg = Common.encodeElevError(errorType, elevNum,curFloor, -1, goingUp);
 			transmitter.sendPacket(msg);
 			removeFloor(getFloor());
 		}
 		while(getFloor() != -1) {
 			System.out.println("Removing floors..");
-			System.out.println("Removing floor: "+getFloor()+" | " +map.get(getFloor()));
 			msg = Common.encodeElevError(errorType, elevNum, curFloor, ((boolean)map.get(getFloor())) ? getFloor(): -1, goingUp);
 			transmitter.sendPacket(msg);
 			removeFloor(getFloor());
@@ -324,6 +343,10 @@ public class Elevator implements Runnable {
 		
 	}
 	
+	/**
+	 * check if theres a fault
+	 * @throws FileNotFoundException
+	 */
 	private void pollStop() throws FileNotFoundException {
 		if(GUIFlag) {
 			if(commandBridge_fault.getFault(elevNum)) {
@@ -331,7 +354,6 @@ public class Elevator implements Runnable {
 				if(state == up || state == down) {
 					reason = 0;
 				}
-				System.out.println("6");
 				makeStuck(reason);
 			}
 		}
@@ -339,7 +361,6 @@ public class Elevator implements Runnable {
 		stuckMsg = fileLoader.errorFileReader(elevNum);
 		if(stuckMsg != null && !GUIFlag) {
 			if(stuckMsg.equals("StuckBetween") && state != idle) {
-				System.out.println("7");
 				makeStuck(0);
 			}
 		}
@@ -347,6 +368,9 @@ public class Elevator implements Runnable {
 
 	}
 
+	/**
+	 * check if theres a command from the GUI
+	 */
 	public void pollCommand() {
 		if(GUIFlag) {
 			// Get next floor from bridge
@@ -367,6 +391,10 @@ public class Elevator implements Runnable {
 		}
 	}
 	
+	/**
+	 * get the floor to currently go to depending on the state
+	 * @return Integer
+	 */
 	public Integer getFloor() {
 		int target = -1;
 		try {
@@ -416,27 +444,40 @@ public class Elevator implements Runnable {
 		}
 	}
 	
-	//Method openDoor sets the door status to false to signify an open door
+	/**
+	 * open the door
+	 */
 	private void openDoor() {
 		this.doorStatus = false;
 	}
 
-	//Method closeDoor sets door status to true for closed door
+	/**
+	 * close the door
+	 */
 	private void closeDoor() {
 		this.doorStatus = true;
 	}
 
-	// Getter getCurrState to retrieve the current motor state
+	/**
+	 * get teh current state
+	 * @return MotorState
+	 */
 	public MotorState getCurrState() {
 		return state;
 	}
 
-	//getter getCurrFloor to return the current floor number
+	/**
+	 * get the current floor
+	 * @return int
+	 */
 	public int getCurrFloor() {
 		return curFloor;
 	}
 	
-	//getter to return door status
+	/**
+	 * get the door status
+	 * @return boolean false = door open
+	 */
 	public boolean getDoorStatus() {
 		return doorStatus;
 	}
@@ -460,8 +501,10 @@ public class Elevator implements Runnable {
 //		
 //	}
 	
-	// receive method that first sends a check request to elevatorSubsystem
-	// and then receives instructions for a specific elevator
+	/**
+	 * receive command from scheduler
+	 * @throws FileNotFoundException
+	 */
 	public void receive() throws FileNotFoundException {
 		pollStop();
 		pollCommand();
@@ -489,6 +532,9 @@ public class Elevator implements Runnable {
 		pollCommand();
 	}
 
+	/**
+	 * run loop 
+	 */
 	@Override
 	public void run() {
 		// TODO Auto-generated method stub

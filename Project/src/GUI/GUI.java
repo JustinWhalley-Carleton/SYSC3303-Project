@@ -278,23 +278,39 @@ public class GUI extends JFrame{
 		return panel;
 	}
 	
+	/**
+	 * get the elevator subsystem
+	 * @return ElevatorSubsystem
+	 */
 	public ElevatorSubsystem getElev() {
 		return elev;
 	}
 	
+	/**
+	 * get the scheduler
+	 * @return Scheduler
+	 */
 	public Scheduler getScheduler() {
 		return scheduler;
 	}
 	
+	/**
+	 * get the floor subsystem
+	 * @return FloorSubsystem
+	 */
 	public FloorSubSystem getFloor() {
 		return floor;
 	}
 	
+	/**
+	 * Stop the program
+	 */
 	public void stop() {
 		elevatorThread.interrupt();
 		schedulerThread.interrupt();
 		floorThread.interrupt();
 	}
+	
 	public static void main(String[] args) {
 		new GUI(true);
 	}

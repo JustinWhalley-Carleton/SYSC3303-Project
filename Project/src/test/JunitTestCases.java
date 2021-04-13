@@ -38,6 +38,7 @@ import GUI.ElevatorPanel;
 import GUI.GUI;
 import GUI.Helper;
 import GUI.TextManager;
+import GUI.CommandBridge.TYPE;
 import Scheduler.Scheduler;
 import common.Common;
 import Timer.TimerController;
@@ -66,6 +67,12 @@ class JunitTestCases {
 	static int GUI_RECV_SCHEDULER_PORT;
 	static int SCHEDULER_RECV_GUI_PORT;
 	static GUI gui;
+	static int BRIDGE_FAULT_SEND;
+	static int BRIDGE_FAULT_RECV;
+	static int BRIDGE_FLOOR_SEND;
+	static int BRIDGE_FLOOR_RECV;
+	static int BRIDGE_ELEV_SEND;
+	static int BRIDGE_ELEV_RECV;
 	private static int floorTiming;
 	
 	/**
@@ -120,7 +127,8 @@ class JunitTestCases {
 		return lines;
 	}
 	
-	static void createSettingsFile(int rows, int floors, int elevators, int speed, int elev_err, int port1, int port2, int port3,int port4, int port5, int port6, int port7, int port8) {
+	static void createSettingsFile(int rows, int floors, int elevators, int speed, int elev_err, int port1, int port2, int port3,int port4, int port5, int port6, int port7, int port8,
+									int port9, int port10, int port11, int port12,int port13,int port14) {
 		try {
 			String path = System.getProperty("user.dir")+System.getProperty("file.separator")+"src"+System.getProperty("file.separator")+"test"+System.getProperty("file.separator")+"settings.txt";
 			File file = new File(path);
@@ -146,6 +154,13 @@ class JunitTestCases {
 			writer.write("\n// GUI ports\n");
 			writer.write("GUI_RECV_SCHEDULER_PORT: "+port7+"\n");
 			writer.write("SCHEDULER_RECV_GUI_PORT: "+port8+"\n");
+			writer.write("\n// Command Bridge ports\n");
+			writer.write("BRIDGE_FAULT_SEND: "+port9+"\n");
+			writer.write("BRIDGE_FAULT_RECV: "+port10+"\n");
+			writer.write("BRIDGE_FLOOR_SEND: "+port11+"\n");
+			writer.write("BRIDGE_FLOOR_RECV: "+port12+"\n");
+			writer.write("BRIDGE_ELEV_SEND: "+port13+"\n");
+			writer.write("BRIDGE_ELEV_RECV: "+port14+"\n");
 			writer.close();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -153,7 +168,7 @@ class JunitTestCases {
 	}
 	
 	static int[] readSettingsFile() {
-		int[] data = new int[13];
+		int[] data = new int[19];
 		try {
 			Scanner scanner = new Scanner(new File("src/test/settings.txt"));
 			while(scanner.hasNextLine()) {
@@ -184,7 +199,14 @@ class JunitTestCases {
 					
 					case "GUI_RECV_SCHEDULER_PORT:"		-> data[11] 		= value;
 					case "SCHEDULER_RECV_GUI_PORT:"		-> data[12]		= value;
-					// Unsupported settings
+					
+					case "BRIDGE_FAULT_SEND:" -> data[13]   = value; 
+                    case "BRIDGE_FAULT_RECV:" -> data[14] = value; 
+                    case "BRIDGE_FLOOR_SEND:" -> data[15]   = value; 
+                    case "BRIDGE_FLOOR_RECV:" -> data[16] = value; 
+                    case "BRIDGE_ELEV_SEND:"  -> data[17]  = value; 
+                    case "BRIDGE_ELEV_RECV:"  -> data[18] = value; 
+					// Unsupported setting
 					default -> System.out.println("Unexpected item in settings file.");
 				}
 			}
@@ -213,9 +235,16 @@ class JunitTestCases {
 		SCHEDULER_RECV_ELEV_PORT = settings[10];
 		GUI_RECV_SCHEDULER_PORT = settings[11];
 		SCHEDULER_RECV_GUI_PORT = settings[12];
-		createSettingsFile(ROWS,FLOORS,29,4,ELEV_ERR,ELEV_RECV_PORT-20,ELEV_SUB_ELEV_RECV_PORT,FLOOR_SUB_RECV_PORT,SCHEDULER_RECV_FLOOR_PORT,ELEV_SUB_RECV_PORT,SCHEDULER_RECV_ELEV_PORT,GUI_RECV_SCHEDULER_PORT,SCHEDULER_RECV_GUI_PORT);
+		BRIDGE_FAULT_SEND = settings[13];
+		BRIDGE_FAULT_RECV = settings[14];
+		BRIDGE_FLOOR_SEND = settings[15];
+		BRIDGE_FLOOR_RECV = settings[16];
+		BRIDGE_ELEV_SEND = settings[17];
+		BRIDGE_ELEV_RECV = settings[18];
+		createSettingsFile(ROWS,FLOORS,29,4,ELEV_ERR,ELEV_RECV_PORT-20,ELEV_SUB_ELEV_RECV_PORT,FLOOR_SUB_RECV_PORT,SCHEDULER_RECV_FLOOR_PORT,ELEV_SUB_RECV_PORT,
+					SCHEDULER_RECV_ELEV_PORT,GUI_RECV_SCHEDULER_PORT,SCHEDULER_RECV_GUI_PORT,BRIDGE_FAULT_SEND,BRIDGE_FAULT_RECV,BRIDGE_FLOOR_SEND ,BRIDGE_FLOOR_RECV,BRIDGE_ELEV_SEND,BRIDGE_ELEV_RECV);
 		GUIFileLoader.deleteFile();
-		 gui = new GUI(true);
+		 gui = new GUI(false);
 		 floorTiming  = Elevator.floorTiming*2;
 		 for(ElevatorPanel panel : GUI.elevatorPanels) {
 			 Helper.turnAllButtonsOn(panel.buttons);
@@ -224,7 +253,8 @@ class JunitTestCases {
 	
 	@AfterAll
 	public static void destroy() {
-		createSettingsFile(ROWS,FLOORS,ELEVATORS,SPEED,ELEV_ERR,ELEV_RECV_PORT,ELEV_SUB_ELEV_RECV_PORT,FLOOR_SUB_RECV_PORT,SCHEDULER_RECV_FLOOR_PORT,ELEV_SUB_RECV_PORT,SCHEDULER_RECV_ELEV_PORT,GUI_RECV_SCHEDULER_PORT,SCHEDULER_RECV_GUI_PORT);
+		createSettingsFile(ROWS,FLOORS,ELEVATORS,SPEED,ELEV_ERR,ELEV_RECV_PORT,ELEV_SUB_ELEV_RECV_PORT,FLOOR_SUB_RECV_PORT,SCHEDULER_RECV_FLOOR_PORT,ELEV_SUB_RECV_PORT,
+				SCHEDULER_RECV_ELEV_PORT,GUI_RECV_SCHEDULER_PORT,SCHEDULER_RECV_GUI_PORT,BRIDGE_FAULT_SEND,BRIDGE_FAULT_RECV,BRIDGE_FLOOR_SEND ,BRIDGE_FLOOR_RECV,BRIDGE_ELEV_SEND,BRIDGE_ELEV_RECV);
 		GUIFileLoader.deleteFile();
 	}
 	
@@ -653,10 +683,11 @@ class JunitTestCases {
 	@Test
 	void testReadSettingsRows() {
 		int[] prevData = readSettingsFile();
-		createSettingsFile(10,5,15,3,1, 1,2,3,4,5,6,7,8);
+		createSettingsFile(10,5,15,3,1, 1,2,3,4,5,6,7,8,9,10,11,12,13,14);
 		int[] newData = readSettingsFile();
 		assertEquals(newData[1], 10);
-		createSettingsFile(prevData[1],prevData[2],prevData[0],prevData[3],prevData[4],prevData[5],prevData[6],prevData[7],prevData[8],prevData[9],prevData[10],prevData[11],prevData[12]);
+		createSettingsFile(prevData[1],prevData[2],prevData[0],prevData[3],prevData[4],prevData[5],prevData[6],prevData[7],prevData[8],prevData[9],prevData[10],prevData[11],prevData[12],
+				prevData[13],prevData[14],prevData[15],prevData[16],prevData[17],prevData[18]);
 	}
 	
 	/**
@@ -665,10 +696,11 @@ class JunitTestCases {
 	@Test
 	void testReadSettingsFloors() {
 		int[] prevData = readSettingsFile();
-		createSettingsFile(10,5,15,3,1,2,3,4,5,6,7,8,9);
+		createSettingsFile(10,5,15,3,1, 1,2,3,4,5,6,7,8,9,10,11,12,13,14);
 		int[] newData = readSettingsFile();
 		assertEquals(newData[2], 5);
-		createSettingsFile(prevData[1],prevData[2],prevData[0],prevData[3],prevData[4],prevData[5],prevData[6],prevData[7],prevData[8],prevData[9],prevData[10],prevData[11],prevData[12]);
+		createSettingsFile(prevData[1],prevData[2],prevData[0],prevData[3],prevData[4],prevData[5],prevData[6],prevData[7],prevData[8],prevData[9],prevData[10],prevData[11],prevData[12],
+				prevData[13],prevData[14],prevData[15],prevData[16],prevData[17],prevData[18]);
 	}
 	
 	/**
@@ -677,10 +709,11 @@ class JunitTestCases {
 	@Test
 	void testReadSettingsElevators() {
 		int[] prevData = readSettingsFile();
-		createSettingsFile(10,5,15,3,1,2,3,4,5,6,7,8,9);
+		createSettingsFile(10,5,15,3,1, 1,2,3,4,5,6,7,8,9,10,11,12,13,14);
 		int[] newData = readSettingsFile();
 		assertEquals(newData[0], 15);
-		createSettingsFile(prevData[1],prevData[2],prevData[0],prevData[3],prevData[4],prevData[5],prevData[6],prevData[7],prevData[8],prevData[9],prevData[10],prevData[11],prevData[12]);
+		createSettingsFile(prevData[1],prevData[2],prevData[0],prevData[3],prevData[4],prevData[5],prevData[6],prevData[7],prevData[8],prevData[9],prevData[10],prevData[11],prevData[12],
+				prevData[13],prevData[14],prevData[15],prevData[16],prevData[17],prevData[18]);
 	}
 	
 	/**
@@ -689,10 +722,11 @@ class JunitTestCases {
 	@Test
 	void testReadSettingsSpeed() {
 		int[] prevData = readSettingsFile();
-		createSettingsFile(10,5,15,3,1,2,3,4,5,6,7,8,9);
+		createSettingsFile(10,5,15,3,1, 1,2,3,4,5,6,7,8,9,10,11,12,13,14);
 		int[] newData = readSettingsFile();
 		assertEquals(newData[3], 3);
-		createSettingsFile(prevData[1],prevData[2],prevData[0],prevData[3],prevData[4],prevData[5],prevData[6],prevData[7],prevData[8],prevData[9],prevData[10],prevData[11],prevData[12]);
+		createSettingsFile(prevData[1],prevData[2],prevData[0],prevData[3],prevData[4],prevData[5],prevData[6],prevData[7],prevData[8],prevData[9],prevData[10],prevData[11],prevData[12],
+				prevData[13],prevData[14],prevData[15],prevData[16],prevData[17],prevData[18]);
 	}
 	
 	/**
@@ -840,6 +874,12 @@ class JunitTestCases {
 	@Test
 	void testFloorNotRescheduled() {
 		GUI.elevatorPanels[15].buttons[20].doClick();
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		GUI.elevatorPanels[15].faultButton.doClick();
 		try {
 			Thread.sleep(1000);
@@ -862,30 +902,6 @@ class JunitTestCases {
 			}
 		}
 		assertFalse(flag);
-	}
-	
-	/**
-	 * test elevator up state
-	 */
-	@Test
-	void testUpState() {
-		
-	}
-	
-	/**
-	 * test elevator down state
-	 */
-	@Test
-	void testDownState() {
-		
-	}
-	
-	/**
-	 * test elevator idle state
-	 */
-	@Test 
-	void testIdleState() {
-		
 	}
 	
 	/**
@@ -1575,6 +1591,12 @@ class JunitTestCases {
 	 */
 	@Test
 	void testSchedulerHoldsDownState() {
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		GUI.elevatorPanels[8].buttons[3].doClick();
 		try {
 			Thread.sleep(6*floorTiming);
@@ -1657,53 +1679,6 @@ class JunitTestCases {
 		assertTrue(gui.getScheduler().elevtStates[12].isStuck);
 	}
 	
-	/**
-	 * test scheduler elevator message queue
-	 */
-	@Test
-	void testSchedulerElevMessageQueue() {
-		try {
-			Scheduler scheduler = new Scheduler(3,4,true);
-			byte[] data = Common.encodeFloor(1, false);
-			scheduler.floorSubAddMsg(data);
-			int[] msg = Common.decode(scheduler.msgToElevtSub.poll());
-			boolean flag = false;
-			for(int i = 0; i < 19; i++) {
-				int closestElev = i;
-				data = Common.encodeScheduler(closestElev, 1,0);
-				int[] msg2 = Common.decode(data);
-				if(msg[0] == msg2[0] && msg[1] == msg2[1] && msg[2] == msg2[2]) {
-					flag = true;
-				}
-			}
-			assertTrue(flag);
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-	
-	/**
-	 * test scheduler floor message queue
-	 */
-	@Test 
-	void testSchedulerFloorMessageQueue() {
-		try {
-			Scheduler scheduler = new Scheduler(3,4,true);
-			byte[] data = Common.encodeElevator(1, 10,new Idle(), 10);
-			scheduler.elevtSubAddMsg(data);
-			data = Common.encodeScheduler(1, 10,0);
-			int[] decodedData = Common.decode(data);
-			int[] decodedMsg = Common.decode(scheduler.msgToFloorSub.poll());
-			assertEquals(decodedData[0],decodedMsg[0]);
-			assertEquals(decodedData[1],decodedMsg[1]);
-			assertEquals(decodedData[2],decodedMsg[2]);
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-	
 	
 	/**
 	 * test elevator subsystem message queue for elevators
@@ -1711,7 +1686,7 @@ class JunitTestCases {
 	@Test 
 	void testElevatorSubMessageQueueElev() {
 		try {
-			ElevatorSubsystem elevSub = new ElevatorSubsystem(5,false,true);
+			ElevatorSubsystem elevSub = new ElevatorSubsystem(false,true);
 			byte[] data = Common.encodeScheduler(1, 1, 1);
 			elevSub.initElevatorsBuffer(1);
 			elevSub.initElevatorsBuffer(2);
@@ -1730,7 +1705,7 @@ class JunitTestCases {
 	@Test 
 	void testElevatorSubMessageQueueScheduler() {
 		try {
-			ElevatorSubsystem elevSub = new ElevatorSubsystem(5,false,true);
+			ElevatorSubsystem elevSub = new ElevatorSubsystem(false,true);
 			byte[] data = Common.encodeElevator(1, 1, new Idle(), 1);
 			elevSub.sendToScheduler(data);
 			assertEquals(data,elevSub.getMsgScheduler());
@@ -1746,7 +1721,7 @@ class JunitTestCases {
 	@Test
 	void testElevatorSubMessageQueueDeletesScheduler() {
 		try {
-			ElevatorSubsystem elevSub = new ElevatorSubsystem(5,false,true);
+			ElevatorSubsystem elevSub = new ElevatorSubsystem(false,true);
 			byte[] data = Common.encodeElevator(1, 1, new Idle(), 1);
 			elevSub.sendToScheduler(data);
 			assertEquals(data,elevSub.getMsgScheduler());
@@ -1763,7 +1738,7 @@ class JunitTestCases {
 	@Test
 	void testElevatorSubMessageQueueDeletesElevator() {
 		try {
-			ElevatorSubsystem elevSub = new ElevatorSubsystem(5,false,true);
+			ElevatorSubsystem elevSub = new ElevatorSubsystem(false,true);
 			byte[] data = Common.encodeScheduler(1, 1, 1);
 			elevSub.initElevatorsBuffer(1);
 			elevSub.initElevatorsBuffer(2);
@@ -1782,7 +1757,7 @@ class JunitTestCases {
 	@Test
 	void testElevatorSubMessageQueueElevatorProperQueue() {
 		try {
-			ElevatorSubsystem elevSub = new ElevatorSubsystem(5,false,true);
+			ElevatorSubsystem elevSub = new ElevatorSubsystem(false,true);
 			byte[] data = Common.encodeScheduler(1, 1, 1);
 			elevSub.initElevatorsBuffer(1);
 			elevSub.initElevatorsBuffer(2);
