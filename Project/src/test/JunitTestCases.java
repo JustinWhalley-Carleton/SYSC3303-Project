@@ -996,7 +996,7 @@ class JunitTestCases {
 		int[] settings = readSettingsFile();
 		assertEquals(settings[2],gui.getFloor().floors.length);
 	}
-	
+
 	/**
 	 * test elevator receive message
 	 */
@@ -1039,7 +1039,7 @@ class JunitTestCases {
 		}
 		assertFalse(gui.getFloor().floors[8].buttonUpOn());
 	}
-	
+
 	/**
 	 * test elev button changes color when clicked
 	 */
