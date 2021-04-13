@@ -1,7 +1,6 @@
 package GUI;
 
 import java.awt.*;
-import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.net.InetAddress;
@@ -10,11 +9,8 @@ import java.util.Scanner;
 import javax.swing.*;
 import javax.swing.border.CompoundBorder;
 import javax.swing.plaf.basic.BasicArrowButton;
-
-import ElevatorSubsystem.Elevator;
 import ElevatorSubsystem.ElevatorSubsystem;
 import FloorSubsystem.FloorSubSystem;
-import FloorSubsystem.GUIFileLoader;
 import Scheduler.Scheduler;
 import common.Common;
 import common.RPC;
@@ -45,9 +41,9 @@ public class GUI extends JFrame{
 	private static int SCHEDULER_RECV_GUI_PORT;
 	private static int GUI_RECV_SCHEDULER_PORT;
 	// Command Bridges
-	private CommandBridge commandBridge_fault;
-	private CommandBridge commandBridge_floor;
-	private CommandBridge commandBridge_button;
+	private final CommandBridge commandBridge_fault;
+	private final CommandBridge commandBridge_floor;
+	private final CommandBridge commandBridge_button;
 
 	/**
 	 * constructor for GUI 
@@ -55,7 +51,6 @@ public class GUI extends JFrame{
 	public GUI(boolean show) {
 		// Read the settings file
 		getSettings();
-		GUIFileLoader.deleteFile();
 		try {
 			new Test(true).readSettings();
 		} catch (Exception e1) {

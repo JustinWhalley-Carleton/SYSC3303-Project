@@ -10,7 +10,6 @@ public class FloorSubSystem implements Runnable{
     // Constants
     private final int MIN_FLOOR;
     private final int MAX_FLOOR;
-    private byte[] requestedDir;
     public Floor[] floors;
 
     public FileLoader instructionFile;

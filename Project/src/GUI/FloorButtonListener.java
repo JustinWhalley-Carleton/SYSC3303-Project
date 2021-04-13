@@ -3,15 +3,13 @@ package GUI;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
 import javax.swing.JButton;
 
-import FloorSubsystem.GUIFileLoader;
 
 public class FloorButtonListener implements ActionListener{
-	private int floorNum;
-	private boolean up;
-	private CommandBridge commandBridge;
+	private final int floorNum;
+	private final boolean up;
+	private final CommandBridge commandBridge;
 	
 	/**
 	 * constructor for a floor button listener
