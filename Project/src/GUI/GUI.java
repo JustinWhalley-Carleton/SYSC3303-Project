@@ -11,7 +11,6 @@ import javax.swing.border.CompoundBorder;
 import javax.swing.plaf.basic.BasicArrowButton;
 import ElevatorSubsystem.ElevatorSubsystem;
 import FloorSubsystem.FloorSubSystem;
-import FloorSubsystem.GUIFileLoader;
 import Scheduler.Scheduler;
 import common.Common;
 import common.RPC;
@@ -52,7 +51,6 @@ public class GUI extends JFrame{
 	public GUI(boolean show) {
 		// Read the settings file
 		getSettings();
-		GUIFileLoader.deleteFile();
 		try {
 			new Test(true).readSettings();
 		} catch (Exception e1) {
