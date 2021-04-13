@@ -43,7 +43,7 @@ public class Elevator implements Runnable {
 	private RPC transmitter;
 	private TimerController timer, timer2;
 	private boolean testing = false;
-	private int NUM_FLOORS = Test.FLOORS;
+	private int NUM_FLOORS = Common.FLOORS;
 	private ElevatorButton[] buttons;
 	private boolean stuck=false;
 	private FileLoader fileLoader;
@@ -51,7 +51,7 @@ public class Elevator implements Runnable {
 	private boolean goingUp;
 	private FileLoader file;
 	private boolean GUIFlag;
-	public static final int floorTiming = (int) 2266/(int)Test.SPEED;
+	public static final int floorTiming = (int) 2266/(int)Common.SPEED;
 	private long moveStart;
 	private boolean doorOpen = false;
 	private long doorStart;

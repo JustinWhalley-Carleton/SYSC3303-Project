@@ -22,7 +22,7 @@ import test.Test;
 
 public class GUI extends JFrame{
 
-	private static final boolean CREATE_ALL_SUBSYSTEMS = true;
+	private static final boolean CREATE_ALL_SUBSYSTEMS = false;
 	
 	private File instructionFile = new File("src/test/settings.txt");
 	private static int ROWS;
@@ -121,7 +121,6 @@ public class GUI extends JFrame{
 	       			int[] decodedMsg = Common.decode(msg);
 	       			if(decodedMsg.length == 3) {
 	       				elevatorPanels[decodedMsg[0]-1].personIn();
-	       				System.out.println(decodedMsg[2]);
 	       				if(decodedMsg[2]==1) {
 	       					upButtons[decodedMsg[1]-1].setEnabled(true);
 	       				} else {
@@ -129,7 +128,6 @@ public class GUI extends JFrame{
 	       				}
 	       			} else if(Common.findType(msg) == Common.TYPE.ELEV_ERROR) {
 	       				if(Common.ELEV_ERROR.decode(msg)== Common.ELEV_ERROR.RECOVER) {
-	       					System.out.println("Trying to recover");
 	       					elevatorPanels[decodedMsg[0]-1].update(decodedMsg[1],decodedMsg[3],"Recovered");
 	       					TextManager.print("Elevator "+decodedMsg[0]+" recovered from fault");
 	       				} else {
@@ -137,7 +135,6 @@ public class GUI extends JFrame{
 	       				}
 	       			} else if (Common.findType(msg) != Common.TYPE.CONFIRMATION) {
 		       			String state;
-		       			System.out.println("DECODED: "+ decodedMsg[0] + " " + decodedMsg[1] + " " + decodedMsg[2] + " " + decodedMsg[3]);
 		       			if(decodedMsg[2] == 1) {
 		       				state = "Up";
 		       			} else if (decodedMsg[2]==0) {
