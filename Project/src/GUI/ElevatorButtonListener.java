@@ -3,10 +3,8 @@ package GUI;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
 import javax.swing.JButton;
 
-import FloorSubsystem.GUIFileLoader;
 
 public class ElevatorButtonListener implements ActionListener{
 	private int floorNum;

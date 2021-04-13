@@ -4,7 +4,6 @@
 package common;
 
 import ElevatorSubsystem.*;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.time.LocalTime;

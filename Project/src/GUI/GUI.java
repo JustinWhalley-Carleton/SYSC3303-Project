@@ -1,7 +1,6 @@
 package GUI;
 
 import java.awt.*;
-import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.net.InetAddress;
@@ -10,8 +9,6 @@ import java.util.Scanner;
 import javax.swing.*;
 import javax.swing.border.CompoundBorder;
 import javax.swing.plaf.basic.BasicArrowButton;
-
-import ElevatorSubsystem.Elevator;
 import ElevatorSubsystem.ElevatorSubsystem;
 import FloorSubsystem.FloorSubSystem;
 import FloorSubsystem.GUIFileLoader;
